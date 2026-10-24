@@ -5184,7 +5184,7 @@ LOC_KRIS.forEach(e => { if (e[0] === '2026-10-22T20:20') e[1] = 'itaewon'; });
 {
   const t = 'find my bilang itaewon. "ada urusan" katanya. oh, urusannya di itaewon. kantornya kan di yeouido. gue tutup appnya. gue buka lagi. masih itaewon';
   ALT.forEach(a => { if (a[0] === '2026-10-22T21:00') a[1] = t; });
-  X_POSTS.forEach(p => { if (p[1] === 'alt' && p[2] === '2026-10-22T21:00') p[3] = t; if (p[0] === 'y2') p[3] = 'ga direncanain tapi malem ini seru bgt ✨ itaewon at night hits different'; });
+  X_POSTS.forEach(p => { if (p[1] === 'alt' && p[2] === '2026-10-22T21:00') p[3] = t; if (p[0] === 'y2') p[3] = 'malem ini seru ✨ itaewon at night hits different'; });
 }
 
 // janjian dinner tower B (kamis 22, jam 7, unit surya) — diajak dari tgl 20, kris ngegantung
