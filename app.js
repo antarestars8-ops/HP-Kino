@@ -291,12 +291,12 @@ const FIGHT_LOCK = new Date('2026-10-24T14:08');
 // telpon berantem udah diangkat duluan: spam chat Kris sesudahnya (sampe jam telpon aslinya) ga dimunculin
 S.fightAns = store.get('fightAns', 0);
 const afterFightAns = (c, it) => S.fightAns && c.id === 'kris' && !it.x && ((it.ts.getTime() > S.fightAns && it.ts.getTime() <= new Date(FIGHT_AT).getTime()) || (it.o && it.o.afterFight && !it.o.fightLog && it.ts.getTime() < S.fightAns)); // diangkat telat: naskah sesudah-berantem yg jamnya sebelum diangkat ga dimunculin
-// log "Panggilan suara" berantem: jam & durasinya ngikutin telpon beneran. ga pernah diangkat = tak terjawab
+// log "Panggilan suara" berantem: jam diangkat & durasinya ngikutin telpon beneran. save lama yg ga pernah diangkat = tak terjawab
 S.fightEnd = store.get('fightEnd', 0);
 function fixFightLog() {
   const c = CHATS.find(x => x.id === 'kris'), it = c.items.find(i => i.o && i.o.afterFight && i.o.call && /^Panggilan suara/.test(i.o.call)); if (!it) return;
   it.o.fightLog = true;
-  if (S.fightAns && S.fightEnd > S.fightAns) { const sec = Math.round((S.fightEnd - S.fightAns) / 1000); it.ts = new Date(S.fightEnd); it.o.call = `Panggilan suara ${pad(Math.floor(sec / 60))}:${pad(sec % 60)}`; }
+  if (S.fightAns && S.fightEnd > S.fightAns) { const sec = Math.round((S.fightEnd - S.fightAns) / 1000); it.ts = new Date(S.fightAns); it.o.call = `Panggilan suara ${pad(Math.floor(sec / 60))}:${pad(sec % 60)}`; }
   else if (S.fightDone && !S.fightAns) it.o.call = 'Panggilan tak terjawab';
   sortItems(c);
 }
@@ -1404,11 +1404,13 @@ let fightGap = 0; // jeda abis ditolak sebelum nelpon lagi
 function maybeFight() {
   if (fightRinging && !document.querySelector('.call') && Date.now() > fightGap) fightRinging = false; // layar telfonnya ketutup/kebuang tanpa diangkat/ditolak: bunyiin lagi, jangan nyangkut
   if (S.fightDone || fightRinging || !visible(new Date(FIGHT_AT))) return;
-  // ga diangkat 20 menit / sampe prod up 17.25 (atau baru buka HP sesudahnya): telponnya kelewat, cerita jalan terus
+  // ga diangkat sampe 14.27 (atau baru buka HP sesudahnya): Kris berhenti nelpon, cerita jalan terus
   if (fightOver()) {
     S.fightDone = true; store.set('fightDone', true);
-    if (!S.callLog.some(c => c.fight)) { S.callLog.push({ who: 'Kris', t: new Date(FIGHT_AT).getTime(), out: false, missed: true, fight: true, lines: FIGHT_CALL.map(l => [l[0], l[1]]) }); S.callLog.sort((a, b) => b.t - a.t); store.set('callLog', S.callLog); }
-    fixFightLog(); // log 14.09 jadi tak terjawab
+    // tetep dianggep diangkat jam 14.27 (Kino akhirnya ngangkat di pantry): log & riwayat "diterima", bisa diputer ulang dari Telepon
+    if (!S.fightAns) { S.fightAns = FIGHT_GIVEUP.getTime(); S.fightEnd = S.fightAns + FIGHT_AUTO_SEC * 1000; store.set('fightAns', S.fightAns); store.set('fightEnd', S.fightEnd); }
+    if (!S.callLog.some(c => c.fight && !c.missed)) { S.callLog.push({ who: 'Kris', t: S.fightAns, out: false, missed: false, fight: true, lines: FIGHT_CALL.map(l => [l[0], l[1]]) }); S.callLog.sort((a, b) => b.t - a.t); store.set('callLog', S.callLog); }
+    fixFightLog();
     refreshUnder(); return;
   }
   if (document.querySelector('.intro')) return; // masih di layar "Mulai"
@@ -1420,10 +1422,10 @@ const FIGHT_DECLINE = [['kino', 'please'], ['aku tau kamu liat hp'], ['kasih aku
 // abis itu muter terus, sampe diangkat. makin kacau
 const FIGHT_DECLINE_LOOP = [['delapan tahun kino', 'jangan selesai kayak gini'], ['yuna itu', 'nggak.', 'aku salah. udah itu aja'], ['aku ga bisa mikir apa2', 'dari tadi cuma liatin hp'], ['bilang aku brengsek juga gpp', 'asal kamu ngomong'], ['kino'], ['aku jelasin semuanya. ga ada yg aku tutupin lagi'], ['kamu udah makan?', 'maaf. aku ga tau mau ngomong apa lagi'], ['satu kali aja'], ['kamu mau blok aku juga aku ngerti', 'tapi jangan dulu'], ['kino sayang', 'maaf', 'maaf maaf maaf'], ['ini aku. kris', 'masih aku'], ['aku ga tidur semalem', 'iya aku tau itu bukan alesan'], ['tolong'], ['kamu pernah bilang', '"kalo berantem jangan tidur sebelum baikan"', 'aku masih pegang itu'], ['aku nangis kayak orang bego'], ['...'], ['aku mau ke tempat kamu', 'nggak. nanti kamu makin marah', 'angkat aja please'], ['kino please please'], ['aku ga minta dimaafin sekarang', 'aku cuma mau denger suara kamu'], ['jangan pergi']];
 let fightDeclines = 0;
-// Kris nyerah 20 menit sejak telpon pertama bunyi (paling telat prod up 17.25): telponnya kelewat, cerita jalan terus
-const FIGHT_MAX = new Date('2026-10-24T17:25'), FIGHT_WINDOW = 20 * 60000;
-const fightGiveUp = () => { const f = store.get('fightFirst', 0); return f ? Math.min(FIGHT_MAX.getTime(), f + FIGHT_WINDOW) : FIGHT_MAX.getTime(); };
-const fightOver = () => now().getTime() >= fightGiveUp();
+// Kris nyerah 14.27 (~20 menit sejak telpon pertama, sebelum Kino balik dari pantry 14.31): telponnya kelewat, cerita jalan terus
+const FIGHT_GIVEUP = new Date('2026-10-24T14:27');
+const fightOver = () => now() >= FIGHT_GIVEUP;
+const FIGHT_AUTO_SEC = 3 * 60 + 41; // durasi telpon kalo diangkatnya "di luar layar" jam 14.27: kelar 14.30, Kino balik ke ruangan 14.31
 // jeda sebelum nelpon lagi: awalnya beruntun, lama2 makin jarang (biar ga ratusan telpon kalo HP dibiarin), tapi ga pernah berhenti
 const fightRedialMs = () => fightDeclines <= 20 ? 3000 : Math.min(90000, 3000 + (fightDeclines - 20) * 6000);
 // diangkat: chat mohon2 yg masih antri (dijadwalin beberapa detik ke depan) dibatalin, biar Kris ga spam pas lagi ngobrol
@@ -1434,10 +1436,10 @@ function dropQueuedPleas() {
 }
 function fightCall(autoMiss = 0) {
   if (fightRinging || S.fightDone || fightOver()) return;
-  fightRinging = true; if (!store.get('fightFirst', 0)) store.set('fightFirst', now().getTime());
+  fightRinging = true;
   callScreen({ who: 'Kris', dir: 'in', lines: FIGHT_CALL, onAnswer: () => { if (!S.fightAns) { S.fightAns = now().getTime(); store.set('fightAns', S.fightAns); } dropQueuedPleas(); },
     onEnd: () => { fightRinging = false; S.fightDone = true; store.set('fightDone', true); S.fightEnd = now().getTime(); store.set('fightEnd', S.fightEnd); fixFightLog(); refreshUnder(); },
-    onDecline: () => { // ditolak: Kris ga nyerah, missed call numpuk + chat, nelpon lagi sampe diangkat (makin lama makin jarang) atau Kris nyerah (fightGiveUp)
+    onDecline: () => { // ditolak: Kris ga nyerah, missed call numpuk + chat, nelpon lagi sampe diangkat (makin lama makin jarang) atau Kris nyerah 14.27
       const queued = S.extra.filter(x => x.chat === 'kris').reduce((m, x) => Math.max(m, x.t), 0) - now().getTime(); // chat batch sebelumnya belum abis masuk: antri di belakangnya, jangan nyampur
       addMsg('kris', [['them', '', { call: 'Panggilan tak terjawab', quiet: true }], ...(FIGHT_DECLINE[fightDeclines] || FIGHT_DECLINE_LOOP[(fightDeclines - FIGHT_DECLINE.length) % FIGHT_DECLINE_LOOP.length]).map(x => ['them', x])], Math.max(300, queued + 1500)); fightDeclines++;
       const gap = fightRedialMs(); fightGap = Date.now() + gap + 500; setTimeout(() => { fightRinging = false; if (!S.fightDone && !fightOver() && !store.get('ending', null) && !document.querySelector('.call')) fightCall(); }, gap);
