@@ -1,9 +1,9 @@
 // ===== HP Kino — bahasa =====
 // Teks asli (Indonesia) tetap jadi kunci; tiap teks yg nongol di layar diganti terjemahannya kalau ada.
 // Kamus per bahasa ada di i18n/<lang>.js, cuma dimuat kalau bahasa itu yg dipilih.
-const LANGS = [['id', '🇮🇩', 'Indonesia'], ['en', '🇬🇧', 'English'], ['ko', '🇰🇷', '한국어'], ['zh', '🇨🇳', '中文']];
+const LANGS = [['id', '🇮🇩', 'Indonesia'], ['en', '🇬🇧', 'English'], ['ko', '🇰🇷', '한국어']];
 const LANG = (() => { try { const l = JSON.parse(localStorage.getItem('hpkino:lang') || 'null'); return LANGS.some(x => x[0] === l) ? l : null; } catch (e) { return null; } })();
-const I18N_ON = false; // fitur bahasa disembunyiin dulu (masih dirapihin)
+const I18N_ON = true; // zh belum, makanya ga ada di LANGS
 const L = I18N_ON ? (LANG || 'id') : 'id';
 if (L !== 'id') document.write(`<script src="i18n/${L}.js"><\/script>`);
 document.documentElement.lang = L;
