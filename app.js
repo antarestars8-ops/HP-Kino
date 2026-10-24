@@ -600,7 +600,7 @@ function intro() {
     <div class="disc">Fan fiction. Semua nama, chat & kejadian rekaan.<br>cr. stayroom ai & antarestars</div>
   </div>`);
   el.querySelectorAll('.langs button').forEach(b => b.onclick = () => { if (b.dataset.l !== L || !LANG) setLang(b.dataset.l); });
-  el.querySelector('.cta').onclick = () => { if (!LANG) { try { localStorage.setItem('hpkino:lang', JSON.stringify(L)); } catch (e) {} } lock(); };
+  el.querySelector('.cta').onclick = () => { if (!LANG) { try { localStorage.setItem('hpkino:lang', JSON.stringify(L)); } catch (e) {} } if (window.__kadoPending) { const f = window.__kadoPending; window.__kadoPending = null; f(); } else lock(); };
   wirePwa(el);
   const fb = el.querySelector('.fullbtn'), fsync = () => { fb.textContent = `⛶ Layar penuh · ${isFull() ? 'nyala' : 'mati'}`; };
   if (canFull()) { fb.style.display = ''; fsync(); fb.onclick = () => { setFull(!isFull()); fsync(); }; }
@@ -2382,17 +2382,19 @@ function fit() {
 if (window.visualViewport) visualViewport.addEventListener('resize', fit);
 addEventListener('resize', fit); fit();
 // buat ngecek ending: ?lihat=maafin (ending) / ?lihat=maafin&epilog (narasi epilog → tombol HP seminggu kemudian). pake tab private biar progres asli ga ketimpa
-if (!window.__kadoGo) { const lk = DEV && new URLSearchParams(location.search).get('lihat'); if (lk && ENDINGS[lk] && !EPI) { S.unlocked = true; S.fightDone = true; store.set('fightDone', true); home(); setTimeout(() => ending(lk, new URLSearchParams(location.search).has('epilog')), 300); } else if (EPI) epiEnter(); else if (store.get('resume', false)) { try { localStorage.removeItem('hpkino:resume'); } catch (e) {} S.unlocked = true; home(); } else if (store.get('backToCard', null) && ENDINGS[store.get('backToCard', null)]) { const k = store.get('backToCard', null); try { localStorage.removeItem('hpkino:backToCard'); } catch (e) {} S.unlocked = true; home(); setTimeout(() => ending(k, false, true), 200); } else if (store.get('pickAgain', false)) { try { localStorage.removeItem('hpkino:pickAgain'); } catch (e) {} S.unlocked = true; home(); setTimeout(pickAgain, 300); } else if (store.get('resumeLock', false)) { try { localStorage.removeItem('hpkino:resumeLock'); } catch (e) {} lock(); } else intro(); }
+if (!window.__kadoGo) { const lk = DEV && new URLSearchParams(location.search).get('lihat'); if (lk && ENDINGS[lk] && !EPI) { S.unlocked = true; S.fightDone = true; store.set('fightDone', true); home(); setTimeout(() => ending(lk, new URLSearchParams(location.search).has('epilog')), 300); } else if (EPI) epiEnter(); else if (store.get('resume', false) && !(!LANG && store.get('kadoToast', null) === true)) { try { localStorage.removeItem('hpkino:resume'); } catch (e) {} S.unlocked = true; home(); } else if (store.get('backToCard', null) && ENDINGS[store.get('backToCard', null)]) { const k = store.get('backToCard', null); try { localStorage.removeItem('hpkino:backToCard'); } catch (e) {} S.unlocked = true; home(); setTimeout(() => ending(k, false, true), 200); } else if (store.get('pickAgain', false)) { try { localStorage.removeItem('hpkino:pickAgain'); } catch (e) {} S.unlocked = true; home(); setTimeout(pickAgain, 300); } else if (store.get('resumeLock', false)) { try { localStorage.removeItem('hpkino:resumeLock'); } catch (e) {} lock(); } else intro(); }
 
 // abis pake kode hadiah: kasih tau
-{ const k = !window.__kadoGo && store.get('kadoToast', null); if (k) { try { localStorage.removeItem('hpkino:kadoToast'); } catch (e) {} const kt = () => toast({ icon: ICONS.notes, title: '🎁 hadiah dari antarestars', ms: 6000,
+{ const k = !window.__kadoGo && store.get('kadoToast', null); const waitIntro = k === true && !!document.querySelector('.intro'); if (k && !waitIntro) { try { localStorage.removeItem('hpkino:kadoToast'); } catch (e) {} } if (k) { const kt = () => toast({ icon: ICONS.notes, title: '🎁 hadiah dari antarestars', ms: 6000,
   body: k === true ? 'jam di HP Kino dimajuin ke 25 Okt 22.00. HP seminggu kemudian udah kebuka' : k === 'udah' ? 'udah lewat jam 10 malem kok, langsung aja ke epilog' : k === 'belum' ? 'kodenya baru bisa dipake mulai 25 Oktober' : 'kodenya ga ada 🥲' });
-  if (k !== true) setTimeout(kt, 1500);
-  else setTimeout(() => { // layar item dulu biar kerasa lompat waktunya (kayak "seminggu kemudian")
+  const jump = () => setTimeout(() => { // layar item dulu biar kerasa lompat waktunya (kayak "seminggu kemudian")
     const el = h(`<div class="faint" data-nostatus="1" data-modal="1"><p>25 Oktober, 22.00.</p><p class="s" style="color:#d1d1d6;font-size:15px;margin-top:16px;animation-delay:1.2s">hari ulang tahun Kino, udah malem.</p><p class="s2" style="color:#8e8e93;font-size:13px;margin-top:8px;animation-delay:2s">chat seharian udah masuk semua.</p></div>`);
     const go = () => { if (!el.isConnected) return; el.remove(); syncChrome(); setTimeout(kt, 600); };
     el.onclick = go; push(el); setTimeout(go, 5500);
-  }, 300); } }
+  }, 300);
+  if (k !== true) setTimeout(kt, 1500);
+  else if (!waitIntro) jump();
+  else window.__kadoPending = () => { try { localStorage.removeItem('hpkino:kadoToast'); localStorage.removeItem('hpkino:resume'); } catch (e) {} S.unlocked = true; home(); jump(); }; } }
 
 // ---------- afk ≥ 1 jam → muat ulang (biar dapet cerita terbaru + versi terbaru) ----------
 {
