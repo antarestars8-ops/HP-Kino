@@ -338,6 +338,8 @@ _Cara edit: jangan hapus tanda [..] di depan paragraf. Ganti teks di belakangnya
 
 [jeda 11] "Bosen bisa kita urus berdua. Tapi percaya..." Ia menelan ludah. "Itu aku harus bangun lagi sendiri dulu. Dan aku nggak bisa ngelakuinnya sambil liat kamu tiap hari di lift."
 
+"Kamu jalan sama siapa aja juga aku nggak masalah," lanjutnya, lebih pelan. "Yang bikin sakit, aku tahunya dari orang lain. Ditanya 'ikut nonton nggak?', 'ikut ramen nggak?', dan aku nggak tahu apa-apa."
+
 [jeda 12] "Berapa lama?" Suara Kris nyaris tidak terdengar.
 
 [jeda 13] "Nggak tahu."
@@ -590,6 +592,8 @@ _Cara edit: jangan hapus tanda [..] di depan paragraf. Ganti teks di belakangnya
 
 [turun 19] "Bosen aku ngerti, Kris. Tapi kamu bohong. Tiap hari. Dan aku nggak tahu caranya percaya lagi tanpa ngecek Find My tiap jam."
 
+"Kamu jalan sama orang lain, aku nggak peduli. Yang aku peduliin, aku ditanya 'ikut ramen nggak?' sama orang lain, dan aku nggak tahu apa-apa. Delapan tahun, dan aku jadi orang terakhir yang tahu kamu di mana."
+
 [turun 20] Kris tidak membantah. Ia hanya menunduk.
 
 [turun 21] "Aku juga punya yang nggak aku bilang," kata Kino. Kalimat itu keluar sebelum ia sempat memutuskan mau mengatakannya atau tidak.
@@ -813,6 +817,8 @@ _Cara edit: jangan hapus tanda [..] di depan paragraf. Ganti teks di belakangnya
 [waktu 10] Di kepalanya, telepon tadi masih berputar. Suara Kris yang pecah. Kalimat "Aku pengen jadi orang yang sama, yang lebih baik." Kino percaya Kris sungguh-sungguh. Itu yang membuatnya lebih sakit.
 
 [waktu 11] Karena ternyata sungguh-sungguh saja tidak cukup. Delapan tahun ia sungguh-sungguh, dengan caranya sendiri, dan Kris tetap pergi mencari bukti di tempat lain. Mungkin mereka berdua sama-sama sungguh-sungguh, hanya saja dalam bahasa yang berbeda, dan tidak ada yang pernah repot-repot belajar bahasa yang satunya.
+
+Ia tidak pernah marah karena Kris pergi dengan orang lain. Ia marah karena tahu dari orang yang bertanya "ikut nonton nggak?", "ikut ramen nggak?", sementara ia sendiri tidak tahu apa-apa. Seminggu ia jadi orang asing di hidup pacarnya sendiri.
 
 [waktu 12] Bosannya bisa ia maafkan. Bohongnya juga, mungkin, suatu hari nanti. Tapi bukan malam ini. Malam ini ia hanya ingin menutup sesuatu dengan tangannya sendiri, sebelum ada orang lain yang menutupnya untuk dia.
 

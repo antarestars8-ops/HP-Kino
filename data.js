@@ -5453,6 +5453,10 @@ X_KRIS_LIKES.push(['y0', '2026-10-16T18:52']);
 // maafin: Kino bukan marah karena Kris jalan sama orang lain, tapi karena dia ga tau apa-apa (disisipin abis ED biar nomor paragraf di atas ga geser)
 { const L = ENDINGS.maafin.lines, i = L.findIndex(t => t.startsWith('"Capek, bilang capek.'));
   if (i >= 0) L.splice(i + 1, 0, '"Kamu mau jalan sama yang lain pun nggak apa-apa. Makan, nonton, terserah. Asal bilang dulu." Kino menggeleng pelan. "Kamu pikir aku marah karena kamu nggak ngajak aku? Enggak. Aku marah karena tiba-tiba ditanya, \'ikut nonton nggak?\' \'ikut ramen nggak?\' Tapi aku nggak tahu apa-apa."'); }
+// sama di ending lain: marahnya karena ga tau apa2, bukan karena ga diajak
+{ const L = ENDINGS.jeda.lines, i = L.findIndex(t => t.startsWith('"Bosen bisa kita urus berdua.')); if (i >= 0) L.splice(i + 1, 0, '"Kamu jalan sama siapa aja juga aku nggak masalah," lanjutnya, lebih pelan. "Yang bikin sakit, aku tahunya dari orang lain. Ditanya \'ikut nonton nggak?\', \'ikut ramen nggak?\', dan aku nggak tahu apa-apa."'); }
+{ const L = ENDINGS.turun.lines, i = L.findIndex(t => t.startsWith('"Bosen aku ngerti, Kris.')); if (i >= 0) L.splice(i + 1, 0, '"Kamu jalan sama orang lain, aku nggak peduli. Yang aku peduliin, aku ditanya \'ikut ramen nggak?\' sama orang lain, dan aku nggak tahu apa-apa. Delapan tahun, dan aku jadi orang terakhir yang tahu kamu di mana."'); }
+{ const L = ENDINGS.waktu.lines, i = L.findIndex(t => t.startsWith('Karena ternyata sungguh-sungguh saja tidak cukup.')); if (i >= 0) L.splice(i + 1, 0, 'Ia tidak pernah marah karena Kris pergi dengan orang lain. Ia marah karena tahu dari orang yang bertanya "ikut nonton nggak?", "ikut ramen nggak?", sementara ia sendiri tidak tahu apa-apa. Seminggu ia jadi orang asing di hidup pacarnya sendiri.'); }
 // komen/bales Kino ke postingan Kris: sesuai isi postingannya (bukan "norak wkwk" buat semua)
 const KINO_POST_LINES = {
   'ig:kris.chandra@2026-10-13T21:00': [['selamat.', 'makasih 🥹'], ['tidur sana', 'iya iya, abis ini 😅']],
