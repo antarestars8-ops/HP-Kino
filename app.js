@@ -54,9 +54,11 @@ const now = () => !EPI && !NOW_Q && tnow() + OFFSET > ULTAH_END ? new Date(ULTAH
     if (Math.abs(val - CLOCK) < 60000) return;
     try { sessionStorage.setItem('hpkino:clock', JSON.stringify({ fix: val, at: Date.now() })); } catch (e) {}
     if (NOW_Q || sessionStorage.getItem('hpkino:clockReload')) { CLOCK = val; return; }
-    try { sessionStorage.setItem('hpkino:clockReload', '1'); } catch (e) {} location.reload();
+    try { sessionStorage.setItem('hpkino:clockReload', '1'); } catch (e) {} softReload();
   } catch (e) {}
 })();
+// reload otomatis (versi baru / koreksi jam): kalau udah masuk HP, balik langsung ke home, bukan ke layar Mulai (pilih bahasa lagi)
+function softReload() { try { if (typeof S !== 'undefined' && S.unlocked) localStorage.setItem('hpkino:resume', 'true'); else if (document.querySelector('.lock')) localStorage.setItem('hpkino:resumeLock', 'true'); } catch (e) {} location.reload(); } // di layar kunci: balik ke layar kunci (kode sandi ga dilewatin)
 const BDAY = new Date('2026-10-25T00:00');
 // kode hadiah (?kado=...): ga usah nunggu ke epilog. jam HP dimajuin ke 25 Okt 22.00 (HP seminggu kemudian kebuka).
 // cuma berlaku mulai 25 Okt jam beneran, biar cerita real-time 20–24 ga bisa dilewatin. ganti/tambah kodenya di sini
@@ -205,11 +207,20 @@ function nextLine(c) { const { key, pool } = linePool(c); const used = Array.isA
 function useLine(c, line) { const { key } = linePool(c); const used = Array.isArray(S.typeN[key]) ? S.typeN[key] : []; used.push(line._i); S.typeN[key] = used; store.set('typeN', S.typeN); }
 // animasi Kino ngetik di kolom pesan, terus kirim
 // keyboard iOS boongan
-const KB_ROWS = ['qwertyuiop', 'asdfghjkl', '⇧zxcvbnm⌫'];
+const KB_ROWS = L === 'ko' ? ['ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔ', 'ㅁㄴㅇㄹㅎㅗㅓㅏㅣ', '⇧ㅋㅌㅊㅍㅠㅜㅡ⌫'] : ['qwertyuiop', 'asdfghjkl', '⇧zxcvbnm⌫']; // KO: 두벌식
+const KB_LBL = ({ en: ['space', 'send'], ko: ['스페이스', '전송'] })[L] || ['spasi', 'kirim'];
 function keyboardHTML() {
   return `<div class="kb">${KB_ROWS.map(r => `<div class="kbr">${[...r].map(k => `<span class="key ${k === '⇧' || k === '⌫' ? 'fn' : ''}" data-key="${k}">${k}</span>`).join('')}</div>`).join('')}
-    <div class="kbr"><span class="key fn wide">123</span><span class="key fn">🙂</span><span class="key space" data-key=" ">spasi</span><span class="key fn wide ret">kirim</span></div></div>`;
+    <div class="kbr"><span class="key fn wide">${L === 'ko' ? '123' : '123'}</span><span class="key fn">${L === 'ko' ? '🌐' : '🙂'}</span><span class="key space" data-key=" ">${KB_LBL[0]}</span><span class="key fn wide ret">${KB_LBL[1]}</span></div></div>`;
 }
+// huruf hangeul -> tombol 두벌식 yg dipencet (ㄲ = shift+ㄱ, ㅘ = ㅗ+ㅏ, ㄳ = ㄱ+ㅅ, dst)
+const HG = (() => {
+  const CHO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ', JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅗㅏ','ㅗㅐ','ㅗㅣ','ㅛ','ㅜ','ㅜㅓ','ㅜㅔ','ㅜㅣ','ㅠ','ㅡ','ㅡㅣ','ㅣ'];
+  const JONG = ['', 'ㄱ','ㄲ','ㄱㅅ','ㄴ','ㄴㅈ','ㄴㅎ','ㄷ','ㄹ','ㄹㄱ','ㄹㅁ','ㄹㅂ','ㄹㅅ','ㄹㅌ','ㄹㅍ','ㄹㅎ','ㅁ','ㅂ','ㅂㅅ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  const base = { 'ㄲ': 'ㄱ', 'ㄸ': 'ㄷ', 'ㅃ': 'ㅂ', 'ㅆ': 'ㅅ', 'ㅉ': 'ㅈ', 'ㅒ': 'ㅐ', 'ㅖ': 'ㅔ' };
+  return (ch) => { const c = ch.charCodeAt(0) - 0xAC00; if (c < 0 || c > 11171) return null;
+    return [...(CHO[Math.floor(c / 588)] + JUNG[Math.floor(c % 588 / 28)] + JONG[c % 28])].map(j => base[j] || j); };
+})();
 // klik keyboard: pake aud/keyclick.mp3 kalau ada (didecode biar ga delay), kalau gak ada pake "tok" sintetis
 let keyBuf = null, keyBufTried = false, noiseBuf = null;
 function loadKeyBuf() {
@@ -242,14 +253,15 @@ function typeOut(el, text, done) {
   el.classList.add('kb-open');
   const body = el.querySelector('.body'); setTimeout(() => body.scrollTop = body.scrollHeight, 260);
   let k = 0; const shown = tr(text), ops = typoOps(text, shown);
-  const flash = (ch) => { const key = /^[a-z0-9 ⌫]$/i.test(ch) ? kb.querySelector(`[data-key="${ch === ' ' ? ' ' : ch.toLowerCase()}"]`) : null; if (key) { key.classList.add('down'); setTimeout(() => key.classList.remove('down'), 110); } };
+  const press = (ch) => { const key = kb.querySelector(`[data-key="${ch === ' ' ? ' ' : ch.toLowerCase()}"]`); if (key) { key.classList.add('down'); setTimeout(() => key.classList.remove('down'), 110); } };
+  const flash = (ch) => { const jm = HG(ch); if (jm) jm.forEach((j, i) => setTimeout(() => press(j), i * 70)); else if (/^[a-z0-9 ⌫]$/i.test(ch)) press(ch); };
   const step = () => {
     if (!el.isConnected) return;
     if (k < ops.length) {
       const op = ops[k++];
       if (op === -1) { inp.value = inp.value.slice(0, -1); flash('⌫'); keyClick(false); return setTimeout(step, ops[k] === -1 ? 95 + Math.random() * 50 : 380); } // hapus
       if (op === 0) return setTimeout(step, 420 + Math.random() * 200); // sadar salah ketik, diem bentar
-      inp.value += op; snd.classList.add('on'); flash(op); keyClick(op === ' '); setTimeout(step, op === ' ' ? 140 : 75 + Math.random() * 90); return;
+      inp.value += op; snd.classList.add('on'); flash(op); keyClick(op === ' '); const jm = HG(op); setTimeout(step, op === ' ' ? 140 : jm ? jm.length * 70 + 40 + Math.random() * 70 : 75 + Math.random() * 90); return;
     }
     setTimeout(() => {
       const ret = kb.querySelector('.ret'); ret.classList.add('down'); keyClick(true); snd.classList.add('press');
@@ -511,7 +523,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 // versi baru udah aktif → muat ulang sekali biar langsung pake (jangan pas lagi telfon / narasi ending; kalo lagi, tunggu sampe app dibuka lagi)
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
   let swNew = false;
-  const swReload = () => { if (swNew && !document.querySelector('.call, .ending, .finale')) { swNew = false; location.reload(); } };
+  const swReload = () => { if (swNew && !document.querySelector('.call, .ending, .finale')) { swNew = false; softReload(); } };
   navigator.serviceWorker.addEventListener('controllerchange', () => { swNew = true; swReload(); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) swReload(); });
 }
@@ -843,7 +855,7 @@ function xDetail(id) {
   const add = (u, t) => { socPush(key, u, t); if (!el.isConnected) return; body.insertAdjacentHTML('beforeend', xCard([id + 'k' + (S.soc[key].length - 1), u, now().toISOString(), t, '', [], 0])); wireX(el);
     const rc = el.querySelector('.xpost.big .xa span'); if (rc) rc.innerHTML = XI.rep + (reps.length + S.soc[key].length); body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' }); };
   const sync = wireTypeBar(el, 'Ketuk buat bales', next, (l) => { add('kino', l[0]); if (l[1]) setTimeout(() => { add(p[1], l[1]); sync(); }, 3500); });
-  if (S.xAcct !== 'kino') el.querySelector('.socin .f').placeholder = 'Akun priv: ga bisa bales di sini';
+  if (S.xAcct !== 'kino') el.querySelector('.socin .f').placeholder = tr('Akun priv: ga bisa bales di sini');
 }
 // notifikasi X: balesan & like di tweet akun yg lagi aktif (akun priv: kosong, followernya 0)
 function xNotif() {
@@ -1089,7 +1101,7 @@ function renderChat(el, c) {
   const qrHtml = r ? r.opts.map((o, i) => `<button data-o="${i}">${esc(o.me[0])}</button>`).join('') : '';
   if (qr._html !== qrHtml) { qr.innerHTML = qrHtml; qr._html = qrHtml; }
   qr.style.display = r ? '' : 'none';
-  if (!el.dataset.typing) el.querySelector('.kinput .f').placeholder = c.channel ? 'Channel ini gak bisa dibales' : r ? 'Pilih balasan di atas, atau ketuk di sini' : EPI ? 'Kino lagi gak mau ngetik apa2' : (nextScriptedMe(c) || pendingFollow(c) || pendingRandChat(c)) ? 'Ketuk buat bales' : storyBusy(c) ? 'tunggu bentar…' : (!owesAnswer(c) && nextLine(c)) ? 'Ketuk buat bales' : laterHint(c) || 'Kino lagi gak mau ngetik apa2';
+  if (!el.dataset.typing) el.querySelector('.kinput .f').placeholder = tr(c.channel ? 'Channel ini gak bisa dibales' : r ? 'Pilih balasan di atas, atau ketuk di sini' : EPI ? 'Kino lagi gak mau ngetik apa2' : (nextScriptedMe(c) || pendingFollow(c) || pendingRandChat(c)) ? 'Ketuk buat bales' : storyBusy(c) ? 'tunggu bentar…' : (!owesAnswer(c) && nextLine(c)) ? 'Ketuk buat bales' : laterHint(c) || 'Kino lagi gak mau ngetik apa2');
   qr.querySelectorAll('[data-o]').forEach(b => b.onclick = () => typeOut(el, r.opts[+b.dataset.o].me[0], () => { answer(r, +b.dataset.o); renderChat(el, c); markRead(c); }));
   el.dataset.sig = chatSig(c);
   markRead(c); wireChat(el, pr);
@@ -1757,7 +1769,7 @@ function ending(key, epiMode = false, jump = false) {
     <div class="endcard${epiMode ? ' epi' : ''}" style="animation-delay:${(epi.length ? tEnd + (epiMode ? 6.5 : 0.8) : EL ? tLock + lockLen + 0.6 : 0.8 + lines.length * step)}s">
       ${epiMode ? '' : `<div class="bd">selamat ulang tahun, kino.</div>
       <div style="color:#8e8e93;font-size:13px">${`25.10 · ${esc(toneLabel(key, tone))}`}</div>`}
-      ${epiMode ? '' : `<div class="endcol">${(() => { const seen = store.get('endingsSeen', []), keys = ['maafin', 'jeda', 'turun', 'waktu']; return `<div class="ec-t">Ending terbuka: ${keys.filter(k => seen.includes(k)).length}/4</div><div class="ec-row">${keys.map(k => `<span class="${seen.includes(k) ? 'on' : ''}">${seen.includes(k) ? esc(ENDINGS[k].title) : '???'}</span>`).join('')}</div>`; })()}</div>
+      ${epiMode ? '' : `<div class="endcol">${(() => { const seen = store.get('endingsSeen', []), keys = ['maafin', 'jeda', 'turun', 'waktu']; return `<div class="ec-t">${({ en: 'Endings unlocked', ko: '열린 엔딩' })[L] || 'Ending terbuka'}: ${keys.filter(k => seen.includes(k)).length}/4</div><div class="ec-row">${keys.map(k => `<span class="${seen.includes(k) ? 'on' : ''}">${seen.includes(k) ? esc(ENDINGS[k].title) : '???'}</span>`).join('')}</div>`; })()}</div>
       ${playlistHTML()}`}
       <div class="cr">fan fiction · semua nama & kejadian rekaan<br>cr. stayroom ai & antarestars</div>
       ${epiMode ? (EPI ? '<button class="cta epi">tutup</button><br><br><button class="cta now" style="background:transparent;color:#fff;border:1px solid #48484a">← balik ke hari ultah Kino</button>' : '<button class="cta epi">📱 buka HP Kino · seminggu kemudian</button>') : '<button class="cta bday">lanjut ke hari ulang tahun Kino →</button>' + (now() < EPI_OPEN ? '<br><br><button class="cta late" style="background:transparent;color:#fff;border:1px solid #48484a">⏩ ulang tahun Kino, tapi udah jam 10 malem</button><div style="color:#8e8e93;font-size:12px;margin-top:6px">chat seharian masuk sekaligus · HP seminggu kemudian langsung kebuka</div>' : '')}<br><br>
@@ -1909,7 +1921,7 @@ function wireTypeBar(el, ph, next, onSent) {
   const inp = el.querySelector('.socin .f');
   Object.defineProperty(inp, 'value', { get() { return this.textContent; }, set(v) { this.textContent = v; } });
   Object.defineProperty(inp, 'placeholder', { get() { return this.dataset.ph; }, set(v) { this.dataset.ph = v; } });
-  const sync = () => { if (!el.dataset.typing) inp.placeholder = next() ? ph : 'Kino lagi gak mau bales'; };
+  const sync = () => { if (!el.dataset.typing) inp.placeholder = tr(next() ? ph : 'Kino lagi gak mau bales'); };
   inp.onclick = () => { const l = next(); if (!l) return; typeOut(el, l[0], () => { onSent(l); sync(); }); };
   sync(); return sync;
 }
@@ -2130,20 +2142,20 @@ function appFind() {
   const km = pk ? kmBetween(pk, pm) : 0, dist = km < 0.1 ? 'Di dekat kamu' : `${km.toFixed(1).replace('.', ',')} km`;
   const at = (d) => (d.toDateString() === now().toDateString() ? '' : relDay(d) + ' ') + hm(d);
   const since = new Date(Math.max(new Date(ks), sh.at && sh.on ? sh.at : 0)), sinceTxt = at(since);
-  const krow = pk ? `<span>${esc(pk.n)}</span><small>${kk === 'jalan' ? 'Sekarang' : (({ en: 'Here since ', ko: '여기 있은 시각 ' })[L] || 'Di sini sejak ') + sinceTxt}</small></div><em>${dist}</em>` : `<span style="color:#8e8e93">Lokasi tidak tersedia</span><small>Berhenti berbagi lokasi dengan kamu · ${at(sh.at)}</small></div>`;
+  const krow = pk ? `<span>${esc(pk.n)}</span><small>${kk === 'jalan' ? 'Sekarang' : (({ en: 'Here since ', ko: '여기 있은 시각 ' })[L] || 'Di sini sejak ') + sinceTxt}</small></div><em>${dist}</em>` : `<span style="color:#8e8e93">Lokasi tidak tersedia</span><small>${tr('Berhenti berbagi lokasi dengan kamu')} · ${at(sh.at)}</small></div>`;
   const el = win({ cls: 'findapp', back: '', body: `${findMap(pk, pm)}
     <div class="fm-sheet"><div class="fm-grab"></div><div class="fm-h">Orang</div>
       <div class="fm-row" data-p="Kris">${av('Kris', 'rd')}<div class="rt"><b>${esc(dispName('Kris'))}</b>${krow}</div>
       <div class="fm-row">${av('Kino', 'rd')}<div class="rt"><b>Aku</b><span>${esc(pm.n)}</span><small>Berbagi dengan Kris</small></div></div>
     </div>` });
   el.querySelector('.back').style.visibility = 'hidden';
-  el.querySelector('[data-p="Kris"]').onclick = () => win({ cls: 'findapp', sub: true, back: 'Orang', title: esc(dispName('Kris')), body: `${findMap(pk, pm)}<div class="fm-sheet"><div class="fm-h">${esc(dispName('Kris'))}</div>${pk ? `<div class="fm-addr">${esc(pk.n)}<br><span>${esc(pk.a)}</span><br><span>${kk === 'jalan' ? 'Sekarang' : 'Sejak ' + sinceTxt} · ${dist}</span></div>` : `<div class="fm-addr">Lokasi tidak tersedia<br><span>${esc(dispName('Kris'))} berhenti berbagi lokasi dengan kamu.</span></div>`}<div class="list fm-acts">${pk ? '<div class="row"><div class="rt"><div class="r1" style="color:#007aff">Petunjuk Arah</div></div></div>' : '<div class="row"><div class="rt"><div class="r1" style="color:#007aff">Minta Lokasi</div></div></div>'}<div class="row"><div class="rt"><div class="r1" style="color:#007aff">Beri Tahu Saya</div></div></div><div class="row"><div class="rt"><div class="r1" style="color:#ff3b30">Berhenti Berbagi Lokasi Saya</div></div></div></div></div>` });
+  el.querySelector('[data-p="Kris"]').onclick = () => win({ cls: 'findapp', sub: true, back: 'Orang', title: esc(dispName('Kris')), body: `${findMap(pk, pm)}<div class="fm-sheet"><div class="fm-h">${esc(dispName('Kris'))}</div>${pk ? `<div class="fm-addr">${esc(pk.n)}<br><span>${esc(pk.a)}</span><br><span>${kk === 'jalan' ? tr('Sekarang') : (({ en: 'Since ', ko: '' })[L] ?? 'Sejak ') + sinceTxt + (L === 'ko' ? '부터' : '')} · ${dist}</span></div>` : `<div class="fm-addr">Lokasi tidak tersedia<br><span>${({ en: `${esc(dispName('Kris'))} stopped sharing location with you.`, ko: `${esc(dispName('Kris'))} 님이 위치 공유를 중단했습니다.` })[L] || `${esc(dispName('Kris'))} berhenti berbagi lokasi dengan kamu.`}</span></div>`}<div class="list fm-acts">${pk ? '<div class="row"><div class="rt"><div class="r1" style="color:#007aff">Petunjuk Arah</div></div></div>' : '<div class="row"><div class="rt"><div class="r1" style="color:#007aff">Minta Lokasi</div></div></div>'}<div class="row"><div class="rt"><div class="r1" style="color:#007aff">Beri Tahu Saya</div></div></div><div class="row"><div class="rt"><div class="r1" style="color:#ff3b30">Berhenti Berbagi Lokasi Saya</div></div></div></div></div>` });
 }
 // notif pas Kris matiin / nyalain lagi share lokasinya (sekali, kalau baru < 10 menit)
 function findNotice() {
   if (!S.unlocked) return; const seen = store.get('shareSeen', []);
   SHARE_KRIS.forEach(([ts, on, e]) => { const d = new Date(ts); if ((e && endKey() !== e) || seen.includes(ts) || !visible(d) || now() - d > 10 * 60000) return; seen.push(ts); store.set('shareSeen', seen);
-    toast({ icon: ICONS.find, title: 'Lacak', body: `${dispName('Kris')} ${on ? 'mulai berbagi lokasi dengan kamu' : 'berhenti berbagi lokasi dengan kamu'}`, ms: 5000 }); });
+    toast({ icon: ICONS.find, title: 'Lacak', body: `${dispName('Kris')} ${tr(on ? 'mulai berbagi lokasi dengan kamu' : 'berhenti berbagi lokasi dengan kamu')}`, ms: 5000 }); });
 }
 // ===== Kesehatan =====
 // ===== Kesehatan: data per tanggal (YYYY-MM-DD). abis tgl 25 ikut ending =====
@@ -2370,11 +2382,17 @@ function fit() {
 if (window.visualViewport) visualViewport.addEventListener('resize', fit);
 addEventListener('resize', fit); fit();
 // buat ngecek ending: ?lihat=maafin (ending) / ?lihat=maafin&epilog (narasi epilog → tombol HP seminggu kemudian). pake tab private biar progres asli ga ketimpa
-{ const lk = DEV && new URLSearchParams(location.search).get('lihat'); if (lk && ENDINGS[lk] && !EPI) { S.unlocked = true; S.fightDone = true; store.set('fightDone', true); home(); setTimeout(() => ending(lk, new URLSearchParams(location.search).has('epilog')), 300); } else if (EPI) epiEnter(); else if (store.get('resume', false)) { try { localStorage.removeItem('hpkino:resume'); } catch (e) {} S.unlocked = true; home(); } else if (store.get('backToCard', null) && ENDINGS[store.get('backToCard', null)]) { const k = store.get('backToCard', null); try { localStorage.removeItem('hpkino:backToCard'); } catch (e) {} S.unlocked = true; home(); setTimeout(() => ending(k, false, true), 200); } else if (store.get('pickAgain', false)) { try { localStorage.removeItem('hpkino:pickAgain'); } catch (e) {} S.unlocked = true; home(); setTimeout(pickAgain, 300); } else intro(); }
+if (!window.__kadoGo) { const lk = DEV && new URLSearchParams(location.search).get('lihat'); if (lk && ENDINGS[lk] && !EPI) { S.unlocked = true; S.fightDone = true; store.set('fightDone', true); home(); setTimeout(() => ending(lk, new URLSearchParams(location.search).has('epilog')), 300); } else if (EPI) epiEnter(); else if (store.get('resume', false)) { try { localStorage.removeItem('hpkino:resume'); } catch (e) {} S.unlocked = true; home(); } else if (store.get('backToCard', null) && ENDINGS[store.get('backToCard', null)]) { const k = store.get('backToCard', null); try { localStorage.removeItem('hpkino:backToCard'); } catch (e) {} S.unlocked = true; home(); setTimeout(() => ending(k, false, true), 200); } else if (store.get('pickAgain', false)) { try { localStorage.removeItem('hpkino:pickAgain'); } catch (e) {} S.unlocked = true; home(); setTimeout(pickAgain, 300); } else if (store.get('resumeLock', false)) { try { localStorage.removeItem('hpkino:resumeLock'); } catch (e) {} lock(); } else intro(); }
 
 // abis pake kode hadiah: kasih tau
-{ const k = !window.__kadoGo && store.get('kadoToast', null); if (k) { try { localStorage.removeItem('hpkino:kadoToast'); } catch (e) {} setTimeout(() => toast({ icon: ICONS.notes, title: '🎁 hadiah dari antarestars', ms: 6000,
-  body: k === true ? 'jam di HP Kino dimajuin ke 25 Okt 22.00. HP seminggu kemudian udah kebuka' : k === 'udah' ? 'udah lewat jam 10 malem kok, langsung aja ke epilog' : k === 'belum' ? 'kodenya baru bisa dipake mulai 25 Oktober' : 'kodenya ga ada 🥲' }), 1500); } }
+{ const k = !window.__kadoGo && store.get('kadoToast', null); if (k) { try { localStorage.removeItem('hpkino:kadoToast'); } catch (e) {} const kt = () => toast({ icon: ICONS.notes, title: '🎁 hadiah dari antarestars', ms: 6000,
+  body: k === true ? 'jam di HP Kino dimajuin ke 25 Okt 22.00. HP seminggu kemudian udah kebuka' : k === 'udah' ? 'udah lewat jam 10 malem kok, langsung aja ke epilog' : k === 'belum' ? 'kodenya baru bisa dipake mulai 25 Oktober' : 'kodenya ga ada 🥲' });
+  if (k !== true) setTimeout(kt, 1500);
+  else setTimeout(() => { // layar item dulu biar kerasa lompat waktunya (kayak "seminggu kemudian")
+    const el = h(`<div class="faint" data-nostatus="1" data-modal="1"><p>25 Oktober, 22.00.</p><p class="s" style="color:#d1d1d6;font-size:15px;margin-top:16px;animation-delay:1.2s">hari ulang tahun Kino, udah malem.</p><p class="s2" style="color:#8e8e93;font-size:13px;margin-top:8px;animation-delay:2s">chat seharian udah masuk semua.</p></div>`);
+    const go = () => { if (!el.isConnected) return; el.remove(); syncChrome(); setTimeout(kt, 600); };
+    el.onclick = go; push(el); setTimeout(go, 5500);
+  }, 300); } }
 
 // ---------- afk ≥ 1 jam → muat ulang (biar dapet cerita terbaru + versi terbaru) ----------
 {
