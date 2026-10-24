@@ -562,6 +562,7 @@ if ('Notification' in window && Notification.permission === 'granted' && locatio
 // kalau app lagi di background: kirim notif sistem
 function sysNotify(title, body, tag) {
   if (!document.hidden || !('Notification' in window) || Notification.permission !== 'granted') return;
+  title = tr(title); body = tr(body);
   const opts = { body, tag, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', renotify: true };
   try { if (swReg) swReg.showNotification(title, opts); else new Notification(title, opts); } catch (e) {}
 }
@@ -1724,7 +1725,7 @@ function finale() {
   push(el);
 }
 // skor gaya main: tiap balasan pilihan = sabar (+1) / dingin (-1), liat TONE
-const toneLabel = (key, tone) => `kamu main ${tone === 'sabar' ? 'sabar 🤍' : 'dingin 🧊'}` + (typeof TONE_LABEL !== 'undefined' && TONE_LABEL[key] ? ' · ' + TONE_LABEL[key][tone] : '');
+const toneLabel = (key, tone) => tr(`kamu main ${tone === 'sabar' ? 'sabar 🤍' : 'dingin 🧊'}`) + (typeof TONE_LABEL !== 'undefined' && TONE_LABEL[key] ? ' · ' + tr(TONE_LABEL[key][tone]) : '');
 function score() { return Object.entries(S.answers || {}).reduce((a, [id, v]) => a + ((TONE[id] || [])[v.choice] || 0), 0); }
 // baris narasi: '***' jeda adegan, '_..._' italic, 'Flashback.'/'Flashback end.' penanda
 function endP(l, d) {
