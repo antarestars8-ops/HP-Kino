@@ -1404,13 +1404,14 @@ let fightGap = 0; // jeda abis ditolak sebelum nelpon lagi
 function maybeFight() {
   if (fightRinging && !document.querySelector('.call') && Date.now() > fightGap) fightRinging = false; // layar telfonnya ketutup/kebuang tanpa diangkat/ditolak: bunyiin lagi, jangan nyangkut
   if (S.fightDone || fightRinging || !visible(new Date(FIGHT_AT))) return;
+  fightCatchUp(Math.min(now().getTime(), FIGHT_GIVEUP.getTime()));
   // ga diangkat sampe 14.27 (atau baru buka HP sesudahnya): Kris berhenti nelpon, cerita jalan terus
   if (fightOver()) {
     S.fightDone = true; store.set('fightDone', true);
     // tetep dianggep diangkat jam 14.27 (Kino akhirnya ngangkat di pantry): log & riwayat "diterima", bisa diputer ulang dari Telepon
     if (!S.fightAns) { S.fightAns = FIGHT_GIVEUP.getTime(); S.fightEnd = S.fightAns + FIGHT_AUTO_SEC * 1000; store.set('fightAns', S.fightAns); store.set('fightEnd', S.fightEnd); }
     if (!S.callLog.some(c => c.fight && !c.missed)) { S.callLog.push({ who: 'Kris', t: S.fightAns, out: false, missed: false, fight: true, lines: FIGHT_CALL.map(l => [l[0], l[1]]) }); S.callLog.sort((a, b) => b.t - a.t); store.set('callLog', S.callLog); }
-    fixFightLog();
+    fixFightLog(); kinoReacts();
     refreshUnder(); return;
   }
   if (document.querySelector('.intro')) return; // masih di layar "Mulai"
@@ -1421,7 +1422,30 @@ function maybeFight() {
 const FIGHT_DECLINE = [['kino', 'please'], ['aku tau kamu liat hp'], ['kasih aku 5 menit. abis itu terserah kamu'], ['aku ga akan bohong lagi', 'sumpah'], ['kamu boleh marah. boleh teriak', 'tapi ngomong sama aku'], ['jangan diem kino', 'diem kamu yg paling aku takutin'], ['aku ga akan berhenti nelfon']];
 // abis itu muter terus, sampe diangkat. makin kacau
 const FIGHT_DECLINE_LOOP = [['delapan tahun kino', 'jangan selesai kayak gini'], ['yuna itu', 'nggak.', 'aku salah. udah itu aja'], ['aku ga bisa mikir apa2', 'dari tadi cuma liatin hp'], ['bilang aku brengsek juga gpp', 'asal kamu ngomong'], ['kino'], ['aku jelasin semuanya. ga ada yg aku tutupin lagi'], ['kamu udah makan?', 'maaf. aku ga tau mau ngomong apa lagi'], ['satu kali aja'], ['kamu mau blok aku juga aku ngerti', 'tapi jangan dulu'], ['kino sayang', 'maaf', 'maaf maaf maaf'], ['ini aku. kris', 'masih aku'], ['aku ga tidur semalem', 'iya aku tau itu bukan alesan'], ['tolong'], ['kamu pernah bilang', '"kalo berantem jangan tidur sebelum baikan"', 'aku masih pegang itu'], ['aku nangis kayak orang bego'], ['...'], ['aku mau ke tempat kamu', 'nggak. nanti kamu makin marah', 'angkat aja please'], ['kino please please'], ['aku ga minta dimaafin sekarang', 'aku cuma mau denger suara kamu'], ['jangan pergi']];
-let fightDeclines = 0;
+let fightDeclines = store.get('fightDeclines', 0);
+const FIGHT_RING_MS = 12000; // dibiarin bunyi segini = tak terjawab
+// satu "ditolak": missed call + chat mohon2 (urut, makin kacau)
+function fightPleas() {
+  const txt = FIGHT_DECLINE[fightDeclines] || FIGHT_DECLINE_LOOP[(fightDeclines - FIGHT_DECLINE.length) % FIGHT_DECLINE_LOOP.length];
+  fightDeclines++; store.set('fightDeclines', fightDeclines);
+  return [['them', '', { call: 'Panggilan tak terjawab', quiet: true }], ...txt.map(x => ['them', x])];
+}
+// HP ga dibuka (telat / ditinggal) pas Kris lagi nelpon: dianggep Kino nolak terus. missed call + chat diisi mundur sesuai ritme telponnya
+function fightCatchUp(until) {
+  let t = store.get('fightNext', 0) || new Date(FIGHT_AT).getTime(), n = 0;
+  while (t + FIGHT_RING_MS <= until) {
+    S.callLog.push({ who: 'Kris', t, out: false, missed: true, fight: true, lines: FIGHT_CALL.map(l => [l[0], l[1]]) });
+    const miss = t + FIGHT_RING_MS; addMsg('kris', fightPleas(), miss - now().getTime()); t = miss + fightRedialMs(); n++;
+  }
+  store.set('fightNext', t);
+  if (n) { S.callLog.sort((a, b) => b.t - a.t); S.callLog = S.callLog.slice(0, 40); store.set('callLog', S.callLog); }
+}
+// abis telpon berantem: Kino bales di chat. pendek, nyelekit, terus balik kerja
+const FIGHT_REACT = ['brengsek.', 'salam buat yuna.', 'aku balik kerja. nangisin kamu ga bikin prod naik.'];
+function kinoReacts() {
+  if (store.get('fightReact', false) || !S.fightEnd) return; store.set('fightReact', true);
+  addMsg('kris', FIGHT_REACT.map(x => ['me', x]), S.fightEnd + 20000 - now().getTime());
+}
 // Kris nyerah 14.27 (~20 menit sejak telpon pertama, sebelum Kino balik dari pantry 14.31): telponnya kelewat, cerita jalan terus
 const FIGHT_GIVEUP = new Date('2026-10-24T14:27');
 const fightOver = () => now() >= FIGHT_GIVEUP;
@@ -1438,16 +1462,16 @@ function fightCall(autoMiss = 0) {
   if (fightRinging || S.fightDone || fightOver()) return;
   fightRinging = true;
   callScreen({ who: 'Kris', dir: 'in', lines: FIGHT_CALL, onAnswer: () => { if (!S.fightAns) { S.fightAns = now().getTime(); store.set('fightAns', S.fightAns); } dropQueuedPleas(); },
-    onEnd: () => { fightRinging = false; S.fightDone = true; store.set('fightDone', true); S.fightEnd = now().getTime(); store.set('fightEnd', S.fightEnd); fixFightLog(); refreshUnder(); },
+    onEnd: () => { fightRinging = false; S.fightDone = true; store.set('fightDone', true); S.fightEnd = now().getTime(); store.set('fightEnd', S.fightEnd); fixFightLog(); kinoReacts(); refreshUnder(); },
     onDecline: () => { // ditolak: Kris ga nyerah, missed call numpuk + chat, nelpon lagi sampe diangkat (makin lama makin jarang) atau Kris nyerah 14.27
       const queued = S.extra.filter(x => x.chat === 'kris').reduce((m, x) => Math.max(m, x.t), 0) - now().getTime(); // chat batch sebelumnya belum abis masuk: antri di belakangnya, jangan nyampur
-      addMsg('kris', [['them', '', { call: 'Panggilan tak terjawab', quiet: true }], ...(FIGHT_DECLINE[fightDeclines] || FIGHT_DECLINE_LOOP[(fightDeclines - FIGHT_DECLINE.length) % FIGHT_DECLINE_LOOP.length]).map(x => ['them', x])], Math.max(300, queued + 1500)); fightDeclines++;
-      const gap = fightRedialMs(); fightGap = Date.now() + gap + 500; setTimeout(() => { fightRinging = false; if (!S.fightDone && !fightOver() && !store.get('ending', null) && !document.querySelector('.call')) fightCall(); }, gap);
+      addMsg('kris', fightPleas(), Math.max(300, queued + 1500));
+      const gap = fightRedialMs(); store.set('fightNext', now().getTime() + gap); fightGap = Date.now() + gap + 500; setTimeout(() => { fightRinging = false; if (!S.fightDone && !fightOver() && !store.get('ending', null) && !document.querySelector('.call')) fightCall(); }, gap);
     } });
   autoDecline(); // dibiarin bunyi 25 detik = tak terjawab: Kris chat lagi terus nelpon lagi
 }
 // telfon Kris (berantem / 00.00) yg dicuekin: dianggep tak terjawab, jalur yg sama kayak ditolak
-function autoDecline() { const el = [...document.querySelectorAll('.call')].pop(); setTimeout(() => { if (el && el.isConnected && el.querySelector('.yes')) el.querySelector('.no').click(); }, 12000); }
+function autoDecline() { const el = [...document.querySelectorAll('.call')].pop(); setTimeout(() => { if (el && el.isConnected && el.querySelector('.yes')) el.querySelector('.no').click(); }, FIGHT_RING_MS); }
 // telpon iseng dari orang2 pas lagi scrolling: jarang, sesuai jam, sekali per orang
 let nextRandCall = null;
 function maybeRandomCall() {
