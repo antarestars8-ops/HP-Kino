@@ -733,7 +733,7 @@ malem tanggal 22 aku ga nginep kantor. aku jalan sendirian sampe itaewon, cuma p
 
 pas aku sadar fotonya masuk ke album kita, aku hapus. terus aku ga berani buka chat kamu. dua hari. aku tau kamu nunggu, dan aku tetep ga buka. itu yang paling jahat.
 
-mungkin sebagian dari aku pengen ketauan. biar aku ga harus milih kapan ngomongnya. jam satu pagi aku duduk di lobi, siangnya aku malah jalan sama dia. aku sendiri ga ngerti aku maunya apa. sampe kamu ngirim fotonya dan nanya "ini kamu?"
+mungkin sebagian dari aku pengen ketauan. biar aku ga harus milih kapan ngomongnya. jam satu pagi aku duduk di lobi, ga berani naik. siangnya yuna ngajak makan di seongsu, dan aku iya-in, soalnya lebih gampang daripada naik ke 4419 dan ngomong ke kamu. aku sendiri ga ngerti aku maunya apa. sampe kamu ngirim fotonya dan nanya "ini kamu?"
 
 dan yang paling lucu, tiap kali aku sama mereka, yang aku pikirin malah kamu.
 
