@@ -1441,7 +1441,7 @@ function fightCatchUp(until) {
   if (n) { S.callLog.sort((a, b) => b.t - a.t); S.callLog = S.callLog.slice(0, 40); store.set('callLog', S.callLog); }
 }
 // abis telpon berantem: Kino bales di chat. pendek, nyelekit, terus balik kerja
-const FIGHT_REACT = ['brengsek.', 'salam buat yuna.', 'aku balik kerja. nangisin kamu ga bikin prod naik.'];
+const FIGHT_REACT = ['brengsek.', 'delapan tahun, dan aku orang terakhir yg tau.', 'nangisin kamu ga bikin prod naik.'];
 function kinoReacts() {
   if (store.get('fightReact', false) || !S.fightEnd) return; store.set('fightReact', true);
   addMsg('kris', FIGHT_REACT.map(x => ['me', x]), S.fightEnd + 20000 - now().getTime());
