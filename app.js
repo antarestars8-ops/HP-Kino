@@ -293,7 +293,16 @@ S.fightAns = store.get('fightAns', 0);
 const afterFightAns = (c, it) => S.fightAns && c.id === 'kris' && !it.x && ((it.ts.getTime() > S.fightAns && it.ts.getTime() <= new Date(FIGHT_AT).getTime()) || (it.o && it.o.afterFight && !it.o.fightLog && it.ts.getTime() < S.fightAns)); // diangkat telat: naskah sesudah-berantem yg jamnya sebelum diangkat ga dimunculin
 // log "Panggilan suara" berantem: jam diangkat & durasinya ngikutin telpon beneran. save lama yg ga pernah diangkat = tak terjawab
 S.fightEnd = store.get('fightEnd', 0);
+// post akun priv "oke. angkat" ngikutin kapan telponnya beneran diangkat. belum diangkat = belum ada
+const FIGHT_ALT = X_POSTS.find(x => x[1] === 'alt' && x[2] === '2026-10-24T14:07'), FIGHT_ALT_TXT = FIGHT_ALT && FIGHT_ALT[3];
+function fixFightAlt() {
+  if (!FIGHT_ALT) return;
+  if (S.fightAns) { const t = new Date(S.fightAns - 20000); FIGHT_ALT[2] = `${dayKey(t)}T${hm(t).replace('.', ':')}`; FIGHT_ALT[7] = {};
+    FIGHT_ALT[3] = S.fightAns - new Date(FIGHT_AT).getTime() > 3 * 60000 ? FIGHT_ALT_TXT.replace(/^baru juga dikirim,? langsung/, 'dari tadi') : FIGHT_ALT_TXT; }
+  else if (!S.fightDone) FIGHT_ALT[7] = { fight: true };
+}
 function fixFightLog() {
+  fixFightAlt();
   const c = CHATS.find(x => x.id === 'kris'), it = c.items.find(i => i.o && i.o.afterFight && i.o.call && /^Panggilan suara/.test(i.o.call)); if (!it) return;
   it.o.fightLog = true;
   if (S.fightAns && S.fightEnd > S.fightAns) { const sec = Math.round((S.fightEnd - S.fightAns) / 1000); it.ts = new Date(S.fightAns); it.o.call = `Panggilan suara ${pad(Math.floor(sec / 60))}:${pad(sec % 60)}`; }
@@ -1466,7 +1475,7 @@ function dropQueuedPleas() {
 function fightCall(autoMiss = 0) {
   if (fightRinging || S.fightDone || fightOver()) return;
   fightRinging = true;
-  callScreen({ who: 'Kris', dir: 'in', lines: FIGHT_CALL, onAnswer: () => { if (!S.fightAns) { S.fightAns = now().getTime(); store.set('fightAns', S.fightAns); } dropQueuedPleas(); },
+  callScreen({ who: 'Kris', dir: 'in', lines: FIGHT_CALL, onAnswer: () => { if (!S.fightAns) { S.fightAns = now().getTime(); store.set('fightAns', S.fightAns); } dropQueuedPleas(); fixFightAlt(); },
     onEnd: () => { fightRinging = false; S.fightDone = true; store.set('fightDone', true); S.fightEnd = now().getTime(); store.set('fightEnd', S.fightEnd); fixFightLog(); kinoReacts(); refreshUnder(); },
     onDecline: () => { // ditolak: Kris ga nyerah, missed call numpuk + chat, nelpon lagi sampe diangkat (makin lama makin jarang) atau Kris nyerah 14.27
       const queued = S.extra.filter(x => x.chat === 'kris').reduce((m, x) => Math.max(m, x.t), 0) - now().getTime(); // chat batch sebelumnya belum abis masuk: antri di belakangnya, jangan nyampur

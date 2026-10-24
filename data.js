@@ -1866,7 +1866,7 @@ const ALT = [
   ['2026-10-24T12:55', 'prod sempet up 13 menit trs mati lagi, juna mau nangis di toilet, gue juga mau tp ga ada slot'],
   ['2026-10-24T13:55', 'hana ngirim foto, seongsu, pegangan tangan, namanya yuna, fotonya blur tp jelas bgt, lucu ya, gue malah liatin jaketnya, itu jaket yg biasa dia pake ke sini'],
   ['2026-10-24T14:07', 'baru juga dikirim, langsung ditelfonin kayak debt collector, hhhh, oke, angkat, kino lo bisa'],
-  ['2026-10-24T14:40', 'gue ga teriak sama sekali, bangga dikit, dia bilang ngerasa ga disayang, gue bilang gue tau, ternyata tau doang ga cukup ya', { fight: true }],
+  ['2026-10-24T14:40', 'gue ga teriak sama sekali, bangga dikit, dia bilang ngerasa ga disayang, gue bilang gue tau, padahal udah gue siapin buat tanggal 25, mau bilang langsung, bukan lewat chat, keduluan dia capek', { fight: true }],
   ['2026-10-24T15:15', 'dia ngechat mulu, gue baca semua, ga gue bales, gue lg rollback prod ya kris bukan nungguin lo (dua2nya)', { fight: true }],
   ['2026-10-24T15:30', 'tangan gue gemeter bukan gara2 dia gara2 kopi (bukan kopi) (gue belum minum kopi)', { fight: true }],
   ['2026-10-24T16:10', 'dia nunggu di lobi kantor, satpam nanya "itu temennya mas kino?" gue bilang ga kenal, abis itu gue ke toilet 5 menit, ngapain? ya ngapain lagi', { fight: true }],
@@ -3163,7 +3163,7 @@ more('kris', [
     'belum': 'belum. bentar lagi', 'tidur.': 'udah, tidur sana. capek kan', 'kenapa sorry': 'kenapa sorry? gapapa kok',
     'meeting kok bisa nelfon': 'meeting kok bisa nelfon? kangen ya', 'pagi': 'pagii', 'udah tau.': 'iya udah tau kok', 'hm. tidur di mana': 'hm. tidurnya di mana? jangan di kursi',
     'oke.': 'oke. jangan kecapean ya', 'oh. oke.': 'oh. oke. nanti aja deh',
-    'nanti kita ngomong.': 'nanti kita ngomong ya.', 'sekarang jangan ganggu aku dulu.': 'sekarang aku mau benerin prod dulu.',
+    'nanti kita ngomong.': 'nanti kita ngomong.', 'sekarang jangan ganggu aku dulu.': 'sekarang aku mau benerin prod dulu.',
     'jangan ke sini.': 'jangan ke sini dulu.', 'aku gapapa. pulang.': 'aku gapapa kok. kamu pulang, istirahat.',
   };
   const fixLines = (ls) => ls.forEach(l => { if (l[0] === 'k' && W[l[1]]) l[1] = W[l[1]]; });
@@ -3172,7 +3172,7 @@ more('kris', [
   REPLIES.filter(r => r.chat === 'kris' && !r.epi).forEach(r => r.opts.forEach(o => { o.me = o.me.map(t => W[t] || t); }));
   CHATS.find(c => c.id === 'kris').msgs.forEach(m => { if (m[0] === 'me' && m[2] && m[2].startsWith('17.2') | m[2] && m[2].startsWith('20.5') && W[m[1]]) m[1] = W[m[1]]; });
 }
-CHATS.find(c => c.id === 'kris').msgs.forEach(m => { if (m[0] === 'me' && m[1] === 'nanti kita ngomong.') m[1] = 'nanti kita ngomong ya.'; if (m[0] === 'me' && m[1] === 'sekarang jangan ganggu aku dulu.') m[1] = 'sekarang aku mau benerin prod dulu.'; });
+CHATS.find(c => c.id === 'kris').msgs.forEach(m => { if (m[0] === 'me' && m[1] === 'sekarang jangan ganggu aku dulu.') m[1] = 'sekarang aku mau benerin prod dulu.'; });
 
 // ===== Kino ke temen2: tetep singkat & nonchalant, tapi ga ketus (ke Kris tetep paling hangat) =====
 {
@@ -3382,7 +3382,7 @@ more('kris', [
     '2026-10-24T12:55': 'prod sempet up 13 menit terus mati lagi. juna mau nangis di toilet. gue juga mau, tapi slotnya penuh',
     '2026-10-24T13:55': 'hana ngirim foto. seongsu, pegangan tangan, namanya yuna. fotonya blur tapi jelas banget. lucunya gue malah liatin jaketnya. itu jaket yg biasa dia pake ke sini',
     '2026-10-24T14:07': 'baru juga dikirim langsung ditelfonin kayak debt collector. hhhh. oke. angkat. kino lo bisa',
-    '2026-10-24T14:40': 'gue ga teriak sama sekali, bangga dikit. dia bilang ngerasa ga disayang. gue bilang gue tau. ternyata tau doang ga cukup ya',
+    '2026-10-24T14:40': 'gue ga teriak sama sekali, bangga dikit. dia bilang ngerasa ga disayang. gue bilang gue tau. padahal udah gue siapin buat tanggal 25. mau bilang langsung, bukan lewat chat. keduluan dia capek.',
     '2026-10-24T15:15': 'dia ngechat mulu. gue baca semua, ga gue bales. gue lagi rollback prod ya kris, bukan nungguin lo. (dua2nya)',
     '2026-10-24T15:30': 'tangan gue gemeteran. bukan gara2 dia, gara2 kopi. (bukan kopi) (gue belum minum kopi)',
     '2026-10-24T16:10': 'dia nunggu di lobi kantor. satpam nanya "itu temennya mas kino?" gue bilang ga kenal. abis itu gue ke toilet 5 menit. ngapain? ya ngapain lagi',
