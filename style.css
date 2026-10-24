@@ -27,7 +27,7 @@ img{display:block}
 .ph-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
 /* intro */
-.intro{background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 36px;gap:14px}
+.intro{background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:clamp(40px,14vh,120px) 36px 40px;gap:14px;overflow-y:auto} /* nempel atas (bukan ditengahin) biar judul + tombol bahasa ga loncat pas ganti bahasa */
 .intro h1{font-size:28px;font-weight:700;letter-spacing:-.4px}
 .intro p{font-size:15px;line-height:1.55;color:#aeaeb2}
 .intro .disc{font-size:11px;color:#636366;line-height:1.5;margin-top:8px}
@@ -669,9 +669,10 @@ img{display:block}
 .ending .fb{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#8e8e93;margin-top:20px}
 .ending .itl{color:#c7c7cc;text-align:center;font-size:16px;margin:18px 8px}
 /* bahasa */
-.intro .langs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:2px 0 6px}
-.intro .langs button{background:#1c1c1e;color:#d1d1d6;border:1px solid #2c2c2e;border-radius:18px;padding:7px 13px;font-size:14px;font-family:inherit}
-.intro .langs button.on{background:#fff;color:#000;border-color:#fff;font-weight:600}
+/* 3 kolom sama lebar, ga pernah turun baris: posisi tombol ga gerak pas bahasanya diganti */
+.intro .langs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;max-width:330px;margin:2px auto 6px}
+.intro .langs button{background:#1c1c1e;color:#d1d1d6;border:1px solid #2c2c2e;border-radius:18px;padding:7px 4px;font-size:13px;font-weight:600;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.intro .langs button.on{background:#fff;color:#000;border-color:#fff}
 .sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:60;display:flex;align-items:flex-end;animation:fadein .2s}
 .sheet-bg .sheet{background:#f2f2f7;width:100%;border-radius:14px 14px 0 0;padding:14px 0 34px}
 .sheet-bg .sh-t{text-align:center;font-weight:600;font-size:15px;padding:0 0 10px;color:#3c3c43}
