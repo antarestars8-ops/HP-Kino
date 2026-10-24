@@ -1780,7 +1780,7 @@ function ending(key, epiMode = false, jump = false) {
   };
   const bd = el.querySelector('.bday'); if (bd) bd.onclick = () => { if (S.reloadAfterEnding) { try { localStorage.setItem('hpkino:resume', 'true'); } catch (e) {} location.href = location.pathname + location.search; return; } layersEl.querySelectorAll('.call, .ending').forEach(x => x.remove()); S.unlocked = true; home(); }; // ke HP, bukan balik ke pilihan
   // lompat ke 25 Okt 22.00: jam di HP dimajuin (offset kesimpen, jalan terus), terus balik ke HP
-  const lt = el.querySelector('.late'); if (lt) lt.onclick = () => { try { localStorage.setItem('hpkino:replayOffset', String(EPI_OPEN.getTime() - tnow())); localStorage.setItem('hpkino:resume', 'true'); } catch (e) {} location.href = location.pathname; };
+  const lt = el.querySelector('.late'); if (lt) lt.onclick = () => { location.href = location.pathname + '?kado=' + KADO_CODES[0]; }; // lewat kode hadiah yg sama (lompat + toast)
   el.querySelector('.share').onclick = () => shareCard(key, tone, shareLine);
   const nw = el.querySelector('.now'); if (nw) nw.onclick = () => { try { localStorage.removeItem('hpkino:epi'); localStorage.setItem('hpkino:backToCard', JSON.stringify(key)); } catch (e) {} location.href = location.pathname + (tnow() < EPI_OPEN.getTime() ? '?now=2026-10-25T22:00' : ''); };
   const ep = el.querySelector('.epi'); if (ep) ep.onclick = () => { if (EPI) { el.remove(); syncChrome(); return; } goEpilogPhone(key); };
