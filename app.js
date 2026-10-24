@@ -226,17 +226,43 @@ function typeOut(el, text, done) {
   qr.style.pointerEvents = 'none'; inp.value = ''; inp.classList.add('typing-now');
   el.classList.add('kb-open');
   const body = el.querySelector('.body'); setTimeout(() => body.scrollTop = body.scrollHeight, 260);
-  let k = 0; const shown = tr(text);
-  const flash = (ch) => { const key = /^[a-z0-9 ]$/i.test(ch) ? kb.querySelector(`[data-key="${ch === ' ' ? ' ' : ch.toLowerCase()}"]`) : null; if (key) { key.classList.add('down'); setTimeout(() => key.classList.remove('down'), 110); } };
+  let k = 0; const shown = tr(text), ops = typoOps(text, shown);
+  const flash = (ch) => { const key = /^[a-z0-9 ⌫]$/i.test(ch) ? kb.querySelector(`[data-key="${ch === ' ' ? ' ' : ch.toLowerCase()}"]`) : null; if (key) { key.classList.add('down'); setTimeout(() => key.classList.remove('down'), 110); } };
   const step = () => {
     if (!el.isConnected) return;
-    if (k < shown.length) { const ch = shown[k++]; inp.value += ch; snd.classList.add('on'); flash(ch); keyClick(ch === ' '); setTimeout(step, ch === ' ' ? 140 : 75 + Math.random() * 90); return; }
+    if (k < ops.length) {
+      const op = ops[k++];
+      if (op === -1) { inp.value = inp.value.slice(0, -1); flash('⌫'); keyClick(false); return setTimeout(step, ops[k] === -1 ? 95 + Math.random() * 50 : 380); } // hapus
+      if (op === 0) return setTimeout(step, 420 + Math.random() * 200); // sadar salah ketik, diem bentar
+      inp.value += op; snd.classList.add('on'); flash(op); keyClick(op === ' '); setTimeout(step, op === ' ' ? 140 : 75 + Math.random() * 90); return;
+    }
     setTimeout(() => {
       const ret = kb.querySelector('.ret'); ret.classList.add('down'); keyClick(true); snd.classList.add('press');
       setTimeout(() => { ret.classList.remove('down'); inp.value = ''; snd.classList.remove('on', 'press'); inp.classList.remove('typing-now'); qr.style.pointerEvents = ''; delete el.dataset.typing; done(text); setTimeout(() => el.classList.remove('kb-open'), 600); }, 200);
     }, 420);
   };
   setTimeout(step, 280);
+}
+// rencana ketikan: huruf biasa, 0 = jeda (sadar salah), -1 = hapus 1 huruf. ujungnya selalu = shown
+const NEAR = (() => { const m = {}; ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'].forEach(r => [...r].forEach((c, i) => { m[c] = (r[i - 1] || '') + (r[i + 1] || ''); })); return m; })();
+function typoOps(text, shown) {
+  const own = L === 'id' && TYPO_SEQ[text];
+  const flat = (seq) => seq.flatMap(x => typeof x === 'number' ? [0, ...Array(-x).fill(-1)] : [...x]);
+  if (own) return flat(own);
+  const t = now(); if (!PANIC.some(([a, b]) => t >= new Date(a) && t < new Date(b))) return [...shown];
+  // posisi & tombol yg kepencet tetep per teks (ga acak tiap buka), biar kalo diulang keliatannya sama
+  let h = 7; for (const ch of shown) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const rnd = () => ((h = (h * 1103515245 + 12345) >>> 0) / 4294967296);
+  const spots = [...shown].map((c, i) => i).filter(i => i > 0 && NEAR[shown[i].toLowerCase()]);
+  const n = Math.min(3, spots.length, Math.max(1, Math.round(shown.length / 14))), pick = new Set();
+  while (pick.size < n) pick.add(spots[Math.floor(rnd() * spots.length)]);
+  const seq = []; let from = 0;
+  [...pick].sort((a, b) => a - b).forEach(i => {
+    if (i < from) return;
+    const nb = NEAR[shown[i].toLowerCase()], wrong = nb[Math.floor(rnd() * nb.length)], extra = rnd() < .5 ? shown.slice(i + 1, i + 2) : ''; // kadang baru sadar abis 1 huruf lagi
+    seq.push(shown.slice(from, i) + wrong + extra, -(1 + extra.length)); from = i;
+  });
+  seq.push(shown.slice(from));
+  return flat(seq);
 }
 // balasan Kino yg udah ada di naskah tapi jamnya belum lewat: boleh dikirim lebih cepet
 // konten HP seminggu kemudian: epi = key ending, atau 'all' buat semua ending
@@ -407,16 +433,19 @@ function push(el) { el.classList.add('layer'); layersEl.appendChild(el); syncChr
 const exitsEl = (() => { const e = document.createElement('div'); e.id = 'exits'; $('#screen').appendChild(e); return e; })();
 function animOut(el, kind) {
   if (!el || el.classList.contains('lock') || el.classList.contains('intro')) { el && el.remove(); return; }
+  const o = kind === 'exit-app' && el.dataset.origin && !el.style.transform ? el.dataset.origin : ''; // dibuka dari ikon → balik ke ikon (kalo lagi digeser, biarin dari posisi jari)
+  if (o) el.style.transformOrigin = o;
   exitsEl.appendChild(el); el.classList.add(kind);
   // animasi keluar ditaro inline biar selalu menang (halaman yg punya animasi sendiri dulu "masuk lagi" pas back → glitch 2x)
-  el.style.animation = kind === 'exit-sub' ? 'subout .27s cubic-bezier(.4,0,.6,1) forwards' : 'appout .3s cubic-bezier(.4,0,.2,1) forwards';
+  el.style.animation = kind === 'exit-sub' ? 'subout .27s cubic-bezier(.4,0,.6,1) forwards' : o ? 'appiconout .32s cubic-bezier(.4,0,.2,1) forwards' : 'appout .3s cubic-bezier(.4,0,.2,1) forwards';
   setTimeout(() => el.remove(), 320);
 }
 function pop() { const top = layersEl.lastElementChild; if (top && layersEl.children.length > 1) { if (top.dataset.epinarr) setTimeout(epiNarr, 700); animOut(top, top.classList.contains('sub') ? 'exit-sub' : 'exit-app'); syncChrome(); refreshUnder(); } }
 function popTo(n) {
   if (layersEl.children.length <= n) return;
   if ([...layersEl.children].slice(n).some(x => x.dataset.epinarr)) setTimeout(epiNarr, 700);
-  const top = layersEl.lastElementChild;
+  const top = layersEl.lastElementChild, root = layersEl.children[1];
+  if (n <= 1 && root && root !== top && root.dataset.origin) top.dataset.origin = root.dataset.origin; // dari dalem chat langsung ke home: tetep balik ke ikon app-nya
   while (layersEl.children.length > n + 1) layersEl.children[n].remove();
   animOut(top, n <= 1 ? 'exit-app' : (top.classList.contains('sub') ? 'exit-sub' : 'exit-app'));
   syncChrome(); refreshUnder();
@@ -437,8 +466,8 @@ function syncChrome() {
 $('#homebar').onclick = () => { if (topL() && topL().classList.contains('cam')) return pop(); if (!S.unlocked) return passcode(); const t = topL(); if (t && (t.classList.contains('storyv') || t.classList.contains('memshow'))) { const x = t.querySelector('.sv-x, .mx'); if (x) x.click(); else t.remove(); } else if (t && t.dataset.modal) return; if (layersEl.children.length > 1) popTo(1); }; // story & kenangan: tombol home tetep jalan (telfon/ending/interview tetep dikunci)
 
 // ---------- notifikasi ----------
-function ncard({ icon = ICONS.kakao, title, body, when = 'sekarang' }) {
-  return `<div class="ncard"><div class="ni">${icon}</div><div class="nt"><div class="nh">${esc(title)}<span>${esc(when)}</span></div><div class="nb">${esc(body)}</div></div></div>`;
+function ncard({ icon = ICONS.kakao, title, body, when = 'sekarang', go = '' }) {
+  return `<div class="ncard"${go ? ` data-go="${go}"` : ''}><div class="ni">${icon}</div><div class="nt"><div class="nh">${esc(title)}<span>${esc(when)}</span></div><div class="nb">${esc(body)}</div></div></div>`;
 }
 function katalk() {
   try { const a = sfx('katalk'); a.currentTime = 0; a.play().catch(() => { tone([1568], 0, .09, .07, 'triangle'); tone([2093], .1, .14, .07, 'triangle'); }); } catch (e) {}
@@ -446,6 +475,7 @@ function katalk() {
 function toast(opts) {
   sysNotify(opts.title, opts.body, 'msg-' + opts.title);
   if (!opts.icon || opts.icon === ICONS.kakao) katalk();
+  buzz(/^kris/i.test(opts.title || '') ? 'kris' : 'notif');
   // cuma 1 banner sekaligus (kayak iPhone): yg baru gantiin yg lama, biar ga nutupin tombol back
   $('#toasts').querySelectorAll('.ncard').forEach(x => x.remove());
   const el = h(ncard(opts));
@@ -471,6 +501,24 @@ if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
 addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; document.querySelectorAll('.pwa .inst').forEach(b => b.style.display = ''); });
 const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone;
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+// ---------- getar ----------
+// Android: navigator.vibrate. iPhone ga punya API getar buat web; Safari 18+ bisa diakalin pake <input switch> yg diklik (1 klik = 1 "tik", polanya dipecah per tik)
+const BUZZ = {
+  notif: [35, 70, 35],
+  kris: [60, 60, 60, 60, 160], // notif dari Kris: lebih rame
+  ring: [500, 250, 500, 1000], // telpon masuk, diulang selama bunyi
+  wrong: [40, 50, 40, 50, 40], // kode sandi salah
+  faint: [120, 280, 120, 280, 120, 600, 900], // deg.. deg.. deg.. terus jatuh
+};
+let iosSw = null;
+function iosTick() { try { if (!iosSw) { iosSw = document.createElement('label'); iosSw.style.cssText = 'position:fixed;left:-99px;top:0;opacity:0;pointer-events:none'; iosSw.innerHTML = '<input type="checkbox" switch>'; document.body.appendChild(iosSw); } iosSw.click(); } catch (e) {} }
+function buzz(k) {
+  if (store.get('noBuzz', false)) return;
+  const pat = BUZZ[k] || k;
+  try { if (navigator.vibrate) { navigator.vibrate(pat); return; } } catch (e) {}
+  if (!isIOS) return;
+  let t = 0; pat.forEach((ms, i) => { if (i % 2 === 0) setTimeout(iosTick, t); t += ms; });
+}
 function wirePwa(el) {
   const inst = el.querySelector('.inst'), nb = el.querySelector('.notif');
   if (!standalone() && (installEvt || isIOS)) inst.style.display = '';
@@ -517,23 +565,25 @@ function intro() {
     ${I18N_ON ? '' : '<!--'}<div class="langs">${LANGS.map(([k, f, n]) => `<button data-l="${k}" class="${k === L ? 'on' : ''}">${f} ${n}</button>`).join('')}</div>${I18N_ON ? '' : '-->'}
     <p>${T.when(d)}<br>${T.p}</p>
     <button class="cta">${T.go}</button>
-    <div class="pwa"><button class="inst" style="display:none">⤓ Install ke HP</button><button class="notif">🔔 Nyalain notifikasi</button></div>
+    <div class="pwa"><button class="inst" style="display:none">⤓ Install ke HP</button><button class="notif">🔔 Nyalain notifikasi</button><button class="fullbtn" style="display:none"></button></div>
     <div class="disc">Fan fiction. Semua nama, chat & kejadian rekaan.<br>cr. stayroom ai & antarestars</div>
   </div>`);
   el.querySelectorAll('.langs button').forEach(b => b.onclick = () => { if (b.dataset.l !== L || !LANG) setLang(b.dataset.l); });
   el.querySelector('.cta').onclick = () => { if (!LANG) { try { localStorage.setItem('hpkino:lang', JSON.stringify(L)); } catch (e) {} } lock(); };
   wirePwa(el);
+  const fb = el.querySelector('.fullbtn'), fsync = () => { fb.textContent = `⛶ Layar penuh · ${isFull() ? 'nyala' : 'mati'}`; };
+  if (canFull()) { fb.style.display = ''; fsync(); fb.onclick = () => { setFull(!isFull()); fsync(); }; }
   setBase(el);
 }
 
 // ---------- lock screen ----------
 function lockNotifs() {
   const out = [];
-  CHATS.forEach(c => { const u = c.muted ? 0 : unread(c); if (u) { const m = lastMsg(c); out.push({ ts: m.ts, html: ncard({ title: c.group ? `${c.name} · ${m.who}` : c.name, body: u > 1 ? `${preview(m)}  (+${u - 1})` : preview(m), when: relDay(m.ts) === hm(m.ts) ? hm(m.ts) : relDay(m.ts) }) }); } });
+  CHATS.forEach(c => { const u = c.muted ? 0 : unread(c); if (u) { const m = lastMsg(c); out.push({ ts: m.ts, html: ncard({ go: 'c:' + c.id, title: c.group ? `${c.name} · ${m.who}` : c.name, body: u > 1 ? `${preview(m)}  (+${u - 1})` : preview(m), when: relDay(m.ts) === hm(m.ts) ? hm(m.ts) : relDay(m.ts) }) }); } });
   out.sort((a, b) => b.ts - a.ts);
   const d = daysLeft();
-  const cal = d > 0 ? ncard({ icon: ICONS.calendar(BDAY), title: 'Kalender', body: `🎂  ${d === 1 ? 'besok' : d + ' hari lagi'}`, when: 'hari ini' }) : '';
-  const mem = ncard({ icon: ICONS.photos, title: 'Foto', body: 'Kenangan: ulang tahun kris 🎂 · 3 Oktober', when: 'kemarin' });
+  const cal = d > 0 ? ncard({ icon: ICONS.calendar(BDAY), go: 'app:calendar', title: 'Kalender', body: `🎂  ${d === 1 ? 'besok' : d + ' hari lagi'}`, when: 'hari ini' }) : '';
+  const mem = ncard({ icon: ICONS.photos, go: 'app:photos', title: 'Foto', body: 'Kenangan: ulang tahun kris 🎂 · 3 Oktober', when: 'kemarin' });
   const t = now();
   if (t >= INTV[0] && t < INTV[1]) { // lagi interview: notif dibisukan Fokus
     const ic = (bg, txt) => `<div style="width:100%;height:100%;border-radius:9px;background:${bg};display:grid;place-items:center;color:#fff;font-weight:700;font-size:17px">${txt}</div>`;
@@ -551,10 +601,28 @@ function lock() {
     <div class="lk-notes">${lockNotifs()}</div>
     <div class="lk-bot"><div class="lk-btn"><svg viewBox="0 0 24 24"><path d="M8 2h8v4l-2 3v13h-4V9L8 6z"/></svg></div><div class="lk-btn lk-cam"><svg viewBox="0 0 24 24"><path d="M9 4l-1.5 2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3.5L15 4zm3 4.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z"/></svg></div></div>
   </div>`);
-  let y0 = null;
-  el.addEventListener('pointerdown', e => y0 = e.clientY);
-  el.addEventListener('pointerup', e => { if (e.target.closest('.lk-cam')) { y0 = null; return openCamera(); } if (y0 !== null && (y0 - e.clientY > 40 || e.target.closest('.ncard'))) passcode(); y0 = null; });
+  // ketuk di mana aja = kode sandi. ketuk notif = abis kebuka langsung ke chat/app-nya. geser ke atas: lihat gesture di bawah (ngikutin jari)
+  el.addEventListener('click', e => {
+    if (Date.now() - (S.lockDragAt || 0) < 400) return;
+    if (e.target.closest('.lk-cam')) return openCamera();
+    if (e.target.closest('.lk-btn')) return;
+    const n = e.target.closest('.ncard'); S.goTo = (n && n.dataset.go) || null;
+    passcode();
+  });
   setBase(el);
+}
+// geser layar kunci: layarnya naik ngikutin jari, kode sandi muncul pelan2. dilepas: lanjut kalo cukup jauh / cukup cepet, kalo ngga balik lagi
+function lockDrag(lk, d) {
+  let p = layersEl.querySelector('.pass');
+  if (!p) { S.goTo = null; passcode(); p = layersEl.querySelector('.pass'); if (!p) return; p.style.animation = 'none'; }
+  lk.style.transition = 'none'; lk.style.transform = `translateY(${-d * .6}px)`;
+  p.style.transition = 'none'; p.style.opacity = Math.min(1, d / 260);
+}
+function lockRelease(lk, d, v) {
+  const p = layersEl.querySelector('.pass'), ok = d > 140 || (d > 40 && v > .5); S.lockDragAt = Date.now();
+  lk.style.transition = 'transform .3s cubic-bezier(.2,.8,.2,1)'; lk.style.transform = '';
+  if (p) { p.style.transition = 'opacity .22s'; p.style.opacity = ok ? '1' : '0'; }
+  setTimeout(() => { lk.style.transition = ''; if (!p) return; p.style.transition = ''; if (!ok && p.isConnected) { p.remove(); syncChrome(); } }, 320);
 }
 function passcode() {
   if (layersEl.querySelector('.pass') || S.unlocked) return;
@@ -574,18 +642,19 @@ function passcode() {
     code += b.dataset.n; draw();
     if (code.length === 4) setTimeout(() => {
       if (code === STORY.passcode) return unlock();
-      S.wrong++; dots.classList.add('shake'); setTimeout(() => dots.classList.remove('shake'), 450);
+      S.wrong++; buzz('wrong'); dots.classList.add('shake'); setTimeout(() => dots.classList.remove('shake'), 450);
       code = ''; draw();
     }, 120);
   });
-  el.querySelector('.cancel').onclick = () => { if (code) { code = code.slice(0, -1); draw(); } else pop(); };
+  el.querySelector('.cancel').onclick = () => { if (code) { code = code.slice(0, -1); draw(); } else { S.goTo = null; pop(); } };
   push(el);
 }
 const FAINT = [new Date('2026-10-24T17:40'), new Date('2026-10-24T20:35')];
 const INTV = [new Date('2026-10-22T17:00'), new Date('2026-10-22T17:40')];
 function unlock() {
-  const t = now();
+  const t = now(), go = S.goTo; S.goTo = null;
   if (t >= FAINT[0] && t < FAINT[1]) { // GERD Kino kumat (di klinik, ketiduran abis dikasih obat): HP ga bisa dibuka
+    buzz('faint');
     const el = h(`<div class="faint" data-nostatus="1" data-modal="1"><p>Dada Kino panas. Perutnya melilit.</p><p class="s">Ia nggak bisa berdiri. Lalu semuanya jauh.</p><p class="s2">(Kino lagi ditangani di klinik. HP-nya cuma bisa nerima notif. coba buka lagi nanti.)</p></div>`);
     const go = () => { if (el.isConnected) { el.remove(); syncChrome(); } }; push(el); setTimeout(() => { el.onclick = go; }, 2500); setTimeout(go, 10000); return; // 10 detik biar kebaca semua; boleh ditap abis 2,5 detik
   }
@@ -594,6 +663,7 @@ function unlock() {
     const go = () => { if (el.isConnected) { el.remove(); syncChrome(); } }; el.onclick = go; push(el); setTimeout(go, 8000); return;
   }
   S.unlocked = true; home();
+  if (go) setTimeout(() => { if (!S.unlocked || layersEl.children.length > 1) return; const [k, v] = go.split(':'); if (k === 'c') openApp('kakao', v); else openApp(v); }, 350);
   const k = dayKey(), d = DAILY[k], shown = store.get('daily', {});
   if (d && !shown[k] && !EPI) { shown[k] = 1; store.set('daily', shown); setTimeout(() => toast({ icon: typeof ICONS[d[0]] === 'function' ? ICONS[d[0]](now()) : (ICONS[d[0]] || ICONS.calendar(now())), title: d[1], body: d[2], ms: 5000 }), 900); }
 }
@@ -646,9 +716,9 @@ function home() {
     <div class="spot"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>Cari</div>
     <div class="dock">${DOCK.map(appIcon).join('')}</div>
   </div>`);
-  el.querySelectorAll('.app').forEach(b => b.onclick = () => openApp(b.dataset.app));
-  el.querySelector('.wcal').onclick = () => openApp('calendar');
-  el.querySelector('.wwx').onclick = () => openApp('weather');
+  el.querySelectorAll('.app').forEach(b => b.onclick = () => openFrom(b.querySelector('.icon, .fmw-box') || b, b.dataset.app));
+  el.querySelector('.wcal').onclick = (e) => openFrom(e.currentTarget, 'calendar');
+  el.querySelector('.wwx').onclick = (e) => openFrom(e.currentTarget, 'weather');
   epiButton(el); setBase(el);
 }
 // update badge home + daftar chat di tempat (gak gambar ulang home biar gak kedip)
@@ -670,6 +740,14 @@ function win({ title = '', back = '', cls = '', body = '', dark = true, sub = fa
   el.querySelector('.back').onclick = pop;
   if (S.noAnim) el.style.animation = 'xfade .22s ease both';
   return push(el);
+}
+// buka app dari home: zoom keluar dari ikonnya (kayak iPhone). pas ditutup balik mengecil ke ikon itu (lihat animOut)
+function openFrom(icon, id) {
+  const scr = $('#screen'), r = icon.getBoundingClientRect(), sr = scr.getBoundingClientRect(), sc = sr.width / scr.offsetWidth;
+  const o = `${Math.round((r.left + r.width / 2 - sr.left) / sc)}px ${Math.round((r.top + r.height / 2 - sr.top) / sc)}px`;
+  const before = topL(); openApp(id);
+  const t = topL(); if (!t || t === before || t.classList.contains('sub') || t.dataset.modal) return;
+  t.dataset.origin = o; t.style.transformOrigin = o; t.style.animation = 'appicon .38s cubic-bezier(.2,.85,.25,1)';
 }
 function openApp(id, arg) {
   if (!S.unlocked) return;
@@ -1295,7 +1373,8 @@ function ringtone() {
   try { file = sfx('ringtone'); file.loop = true; file.currentTime = 0; } catch (e) {}
   const synth = () => { const seq = [[0, 784], [.15, 1047], [.3, 1175], [.45, 1047], [.6, 784], [.9, 880], [1.05, 1175], [1.2, 1319], [1.5, 1175], [1.65, 880]]; const loop = () => { if (!on) return; seq.forEach(([t, f]) => marimba(f, t)); setTimeout(loop, 2600); }; loop(); };
   if (file) file.play().catch(() => synth()); else synth();
-  return () => { on = false; if (file) file.pause(); };
+  buzz('ring'); const vib = setInterval(() => buzz('ring'), 2250);
+  return () => { on = false; if (file) file.pause(); clearInterval(vib); try { navigator.vibrate && navigator.vibrate(0); } catch (e) {} };
 }
 function say(who, onVoice) {
   return; // file aud/yeoboseyo-*.mp3 belum ada → tiap telfon cuma bikin 404. nyalain lagi kalo filenya udah diupload
@@ -2036,8 +2115,15 @@ function appSettings() {
   const rows = [['#ff9500', 'Mode Pesawat', '', '<path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>'], ['#007aff', 'Wi-Fi', 'TowerB_4419', '<path d="M12 18.5l2.4-2.4a3.4 3.4 0 0 0-4.8 0zM7.2 13.7a6.8 6.8 0 0 1 9.6 0l1.7-1.7a9.2 9.2 0 0 0-13 0zM3.8 10.3a11.6 11.6 0 0 1 16.4 0l1.7-1.7a14 14 0 0 0-19.8 0z"/>'], ['#007aff', 'Bluetooth', 'Nyala', '<path d="M11 3l6 5-4.5 4 4.5 4-6 5v-7l-4 3.5-1-1L10 12 6 8.5l1-1 4 3.5z"/>'], ['#34c759', 'Seluler', '', '<path d="M5 17h3v4H5zM10 13h3v8h-3zM15 8h3v13h-3z"/>']];
   const rows2 = [['#ff3b30', 'Notifikasi', ''], ['#5856d6', 'Fokus', ''], ['#8e8e93', 'Umum', ''], ['#007aff', 'Tampilan & Kecerahan', ''], ['#34c759', 'Face ID & Kode Sandi', ''], ['#34c759', 'Baterai', `${Math.round(battery() * 100)}%`], ['#5856d6', 'Durasi Layar', '']].concat(I18N_ON ? [['#007aff', '🌐 Bahasa · Language', LANGS.find(x => x[0] === L)[2]]] : []);
   const r = (arr) => arr.map(([c, t, v, p]) => `<div class="row"><div class="sicon" style="background:${c}"><svg viewBox="0 0 24 24">${p || '<circle cx="12" cy="12" r="5"/>'}</svg></div><div class="rt"><div class="r1">${t}<span>${v}</span></div></div>${CHEV}</div>`).join('');
-  win({ big: 'Pengaturan', body: `<div class="list"><div class="row" style="padding:10px 16px">${av('Kino', 'rd')}<div class="rt"><div class="r1" style="font-size:20px">Kino</div><div class="r2" style="font-size:13px">Akun Apple, iCloud, dan lainnya</div></div>${CHEV}</div></div><div class="list">${r(rows)}</div><div class="list">${r(rows2)}</div>` });
+  // pilihan pemain (beneran ngaruh, bukan pajangan): layar penuh (cuma di HP) & getar
+  const sw = (k, t, on, c, p) => `<div class="row" data-sw="${k}"><div class="sicon" style="background:${c}"><svg viewBox="0 0 24 24">${p}</svg></div><div class="rt"><div class="r1">${t}</div></div><i class="sw${on ? ' on' : ''}"></i></div>`;
+  const opts = (canFull() ? sw('full', 'Layar Penuh', isFull(), '#8e8e93', '<path d="M4 9V4h5v2H6v3zm11-5h5v5h-2V6h-3zM4 15h2v3h3v2H4zm14 3v-3h2v5h-5v-2z"/>') : '') + sw('buzz', 'Getar', !store.get('noBuzz', false), '#ff2d55', '<path d="M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm1 2v14h6V5zM3 8h2v8H3zm16 0h2v8h-2z"/>');
+  win({ big: 'Pengaturan', body: `<div class="list"><div class="row" style="padding:10px 16px">${av('Kino', 'rd')}<div class="rt"><div class="r1" style="font-size:20px">Kino</div><div class="r2" style="font-size:13px">Akun Apple, iCloud, dan lainnya</div></div>${CHEV}</div></div><div class="list">${r(rows)}</div><div class="list">${opts}</div><div class="list">${r(rows2)}</div>` });
   topL().querySelector('.back').remove();
+  topL().querySelectorAll('[data-sw]').forEach(row => row.onclick = () => {
+    const on = !row.querySelector('.sw').classList.contains('on'); row.querySelector('.sw').classList.toggle('on', on);
+    if (row.dataset.sw === 'full') setFull(on); else { store.set('noBuzz', !on); if (on) buzz('notif'); }
+  });
   [...topL().querySelectorAll('.row')].find(r => r.textContent.includes('Durasi Layar')).onclick = screenTime;
   const lr = [...topL().querySelectorAll('.row')].pop();
   if (I18N_ON) lr.onclick = () => { const sh = h(`<div class="sheet-bg"><div class="sheet"><div class="sh-t">Bahasa · Language</div>${LANGS.map(([k, f, n]) => `<div class="row" data-l="${k}"><div class="rt"><div class="r1">${f}  ${n}<span>${k === L ? '✓' : ''}</span></div></div></div>`).join('')}</div></div>`);
@@ -2114,7 +2200,7 @@ let lastMailN = mailVis().length;
 let lastVisCount = Object.fromEntries(CHATS.map(c => [c.id, msgsOnly(c).length]));
 setInterval(() => {
   tickStatus();
-  { const t = now(); if (S.unlocked && !EPI && ((t >= INTV[0] && t < INTV[1]) || (t >= FAINT[0] && t < FAINT[1])) && !document.querySelector('.call, .ending')) { layersEl.querySelectorAll('.layer').forEach(x => x.remove()); lock(); } } // lagi interview / di klinik: HP kekunci
+  { const t = now(); if (S.unlocked && !EPI && ((t >= INTV[0] && t < INTV[1]) || (t >= FAINT[0] && t < FAINT[1])) && !document.querySelector('.call, .ending')) { if (t >= FAINT[0] && t < FAINT[1]) buzz('faint'); layersEl.querySelectorAll('.layer').forEach(x => x.remove()); lock(); } } // lagi interview / di klinik: HP kekunci (pas Kino jatoh: HP-nya getar)
   let changed = false;
   CHATS.forEach(c => {
     const ms = msgsOnly(c);
@@ -2150,10 +2236,11 @@ setInterval(() => {
   const pos = (e) => { const r = scr.getBoundingClientRect(), sc = r.height / scr.offsetHeight; return [(e.clientX - r.left) / sc, (e.clientY - r.top) / sc]; };
   scr.addEventListener('pointerdown', e => {
     const [x, y] = pos(e); const t = topL();
-    g = { x, y, bottom: y > scr.offsetHeight - 46, left: x < 22, t, moved: false };
+    g = { x, y, bottom: y > scr.offsetHeight - 46, left: x < 22, t, moved: false, at: performance.now(), lock: !S.unlocked && !!t && t.classList.contains('lock') && !e.target.closest('.lk-btn') };
   });
   scr.addEventListener('pointermove', e => {
     if (!g || !g.t || g.t.dataset.modal) return; const [x, y] = pos(e); const dx = x - g.x, dy = y - g.y;
+    if (g.lock) { if (g.moved || dy < -8) { g.moved = true; lockDrag(g.t, Math.max(0, -dy)); } return; }
     if (g.left && g.t.classList.contains('sub') && dx > 6) { g.moved = true; g.t.style.transition = 'none'; g.t.style.transform = `translateX(${Math.max(0, dx)}px)`; }
     else if (g.bottom && S.unlocked && layersEl.children.length > 1 && dy < -6) { g.moved = true; const k = Math.min(1, -dy / 500); g.t.style.transition = 'none'; g.t.style.transformOrigin = '50% 80%'; g.t.style.transform = `translateY(${dy * .45}px) scale(${1 - k * .45})`; g.t.style.borderRadius = `${k * 60}px`; }
   });
@@ -2164,6 +2251,7 @@ setInterval(() => {
     if (!st.moved && e.type === 'pointerup' && Math.abs(pos(e)[1] - st.y) < 10 && Math.abs(pos(e)[0] - st.x) < 10) passTap(e);
     if (!t) return;
     const [x, y] = pos(e); const dx = x - st.x, dy = y - st.y;
+    if (st.lock) { if (st.moved) lockRelease(t, Math.max(0, -dy), -dy / Math.max(1, performance.now() - st.at)); return; }
     const snap = () => { t.style.transition = 'transform .22s cubic-bezier(.2,.8,.2,1), border-radius .22s'; t.style.transform = ''; t.style.borderRadius = ''; setTimeout(() => { t.style.transition = ''; }, 240); };
     if (t.dataset.modal) return;
     if (st.bottom && dy < -50) {
@@ -2183,8 +2271,16 @@ setInterval(() => {
 })();
 
 // ---------- fit ----------
-// HP di dalem HP: frame iPhone selalu keliatan, di-scale biar muat (termasuk pas di-install / fullscreen)
-function fit() { const st = $('#stage'), m = innerWidth < 500 ? 16 : 24; const s = Math.min(1.15, (st.clientHeight - m) / 876, (st.clientWidth - m) / 417); $('#phone').style.transform = `translate(-50%,-50%) scale(${s})`; }
+// default: HP di dalem HP, frame iPhone keliatan & di-scale biar muat (biar ga kecampur sama HP beneran).
+// mode layar penuh (pilihan pemain, cuma di layar HP): tanpa frame, lebar layar Kino = lebar layar, tingginya ngikutin
+const canFull = () => Math.min(innerWidth, innerHeight) < 600;
+const isFull = () => canFull() && store.get('full', false);
+function setFull(on) { store.set('full', !!on); fit(); }
+function fit() {
+  const st = $('#stage'), ph = $('#phone'), full = isFull(); document.documentElement.classList.toggle('full', full);
+  if (full) { const s = st.clientWidth / 371; ph.style.height = `${st.clientHeight / s}px`; ph.style.transform = `translate(-50%,-50%) scale(${s})`; return; }
+  ph.style.height = ''; const m = innerWidth < 500 ? 16 : 24; const s = Math.min(1.15, (st.clientHeight - m) / 876, (st.clientWidth - m) / 417); ph.style.transform = `translate(-50%,-50%) scale(${s})`;
+}
 if (window.visualViewport) visualViewport.addEventListener('resize', fit);
 addEventListener('resize', fit); fit();
 // buat ngecek ending: ?lihat=maafin (ending) / ?lihat=maafin&epilog (narasi epilog → tombol HP seminggu kemudian). pake tab private biar progres asli ga ketimpa

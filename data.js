@@ -1354,6 +1354,12 @@ TYPE_LINES.grup.push(['ayam lagi ga', [['Surya', 'MAU'], ['Juna', 'gas']]]);
 
 // ===== BERANTEM (telepon) — 22 Okt 23.29, abis Kino kirim foto. Kino santai, nusuk.
 const FIGHT_AT = '2026-10-24T14:07:25';
+// ===== Kino ngetik kepeleset (salah ketik → dihapus → dibenerin). teks yg kekirim tetep sama =====
+// PANIC: jendela waktu Kino lagi kacau → tiap pesan yg dia ketik otomatis ada 1–3 salah ketik yg dibenerin
+const PANIC = [['2026-10-24T14:00', '2026-10-24T15:00'], ['2026-10-24T20:35', '2026-10-24T21:30'], ['2026-10-24T23:30', '2026-10-25T00:30']];
+// TYPO_SEQ: buat momen yg mau ditulis manual (ngalahin PANIC). kunci = teks akhir persis, isi = ketikan & angka minus (hapus n huruf)
+// contoh: 'aku baca': ['aku udah baca', -9, 'baca']  → ngetik "aku udah baca", hapus 9 huruf, ketik "baca"
+const TYPO_SEQ = {};
 const FIGHT_CALL = [
   ['t', 'kino...'],
   ['k', '...'],

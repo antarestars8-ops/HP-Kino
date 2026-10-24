@@ -819,3 +819,15 @@ img{display:block}
 .bub.photo.broken{width:190px;height:120px;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#e5e5ea;color:#8e8e93;font-size:12.5px}
 .bub.photo.broken span{font-size:22px;filter:grayscale(1);opacity:.7}
 /* (telfon di atas layar kunci udah otomatis: layer telfon ditaro sesudah layar kunci. jangan dikasih z-index, nanti nutupin layar ending) */
+/* buka app dari ikon home: zoom dari ikon, nutup balik ke ikon (transform-origin di-set dari JS) */
+@keyframes appicon{from{transform:scale(.12);opacity:0;border-radius:60px}}
+@keyframes appiconout{to{transform:scale(.12);opacity:0;border-radius:60px}}
+/* mode layar penuh (pilihan pemain): tanpa frame iPhone, layar Kino ngisi layar HP */
+html.full #stage{background:#000}
+html.full #phone{width:371px;padding:0;border-radius:0;box-shadow:none;background:#000}
+html.full #screen{border-radius:0}
+/* toggle di Pengaturan */
+.sw{flex:none;position:relative;width:51px;height:31px;border-radius:16px;background:#e9e9eb;transition:background .2s;margin-left:8px}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:transform .2s}
+.sw.on{background:#34c759}
+.sw.on::after{transform:translateX(20px)}
