@@ -4755,6 +4755,8 @@ Object.assign(IG_COMMENTS, {
   const i = LOC_KRIS.findIndex(e => e[0] === '2026-10-24T15:05');
   LOC_KRIS.splice(i, 2, ['2026-10-24T15:05', 'jalan'], ['2026-10-24T15:55', 'kantor'], ['2026-10-24T17:20', 'jalan'], ['2026-10-24T17:50', 'tower'], ['2026-10-24T18:00', 'jalan']);
   LOC_KINO.find(e => e[0] === '2026-10-24T20:15')[0] = '2026-10-24T21:10';
+  // Kris nunggu di depan klinik sampe Kino nyuruh pulang (20.51 "kamu pulang, istirahat" → 20.52 "oke. maaf"), klinik (Tower A) ke apart (Tower B) cuma lewat LG
+  const j = LOC_KRIS.findIndex(e => e[0] === '2026-10-24T20:40'); LOC_KRIS.splice(j, 2, ['2026-10-24T20:53', 'jalan'], ['2026-10-24T20:58', 'tower']);
 }
 
 // kantor & klinik ada di gedung yg sama kayak apart (Tower B: kantor di lantai bawah, apart di atas)
