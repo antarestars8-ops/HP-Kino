@@ -727,7 +727,9 @@ lama-lama aku bosen. bosen nunggu, bosen sama kita yang rasanya gitu-gitu aja. t
 
 dan yuna.
 
-yang keliatan pegangan tangan itu yuna lagi iseng baca garis tangan aku. katanya garis jodoh aku panjang. aku ketawa. ga ada apa-apa yang lebih dari itu. tapi itu ga bikin aku jadi ga salah. aku ngebiarin tangan aku dipegang orang lain, sambil bilang ke kamu aku lembur sendirian. kamu bener, aku bikin kamu keliatan kayak orang bego. padahal kamu ga bego, kino. yang bego aku.
+yang keliatan pegangan tangan itu yuna lagi iseng baca garis tangan aku. katanya garis jodoh aku panjang. aku ketawa. buat aku dia temen. belakangan aku baru sadar dia nganggepnya beda, dan aku yang bego ga nyadar. ga ada apa-apa yang lebih dari itu. tapi itu ga bikin aku jadi ga salah. aku ngebiarin tangan aku dipegang orang lain, sambil bilang ke kamu aku lembur sendirian. kamu bener, aku bikin kamu keliatan kayak orang bego. padahal kamu ga bego, kino. yang bego aku.
+
+malem tanggal 22 aku ga nginep kantor. abis makan aku jalan sendirian sampe itaewon, terus tidur di jjimjilbang. aku cuma pengen nata pikiran, tapi aku ga berani bilang itu ke kamu, jadi aku bohong lagi.
 
 pas aku sadar fotonya masuk ke album kita, aku hapus. terus aku ga berani buka chat kamu. dua hari. aku tau kamu nunggu, dan aku tetep ga buka. itu yang paling jahat.
 
@@ -1006,7 +1008,7 @@ const MIDNIGHT_CALL = [
   ['t', 'kepala kamu masih pusing?'], ['k', 'dikit.'],
   ['t', 'aku di kafe bawah, yg di lobi. aku ga naik. aku cuma mau ngomong'], ['k', 'ngomong.'],
   ['t', 'aku ga bakal bela diri. semua yg di surat itu bener.'],
-  ['t', 'yuna... aku udah bilang ke dia. selesai. ga ada apa-apa lagi.'],
+  ['t', 'yuna... ternyata dia nganggepnya beda. aku ga nyadar. aku udah bilang ke dia, aku punya kamu.'],
   ['k', 'itu urusan kamu.'],
   ['t', 'iya.'],
   ['k', 'kamu tau aku pingsan hari ini?'],
@@ -5320,7 +5322,7 @@ X_POSTS.push(['a' + (ALT.length - 1), 'alt', '2026-10-24T14:00', ALT[ALT.length 
 // telfon berantem: Kris bilang dia "cuma jalan aja" sama yuna (bosen, bukan niat selingkuh). Kino ngebalikin kata2nya
 {
   const set = (from, to) => { const l = FIGHT_CALL.find(l => l[1] === from); if (!l) throw new Error('fight: ' + from); l[1] = to; };
-  set('nggak, kino. dia yuna. temen kantor', 'nggak, kino. dia yuna. aku cuma jalan aja sama dia');
+  set('nggak, kino. dia yuna. temen kantor', 'nggak, kino. dia yuna. temen kantor. aku nganggep dia temen doang');
   set('temen kantor. yang megang tangan kamu. di seongsu. jam makan siang.', 'jalan aja. sambil megang tangan. di seongsu. jam makan siang.');
   set('yang di itaewon tanggal 22 juga temen kantor?', 'yang di itaewon tanggal 22 juga "jalan aja"?');
 }

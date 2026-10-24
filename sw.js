@@ -1,5 +1,5 @@
 // HP Kino service worker — naikin VERSION tiap file inti berubah
-const VERSION = 'hpkino-v309';
+const VERSION = 'hpkino-v310';
 const SHELL = ['index.html', 'style.css', 'i18n/core.js', 'app.js', 'data.js', 'manifest.webmanifest', 'icons/icon-192.png'];
 const MEDIA = 'hpkino-media'; // foto/video/suara: ga ikut kehapus tiap deploy (nama file baru = file baru)
 const CDN = 'https://hp-kino-media.hp-kino.workers.dev'; // media diambil dari Cloudflare (ga ngabisin kuota Vercel). kosongin = balik ke Vercel
