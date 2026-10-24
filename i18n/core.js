@@ -28,6 +28,7 @@ function tr(s) {
   if ((m = t.match(/^(🎂\s*)?(\d+) hari lagi$/))) return (m[1] || '') + ({ en: `${m[2]} days left`, ko: `${m[2]}일 남음`, zh: `还有${m[2]}天` })[L];
   if ((m = t.match(/^(🎂\s+)(\S.*)$/)) && D[m[2]] !== undefined) return m[1] + D[m[2]];
   if ((m = t.match(/^(\d+) Foto$/))) return ({ en: `${m[1]} Photos`, ko: `사진 ${m[1]}장`, zh: `${m[1]}张照片` })[L];
+  if ((m = t.match(/^([\s\S]+?) (\d{1,2}[:.]\d{2})$/)) && D[m[1]] !== undefined) return D[m[1]] + ' ' + m[2]; // "Panggilan suara 03:41"
   if ((m = t.match(/^(\d+) Catatan$/))) return ({ en: `${m[1]} Notes`, ko: `메모 ${m[1]}개` })[L] || t;
   // teks banyak baris yg ga ada utuh di kamus: terjemahin per baris
   if (t.includes('\n')) { let hit = false; const out = s.split('\n').map(x => { const y = x.trim() ? tr(x) : x; if (y !== x) hit = true; return y; }).join('\n'); if (hit) return out; }
