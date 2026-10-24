@@ -1069,9 +1069,10 @@ function playDraft(el, c) {
   inp.classList.add('typing-now'); inp.value = '';
   // diketik pelan2, didiemin, baru dihapus (biar kebaca)
   let i = 0; const typ = () => { if (!el.isConnected) return; if (i < d[2].length) { inp.value = d[2].slice(0, ++i); keyClick(false); return setTimeout(typ, 70 + Math.random() * 60); } setTimeout(del, 3200); };
-  const del = () => {
+  let held = false; const del = () => {
     if (!el.isConnected) return;
-    if (inp.value.length) { inp.value = inp.value.slice(0, -1); keyClick(false); return setTimeout(del, 90 + Math.random() * 60); }
+    if (d[5] && !held && inp.value === d[5]) { held = true; return setTimeout(del, 2600); } // sisa "kamu" doang, didiemin, baru ikut dihapus
+    if (inp.value.length) { inp.value = inp.value.slice(0, -1); keyClick(false); return setTimeout(del, (d[5] ? 45 : 90) + Math.random() * 60); }
     inp.classList.remove('typing-now'); delete el.dataset.typing;
   };
   setTimeout(typ, 900);
