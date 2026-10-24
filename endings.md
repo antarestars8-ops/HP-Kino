@@ -288,7 +288,7 @@ _Cara edit: jangan hapus tanda [..] di depan paragraf. Ganti teks di belakangnya
 
 [maafin epi 34] Kino tertawa. Tawa yang keluar begitu saja, keras dan jelek, seperti tawa delapan tahun lalu di kafe dekat kampus.
 
-[maafin epi 35] Kris selalu bilang dia yang jatuh duluan. Delapan tahun lalu, di kafe kecil dekat kampus, dia yang bertanya "mau nggak", dengan suara yang sedikit gemetar. Kino menjawab "terserah". Kris menganggap itu kemenangan.
+[maafin epi 35] Kris selalu bilang dia yang jatuh duluan. Delapan tahun lalu, di kafe kecil dekat kampus, dia yang bertanya duluan, dengan suara yang sedikit gemetar. "Mau nggak kamu— eh, boleh nggak kamu— boleh nggak aku jadi pacar kamu?" Tiga kali ganti kalimat dalam satu tarikan napas. Kino menjawab "terserah". Kris menganggap itu kemenangan.
 
 [maafin epi 36] Kris tidak pernah tahu soal charger kedua. Yang Kino bawa ke perpustakaan setiap hari, sebulan penuh sebelum hari itu, untuk anak sebelah yang selalu lupa membawa miliknya sendiri.
 
@@ -530,7 +530,7 @@ _Cara edit: jangan hapus tanda [..] di depan paragraf. Ganti teks di belakangnya
 
 [jeda epi 23] Kino menatap pesan itu lama. Lalu menaruh ponselnya di dada, telungkup, dan menutup mata.
 
-[jeda epi 24] Kris selalu bilang dia yang jatuh duluan. Delapan tahun lalu, di kafe kecil dekat kampus, dia yang bertanya "mau nggak", dengan suara yang sedikit gemetar. Kino menjawab "terserah". Kris menganggap itu kemenangan.
+[jeda epi 24] Kris selalu bilang dia yang jatuh duluan. Delapan tahun lalu, di kafe kecil dekat kampus, dia yang bertanya duluan, dengan suara yang sedikit gemetar. "Mau nggak kamu— eh, boleh nggak kamu— boleh nggak aku jadi pacar kamu?" Tiga kali ganti kalimat dalam satu tarikan napas. Kino menjawab "terserah". Kris menganggap itu kemenangan.
 
 [jeda epi 25] Kris tidak pernah tahu soal charger kedua. Yang Kino bawa ke perpustakaan setiap hari, sebulan penuh sebelum hari itu, untuk anak sebelah yang selalu lupa membawa miliknya sendiri.
 
@@ -776,7 +776,7 @@ _Cara edit: jangan hapus tanda [..] di depan paragraf. Ganti teks di belakangnya
 
 [turun epi 23] Kris tidak mengejarnya. Ia hanya berdiri di dekat etalase brownies, tersenyum seperti orang bodoh, dan untuk pertama kalinya dalam dua tahun, ia tidak terburu-buru.
 
-[turun epi 24] Kris selalu bilang dia yang jatuh duluan. Sepuluh tahun lalu, di kafe kecil dekat kampus, dia yang bertanya "mau nggak", dengan suara yang sedikit gemetar. Kino menjawab "terserah". Kris menganggap itu kemenangan.
+[turun epi 24] Kris selalu bilang dia yang jatuh duluan. Sepuluh tahun lalu, di kafe kecil dekat kampus, dia yang bertanya duluan, dengan suara yang sedikit gemetar. "Mau nggak kamu— eh, boleh nggak kamu— boleh nggak aku jadi pacar kamu?" Tiga kali ganti kalimat dalam satu tarikan napas. Kino menjawab "terserah". Kris menganggap itu kemenangan.
 
 [turun epi 25] Kris tidak pernah tahu soal charger kedua. Yang Kino bawa ke perpustakaan setiap hari, sebulan penuh sebelum hari itu, untuk anak sebelah yang selalu lupa membawa miliknya sendiri.
 
@@ -1010,7 +1010,7 @@ Ia tidak pernah marah karena Kris pergi dengan orang lain. Ia marah karena tahu 
 
 [waktu epi 28] Untuk pertama kalinya, tidak tahu terasa ringan.
 
-[waktu epi 29] Kris selalu bilang dia yang jatuh duluan. Sepuluh tahun lalu, di kafe kecil dekat kampus, dia yang bertanya "mau nggak", dengan suara yang sedikit gemetar. Kino menjawab "terserah". Kris menganggap itu kemenangan.
+[waktu epi 29] Kris selalu bilang dia yang jatuh duluan. Sepuluh tahun lalu, di kafe kecil dekat kampus, dia yang bertanya duluan, dengan suara yang sedikit gemetar. "Mau nggak kamu— eh, boleh nggak kamu— boleh nggak aku jadi pacar kamu?" Tiga kali ganti kalimat dalam satu tarikan napas. Kino menjawab "terserah". Kris menganggap itu kemenangan.
 
 [waktu epi 30] Kris tidak pernah tahu soal charger kedua. Yang Kino bawa ke perpustakaan setiap hari, sebulan penuh sebelum hari itu, untuk anak sebelah yang selalu lupa membawa miliknya sendiri.
 

@@ -5364,7 +5364,7 @@ KLOD.forEach(t => t.msgs.forEach(m => { if (m[0] === '2026-10-23T02:16') m[2] = 
 // epilog: Kino yg jatuh duluan (charger kedua di perpus), Kris ga pernah tau. penutup beda tiap ending
 {
   const p = (thn) => [
-    `Kris selalu bilang dia yang jatuh duluan. ${thn} tahun lalu, di kafe kecil dekat kampus, dia yang bertanya "mau nggak", dengan suara yang sedikit gemetar. Kino menjawab "terserah". Kris menganggap itu kemenangan.`,
+    `Kris selalu bilang dia yang jatuh duluan. ${thn} tahun lalu, di kafe kecil dekat kampus, dia yang bertanya duluan, dengan suara yang sedikit gemetar. "Mau nggak kamu— eh, boleh nggak kamu— boleh nggak aku jadi pacar kamu?" Tiga kali ganti kalimat dalam satu tarikan napas. Kino menjawab "terserah". Kris menganggap itu kemenangan.`,
     'Kris tidak pernah tahu soal charger kedua. Yang Kino bawa ke perpustakaan setiap hari, sebulan penuh sebelum hari itu, untuk anak sebelah yang selalu lupa membawa miliknya sendiri.',
   ];
   const put = (key, after, thn, close) => { const e = ENDINGS[key].epi, i = e.findIndex(l => String(l).startsWith(after)); if (i < 0) throw new Error('epi ' + key); e.splice(i + 1, 0, ...p(thn), close); };
