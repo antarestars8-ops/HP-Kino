@@ -7,7 +7,12 @@ const I18N_ON = true; // zh belum, makanya ga ada di LANGS
 const L = I18N_ON ? (LANG || 'id') : 'id', UILANG = L;
 if (L !== 'id') document.write(`<script src="i18n/${L}.js"><\/script>`);
 document.documentElement.lang = L;
-function setLang(l) { try { localStorage.setItem('hpkino:lang', JSON.stringify(l)); } catch (e) {} location.reload(); }
+// resume: balik langsung ke home (bukan layar Mulai); layar digelapin dulu biar ga ngeflash
+function setLang(l, resume) {
+  try { localStorage.setItem('hpkino:lang', JSON.stringify(l)); if (resume) localStorage.setItem('hpkino:resume', 'true'); } catch (e) {}
+  const v = document.createElement('div'); v.style.cssText = 'position:fixed;inset:0;background:#000;z-index:99999;opacity:0;transition:opacity .18s';
+  document.body.appendChild(v); requestAnimationFrame(() => { v.style.opacity = '1'; }); setTimeout(() => location.reload(), 200);
+}
 // terjemahin satu teks utuh; spasi di pinggir dipertahanin
 function tr(s) {
   if (L === 'id' || s == null || !window.I18N) return s;

@@ -2210,7 +2210,7 @@ function appSettings() {
   [...topL().querySelectorAll('.row')].find(r => r.textContent.includes('Durasi Layar')).onclick = screenTime;
   const lr = [...topL().querySelectorAll('.row')].pop();
   if (I18N_ON) lr.onclick = () => { const sh = h(`<div class="sheet-bg"><div class="sheet"><div class="sh-t">Bahasa · Language</div>${LANGS.map(([k, f, n]) => `<div class="row" data-l="${k}"><div class="rt"><div class="r1">${f}  ${n}<span>${k === L ? '✓' : ''}</span></div></div></div>`).join('')}</div></div>`);
-    topL().appendChild(sh); sh.onclick = (e) => { const r = e.target.closest('[data-l]'); if (r && r.dataset.l !== L) setLang(r.dataset.l); else sh.remove(); }; };
+    topL().appendChild(sh); sh.onclick = (e) => { const r = e.target.closest('[data-l]'); if (r && r.dataset.l !== L) setLang(r.dataset.l, true); else sh.remove(); }; };
 }
 function appPhone() {
   const fav = ['Kris', 'Mama', 'Juna', 'Surya', 'Gemilang', 'Sadewa', 'Bagas', 'Ilham', 'Mina'];
