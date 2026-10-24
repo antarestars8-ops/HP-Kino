@@ -64,7 +64,7 @@ const BDAY = new Date('2026-10-25T00:00');
 // cuma berlaku mulai 25 Okt jam beneran, biar cerita real-time 20–24 ga bisa dilewatin. ganti/tambah kodenya di sini
 const KADO_CODES = ['kadokino'];
 try { const kq = new URLSearchParams(location.search).get('kado'); if (kq) {
-  const ok = KADO_CODES.includes(kq.toLowerCase()) && tnow() >= BDAY.getTime(), to = new Date('2026-10-25T22:00').getTime();
+  const ok = KADO_CODES.includes(kq.toLowerCase()) && (tnow() >= BDAY.getTime() || DEV), to = new Date('2026-10-25T22:00').getTime(); // HP dev boleh ngetes sebelum tgl 25
   if (ok && now().getTime() < to) { localStorage.setItem('hpkino:replayOffset', String(to - tnow())); localStorage.setItem('hpkino:resume', 'true'); localStorage.setItem('hpkino:kadoToast', 'true'); }
   else localStorage.setItem('hpkino:kadoToast', ok ? '"udah"' : (KADO_CODES.includes(kq.toLowerCase()) ? '"belum"' : '"salah"'));
   window.__kadoGo = true; location.replace(location.pathname);
