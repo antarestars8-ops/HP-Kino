@@ -16,9 +16,11 @@ for (const c of CHATS) { if (c.muted) continue; // grup di-mute: ga ada push
     const cname = c.id === 'kris' ? 'kris 🐺' : c.name;
     const sender = who === 'them' ? cname : who;
     let body = o.img ? 'Foto' : o.call ? 'Panggilan suara' : o.deleted ? 'Pesan ini telah dihapus.' : text;
-    if (c.id === 'kris' && (o.afterFight || o.retract)) body = 'pesan baru'; // jangan spoiler
+    let full; // pesan Kris sesudah berantem: isinya baru boleh keliatan kalau telponnya udah diangkat (HP pemain yg nentuin, lihat sw.js)
+    if (c.id === 'kris' && o.afterFight && !o.retract) { full = body; body = 'pesan baru'; }
+    else if (c.id === 'kris' && o.retract) body = 'pesan baru'; // jangan spoiler
     if (c.id === 'kris' && o.call) { if (o.call === 'Panggilan tak terjawab') ev.push({ t, tag: 'kriscall', title: 'kris 🐺', body: 'Panggilan tak terjawab' }); continue; } // telfon tak terjawab Kris di cerita (spam abis foto, panik pas klinik) ikut jadi notif. telfon random ga
-    ev.push({ t, tag: c.id, title: cname, body: c.group ? `${sender}: ${body}` : body });
+    ev.push(full ? { t, tag: c.id, title: cname, body, full, gate: 'fight' } : { t, tag: c.id, title: cname, body: c.group ? `${sender}: ${body}` : body });
   }
 }
 ev.push({ t: FIGHT_AT, tag: 'call', title: 'kris 🐺', body: 'KakaoTalk Audio · memanggil…' });

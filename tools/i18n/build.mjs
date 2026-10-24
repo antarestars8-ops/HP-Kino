@@ -17,6 +17,6 @@ const ev = JSON.parse(src.slice(src.indexOf('['), src.lastIndexOf(']') + 1));
 const tr = (s, i) => (dict[s] && dict[s][i]) || s;
 const trBody = (b, i) => { const m = b.match(/^([^:]{1,24}): ([\s\S]*)$/); return m && dict[m[2]] ? `${tr(m[1], i)}: ${tr(m[2], i)}` : tr(b, i); };
 let hit = 0;
-ev.forEach(e => ['en', 'ko', 'zh'].forEach((l, i) => { e[l] = { title: tr(e.title, i), body: trBody(e.body, i) }; if (e[l].body !== e.body) hit++; }));
+ev.forEach(e => ['en', 'ko', 'zh'].forEach((l, i) => { e[l] = { title: tr(e.title, i), body: trBody(e.body, i) }; if (e.full) e[l].full = trBody(e.full, i); if (e[l].body !== e.body) hit++; }));
 fs.writeFileSync(evFile, src.slice(0, src.indexOf('[')) + JSON.stringify(ev) + ';\n');
 console.log('events', ev.length, 'translated bodies', hit);

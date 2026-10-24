@@ -1,5 +1,5 @@
 // HP Kino service worker — naikin VERSION tiap file inti berubah
-const VERSION = 'hpkino-v332';
+const VERSION = 'hpkino-v333';
 const SHELL = ['index.html', 'style.css', 'i18n/core.js', 'app.js', 'data.js', 'manifest.webmanifest', 'icons/icon-192.png'];
 const MEDIA = 'hpkino-media'; // foto/video/suara: ga ikut kehapus tiap deploy (nama file baru = file baru)
 const CDN = 'https://hp-kino-media.hp-kino.workers.dev'; // media diambil dari Cloudflare (ga ngabisin kuota Vercel). kosongin = balik ke Vercel
@@ -7,7 +7,7 @@ const CDN = 'https://hp-kino-media.hp-kino.workers.dev'; // media diambil dari C
 const fromCdn = (f) => !CDN ? Promise.reject() : fetch(/\.png$/.test(f) ? `${CDN}/${f}` : `${CDN}/${VERSION}/${f}`, { mode: 'cors', cache: 'no-store' })
   .then(r => r.ok ? r.blob().then(b => new Response(b, { headers: { 'Content-Type': r.headers.get('Content-Type') || '' } })) : Promise.reject());
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSION).then(c => Promise.all(SHELL.map(f => fromCdn(f).catch(() => fetch(new Request(f, { cache: 'reload' }))).then(r => { if (!r.ok) throw new Error(f); return c.put(f, r); })))).then(() => self.skipWaiting())); });
-self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION && k !== MEDIA).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
+self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION && k !== MEDIA && k !== 'hpkino-state').map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
   if (e.request.method !== 'GET' || u.origin !== location.origin || u.pathname.startsWith('/_vercel/') || u.pathname.startsWith('/api/')) return;
@@ -30,8 +30,10 @@ self.addEventListener('notificationclick', e => {
 // push dari server (app ketutup). Kalau app lagi kebuka & keliatan, gak usah dobel.
 self.addEventListener('push', e => {
   let d = {}; try { d = e.data.json(); } catch (_) { d = { title: 'HP Kino', body: e.data && e.data.text() }; }
-  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cs => {
+  // pesan Kris sesudah berantem: tampilin isinya cuma kalau di HP ini telponnya udah diangkat sebelum pesan itu (state ditulis app.js)
+  const body = d.gate !== 'fight' ? Promise.resolve(d.body) : caches.open('hpkino-state').then(c => c.match('/__state')).then(r => r ? r.json() : {}).then(st => st.fightAt && d.at >= st.fightAt ? d.full : d.body).catch(() => d.body);
+  e.waitUntil(Promise.all([self.clients.matchAll({ type: 'window', includeUncontrolled: true }), body]).then(([cs, b]) => {
     if (cs.some(c => c.visibilityState === 'visible')) return;
-    return self.registration.showNotification(d.title || 'HP Kino', { body: d.body || '', tag: d.tag, renotify: true, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png' });
+    return self.registration.showNotification(d.title || 'HP Kino', { body: b || '', tag: d.tag, renotify: true, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png' });
   }));
 });

@@ -1597,6 +1597,9 @@ function kinoReacts() {
 // Kris nyerah 14.27 (~20 menit sejak telpon pertama, sebelum Kino balik dari pantry 14.31): telponnya kelewat, cerita jalan terus
 const FIGHT_GIVEUP = new Date('2026-10-24T14:27');
 const fightOver = () => now() >= FIGHT_GIVEUP;
+// buat sw.js: notif push pesan Kris sesudah berantem baru keliatan isinya kalau telponnya udah diangkat (kalau ga diangkat, 14.27 otomatis keangkat)
+function swState() { try { caches.open('hpkino-state').then(c => c.put('/__state', new Response(JSON.stringify({ fightAt: S.fightAns || FIGHT_GIVEUP.getTime() })))); } catch (e) {} }
+if ('caches' in window) { setTimeout(swState, 3000); document.addEventListener('visibilitychange', () => { if (document.hidden) swState(); }); }
 const FIGHT_AUTO_SEC = 3 * 60 + 41; // durasi telpon kalo diangkatnya "di luar layar" jam 14.27: kelar 14.30, Kino balik ke ruangan 14.31
 // jeda sebelum nelpon lagi: awalnya beruntun, lama2 makin jarang (biar ga ratusan telpon kalo HP dibiarin), tapi ga pernah berhenti
 const fightRedialMs = () => fightDeclines <= 20 ? 3000 : Math.min(90000, 3000 + (fightDeclines - 20) * 6000);
