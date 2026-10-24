@@ -73,11 +73,17 @@ if (UI[L]) { HARI.splice(0, 7, ...UI[L].hari); BULAN.splice(0, 12, ...UI[L].bula
 const pad = (n) => String(n).padStart(2, '0');
 const hm = (d) => `${pad(d.getHours())}.${pad(d.getMinutes())}`;
 const dayStart = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+// tanggal ikut urutan bahasa: 24 Oktober 2026 / October 24, 2026 / 2026년 10월 24일
+const fmtD = (d, o = {}) => { const mo = o.short && L !== 'ko' ? BULAN[d.getMonth()].slice(0, 3) : BULAN[d.getMonth()], dy = o.day ? HARI[d.getDay()] : '';
+  if (L === 'ko') return `${o.y ? d.getFullYear() + '년 ' : ''}${mo} ${d.getDate()}일${dy ? ' ' + dy : ''}`;
+  if (L === 'en') return `${dy ? dy + ', ' : ''}${mo} ${d.getDate()}${o.y ? ', ' + d.getFullYear() : ''}`;
+  return `${dy ? dy + ', ' : ''}${d.getDate()} ${mo}${o.y ? ' ' + d.getFullYear() : ''}`; };
+const fmtMY = (m, y) => L === 'ko' ? `${y}년 ${BULAN[m]}` : `${BULAN[m]} ${y}`;
 const longDate = (d) => L === 'en' ? `${HARI[d.getDay()]}, ${BULAN[d.getMonth()]} ${d.getDate()}` : L === 'ko' || L === 'zh' ? `${BULAN[d.getMonth()]} ${d.getDate()}${L === 'ko' ? '일' : '日'} ${HARI[d.getDay()]}` : `${HARI[d.getDay()]}, ${d.getDate()} ${BULAN[d.getMonth()]}`;
 function relDay(d) {
   const diff = Math.round((dayStart(now()) - dayStart(d)) / 864e5);
   if (diff <= 0) return hm(d);
-  if (diff === 1) return 'Kemarin';
+  if (diff === 1) return ({ en: 'Yesterday', ko: '어제' })[L] || 'Kemarin';
   if (diff < 7) return HARI[d.getDay()];
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${String(d.getFullYear()).slice(2)}`;
 }
@@ -668,7 +674,7 @@ function unlock() {
   const t = now(), go = S.goTo; S.goTo = null;
   if (t >= FAINT[0] && t < FAINT[1]) { // GERD Kino kumat (di klinik, ketiduran abis dikasih obat): HP ga bisa dibuka
     buzz('faint');
-    const el = h(`<div class="faint" data-nostatus="1" data-modal="1"><p>Dada Kino panas. Perutnya melilit.</p><p class="s">Ia nggak bisa berdiri. Lalu semuanya jauh.</p><p class="s2">(Kino lagi ditangani di klinik. HP-nya cuma bisa nerima notif. coba buka lagi nanti.)</p></div>`);
+    const el = h(`<div class="faint" data-nostatus="1" data-modal="1"><p>Dada Kino panas. Perutnya melilit.</p><p class="s">Ia nggak bisa berdiri. Lalu semuanya jauh.</p><p class="s2">(Kino lagi ditangani di klinik, abis itu ketiduran. HP-nya cuma bisa nerima notif. bisa dibuka lagi sekitar jam 20.35.)</p></div>`);
     const go = () => { if (el.isConnected) { el.remove(); syncChrome(); } }; push(el); ambWhile(el, 'beep'); setTimeout(() => { el.onclick = go; }, 2500); setTimeout(go, 10000); return; // 10 detik biar kebaca semua; boleh ditap abis 2,5 detik
   }
   if (t >= INTV[0] && t < INTV[1]) { // interview oxford: HP ditelungkupin
@@ -775,7 +781,7 @@ const xPost = (id) => X_POSTS.find(p => p[0] === id);
 const xOk = (p) => { const o = p[7] || {}; return visible(new Date(p[2])) && (!o.fight || S.fightDone) && (!o.epi || (EPI && epiIs(o.epi))) && (!o.end || endKey() === o.end); };
 const xVis = () => X_POSTS.filter(xOk).sort((a, b) => new Date(b[2]) - new Date(a[2]));
 function xAv(u, cls = '') { const U = X_USERS[u] || {}; if (U.avImg) return `<div class="av rd ${cls}">${im(U.avImg)}</div>`; if (U.person) return av(U.person, 'rd ' + cls); if (U.emoji) return `<div class="av rd ${cls}" style="background:#e8f2fb;display:grid;place-items:center;font-size:20px">${U.emoji}</div>`; return av('', 'rd ' + cls); }
-const xAgo = (t) => { const m = (now() - t) / 6e4; return m < 60 ? `${Math.max(1, m | 0)}m` : m < 1440 ? `${(m / 60) | 0}j` : `${t.getDate()} ${BULAN[t.getMonth()].slice(0, 3)}`; };
+const xAgo = (t) => { const m = (now() - t) / 6e4; return m < 60 ? `${Math.max(1, m | 0)}m` : m < 1440 ? `${(m / 60) | 0}${L === 'en' ? 'h' : L === 'ko' ? '시간' : 'j'}` : fmtD(t, { short: true }); };
 const XI = {
   rep: '<svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>',
   rt: '<svg viewBox="0 0 24 24"><path d="M7 7h10v6M14 10l3 3 3-3M17 17H7v-6M10 14l-3-3-3 3"/></svg>',
@@ -853,7 +859,7 @@ function xNotif() {
 function xDMs(openU) {
   const ex = S.xAcct === 'kino' ? store.get('xdm', {}) : {};
   const th = (X_DMS[S.xAcct] || []).map(d => ({ ...d, msgs: [...d.msgs, ...(ex[d.u] || [])].sort((a, b) => a[0] < b[0] ? -1 : 1) })).map(d => ({ ...d, vis: d.msgs.filter(m => visible(new Date(m[0]))) })).filter(d => d.vis.length).sort((a, b) => new Date(b.vis[b.vis.length - 1][0]) - new Date(a.vis[a.vis.length - 1][0]));
-  const el = win({ cls: 'xapp', title: 'Pesan', back: '', sub: true, body: th.length ? th.map(d => { const L = d.vis[d.vis.length - 1]; return `<div class="xsrow" data-dm="${d.u}">${xAv(d.u, 'sm')}<div style="flex:1;min-width:0"><b>${esc(X_USERS[d.u].name)}</b><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${L[1] === 'me' ? 'Kamu: ' : ''}${esc(L[2])}</span></div><small style="color:#536471">${xAgo(new Date(L[0]))}</small></div>`; }).join('') : `<div class="xempty">${S.xAcct === 'alt' ? 'Belum ada pesan.<br><small>ga ada yg tau akun ini</small>' : 'Belum ada pesan'}</div>`, footer: xBar(3) });
+  const el = win({ cls: 'xapp', title: 'Pesan', back: '', sub: true, body: th.length ? th.map(d => { const L = d.vis[d.vis.length - 1]; return `<div class="xsrow" data-dm="${d.u}">${xAv(d.u, 'sm')}<div style="flex:1;min-width:0"><b>${esc(X_USERS[d.u].name)}</b><span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${L[1] === 'me' ? ({ en: 'You: ', ko: '나: ' })[UILANG] || 'Kamu: ' : ''}${esc(L[2])}</span></div><small style="color:#536471">${xAgo(new Date(L[0]))}</small></div>`; }).join('') : `<div class="xempty">${S.xAcct === 'alt' ? 'Belum ada pesan.<br><small>ga ada yg tau akun ini</small>' : 'Belum ada pesan'}</div>`, footer: xBar(3) });
   const openT = (u) => { const d = th.find(x => x.u === u); if (d) dmThread(X_USERS[d.u].name, xAv(d.u, 'sm'), d.vis, 'xapp', 'x', d.u); };
   el.querySelectorAll('[data-dm]').forEach(r => r.onclick = () => openT(r.dataset.dm));
   wireXBar(el); if (typeof openU === 'string') openT(openU);
@@ -861,7 +867,7 @@ function xDMs(openU) {
 // satu percakapan DM (X / IG), cuma bisa dibaca
 function dmThread(name, avHtml, msgs, cls, pf, u) {
   let lastDay = '';
-  const body = msgs.map(([ts, who, text]) => { const t = new Date(ts), d = dayKey(t); const sep = d !== lastDay ? `<div class="dmday">${t.getDate()} ${BULAN[t.getMonth()].slice(0, 3)} · ${hm(t)}</div>` : ''; lastDay = d; return `${sep}<div class="dmb ${who === 'me' ? 'me' : ''}">${esc(text)}</div>`; }).join('');
+  const body = msgs.map(([ts, who, text]) => { const t = new Date(ts), d = dayKey(t); const sep = d !== lastDay ? `<div class="dmday">${fmtD(t, { short: true })} · ${hm(t)}</div>` : ''; lastDay = d; return `${sep}<div class="dmb ${who === 'me' ? 'me' : ''}">${esc(text)}</div>`; }).join('');
   const pool = (pf && DM_KINO[pf] && DM_KINO[pf][u]) || [];
   const el = win({ cls: cls + ' dmwin', title: `<span style="display:flex;align-items:center;gap:8px;justify-content:center">${avHtml}${esc(name)}</span>`, back: '', sub: true, body: `<div class="dmlist">${body}</div>`, footer: pool.length ? typeBar('Ketuk buat bales') : '<div class="dmfoot">Kino lagi gak mau bales di sini</div>' });
   const b = el.querySelector('.body'); setTimeout(() => b.scrollTop = b.scrollHeight, 50);
@@ -906,7 +912,7 @@ function igDMs(openU) {
   Object.keys(extra).forEach(u => { if (!base.some(d => d.u === u)) base.push({ u, msgs: extra[u] }); });
   base.forEach(d => d.msgs.sort((a, b) => a[0] < b[0] ? -1 : 1));
   const th = base.map(d => ({ ...d, vis: d.msgs.filter(m => visible(new Date(m[0]))) })).filter(d => d.vis.length).sort((a, b) => new Date(b.vis[b.vis.length - 1][0]) - new Date(a.vis[a.vis.length - 1][0]));
-  const el = win({ cls: 'insta', title: '<b>kinoo.lee</b>', back: '', sub: true, body: `<div style="padding:8px 14px;font-weight:600">Pesan</div>${th.map(d => { const L = d.vis[d.vis.length - 1]; return `<div class="igc-row" data-dm="${d.u}" style="cursor:pointer;align-items:center">${igAv(d.u)}<div><b>${esc(d.u)}</b><small style="display:block;color:#8e8e8e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${L[1] === 'me' ? 'Kamu: ' : ''}${esc(L[2])} · ${ago(new Date(L[0]))}</small></div></div>`; }).join('') || '<div class="xempty">Belum ada pesan</div>'}` });
+  const el = win({ cls: 'insta', title: '<b>kinoo.lee</b>', back: '', sub: true, body: `<div style="padding:8px 14px;font-weight:600">Pesan</div>${th.map(d => { const L = d.vis[d.vis.length - 1]; return `<div class="igc-row" data-dm="${d.u}" style="cursor:pointer;align-items:center">${igAv(d.u)}<div><b>${esc(d.u)}</b><small style="display:block;color:#8e8e8e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${L[1] === 'me' ? ({ en: 'You: ', ko: '나: ' })[UILANG] || 'Kamu: ' : ''}${esc(L[2])} · ${ago(new Date(L[0]))}</small></div></div>`; }).join('') || '<div class="xempty">Belum ada pesan</div>'}` });
   const openT = (u) => { const d = th.find(x => x.u === u); if (d) dmThread(d.u, igAv(d.u), d.vis, 'insta', 'ig', d.u); };
   el.querySelectorAll('[data-dm]').forEach(r => r.onclick = () => openT(r.dataset.dm));
   if (typeof openU === 'string') openT(openU);
@@ -939,7 +945,7 @@ const mailFrom = (m) => m.from === 'Kris' ? krisName() : m.from;
 const mailAv = (m) => m.from === 'Kris' ? av('Kris', 'sm') : m.av && /\.(jpg|png)$/.test(m.av[0]) ? `<div class="av sm"><img src="${m.av[0]}" alt=""></div>` : `<div class="av sm mav" style="background:${m.av ? m.av[1] : '#8e8e93'}">${esc(m.av ? m.av[0] : mailFrom(m)[0])}</div>`;
 const mailWhen = (d) => relDay(d) === hm(d) ? hm(d) : `${d.getDate()}/${d.getMonth() + 1}/${String(d.getFullYear()).slice(2)}`;
 function mailRows() {
-  return mailVis().map((m, i) => { const d = new Date(m.ts), un = !mailIsRead(m); return `<button class="mrow2${un ? ' un' : ''}" data-i="${i}"><i class="mdot"></i>${mailAv(m)}<div class="mtx"><div class="m1"><b>${esc(mailFrom(m))}</b><span>${mailWhen(d)} ›</span></div><div class="m2">${m.tag ? `<em>${esc(m.tag)}</em>` : ''}${esc(m.subj)}</div><div class="m3">${esc(m.body.replace(/\n+/g, ' '))}</div></div></button>`; }).join('');
+  return mailVis().map((m, i) => { const d = new Date(m.ts), un = !mailIsRead(m); return `<button class="mrow2${un ? ' un' : ''}" data-i="${i}"><i class="mdot"></i>${mailAv(m)}<div class="mtx"><div class="m1"><b>${esc(mailFrom(m))}</b><span>${mailWhen(d)} ›</span></div><div class="m2">${m.tag ? `<em>${esc(m.tag)}</em>` : ''}${esc(m.subj)}</div><div class="m3">${esc(tr(m.body).replace(/\n+/g, ' '))}</div></div></button>`; }).join('');
 }
 function appMail() {
   const el = win({ cls: 'mail', back: 'Kotak Surat', act: '<span style="color:#007aff;font-size:17px">Edit</span>', big: 'Kotak Masuk', body: `<div class="msearch"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>Cari</div><div class="mcats"><span class="on">👤 Utama</span><span>🛒 Transaksi</span><span>💬 Update</span><span>📣 Promosi</span></div><div class="mlist2">${mailRows()}</div>`,
@@ -951,12 +957,12 @@ function appMail() {
 function openMail(m) {
   if (/#1842/.test(m.subj) && /merged/.test(m.subj)) clue('github-1842');
   const d = new Date(m.ts);
-  win({ cls: 'mail mread', sub: true, back: 'Kotak Masuk', act: '<span class="mnav">⌃ ⌄</span>', body: `<div class="mhead">${mailAv(m)}<div><b>${esc(mailFrom(m))}</b><small>Ke: Kino · ${d.getDate()} ${BULAN[d.getMonth()]} ${d.getFullYear()} ${hm(d)}</small><small class="maddr">${esc(m.addr)}</small></div></div><h3 class="msubj">${esc(m.subj)}</h3><div class="mbody">${esc(m.body)}</div>`,
+  win({ cls: 'mail mread', sub: true, back: 'Kotak Masuk', act: '<span class="mnav">⌃ ⌄</span>', body: `<div class="mhead">${mailAv(m)}<div><b>${esc(mailFrom(m))}</b><small>${({ en: 'To', ko: '받는 사람' })[L] || 'Ke'}: Kino · ${fmtD(d, { y: true })} ${hm(d)}</small><small class="maddr">${esc(m.addr)}</small></div></div><h3 class="msubj">${esc(m.subj)}</h3><div class="mbody">${esc(m.body)}</div>`,
     footer: `<div class="mfoot mact"><svg viewBox="0 0 24 24"><path d="M5 7h14l-1 13H6zM9 7V4h6v3"/></svg><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 6l8 7 8-7"/></svg><svg viewBox="0 0 24 24"><path d="M10 8L5 12l5 4M5 12h9a5 5 0 0 1 5 5"/></svg><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></div>` });
 }
 function appMemo() {
   const list = MEMOS.filter(m => visible(new Date(m.ts))).sort((a, b) => new Date(b.ts) - new Date(a.ts));
-  const el = win({ cls: 'notepage memo', big: 'Semua Rekaman', back: '', body: `<div class="mlist">${list.map((m, i) => { const d = new Date(m.ts); return `<div class="mrow" data-i="${i}" style="display:none"><div class="mt">${esc(m.title)}</div><div class="ms"><span>${relDay(d) === hm(d) ? hm(d) : `${d.getDate()} ${BULAN[d.getMonth()].slice(0, 3)} ${d.getFullYear()}`}</span><span class="md">--:--</span></div><div class="mplay"><div class="mbar"><i></i></div><div class="mbtns"><button class="mp">▶</button></div></div></div>`; }).join('')}</div><div class="mempty">Belum ada rekaman</div>` });
+  const el = win({ cls: 'notepage memo', big: 'Semua Rekaman', back: '', body: `<div class="mlist">${list.map((m, i) => { const d = new Date(m.ts); return `<div class="mrow" data-i="${i}" style="display:none"><div class="mt">${esc(m.title)}</div><div class="ms"><span>${relDay(d) === hm(d) ? hm(d) : fmtD(d, { short: true, y: true })}</span><span class="md">--:--</span></div><div class="mplay"><div class="mbar"><i></i></div><div class="mbtns"><button class="mp">▶</button></div></div></div>`; }).join('')}</div><div class="mempty">Belum ada rekaman</div>` });
   el.querySelector('.back').innerHTML = '<span>Edit</span>';
   let cur = null;
   el.querySelectorAll('.mrow').forEach(r => {
@@ -1032,7 +1038,7 @@ function chatParts(c) {
   const unreadByKris = (it) => { if (!krisTimes || it.who !== 'me' || (it.o && it.o.call)) return false; const k = it.ts.toISOString ? `${dayKey(it.ts)}T${hm(it.ts).replace('.', ':')}` : ''; const ex = typeof KRIS_READ !== 'undefined' && KRIS_READ[k]; const rt = ex ? new Date(ex).getTime() : krisTimes.find(t => t >= it.ts.getTime()); return !rt || rt > nowT.getTime(); };
   items.forEach((it, i) => {
     let html = it === c._unreadFrom ? '<div class="unread-div"><span>Belum dibaca</span></div>' : ''; // batas pesan terakhir dibaca
-    if (it.date) { parts.push(`<div class="kdate"><span>${HARI[it.date.getDay()]}, ${it.date.getDate()} ${BULAN[it.date.getMonth()]} ${it.date.getFullYear()} ›</span></div>`); return; }
+    if (it.date) { parts.push(`<div class="kdate"><span>${fmtD(it.date, { day: true, y: true })} ›</span></div>`); return; }
     const prev = items[i - 1], next = items[i + 1];
     const from = it.who === 'me' ? 'me' : it.who === 'them' ? c.person : it.who;
     const prevFrom = prev && !prev.date ? (prev.who === 'me' ? 'me' : prev.who === 'them' ? c.person : prev.who) : null;
@@ -1189,9 +1195,9 @@ function wireChat(el, pr = { first: true }) {
 const photoGone = (p) => p.gone && now() >= new Date(p.gone); // foto Koleksi Bersama yg udah dihapus pemiliknya
 function appPhotos() {
   const vis = PHOTOS.map(p => ({ ...p, t: new Date(p.ts) })).filter(p => visible(p.t) && !photoGone(p) && (!p.epi || (EPI && epiIs(p.epi))) && (!p.end || endKey() === p.end) && (!p.noEnd || endKey() !== p.noEnd)).sort((a, b) => b.t - a.t);
-  const groups = []; vis.forEach(p => { const k = `${BULAN[p.t.getMonth()]} ${p.t.getFullYear()}`; let g = groups.find(g => g.k === k); if (!g) groups.push(g = { k, items: [] }); g.items.push(p); });
+  const groups = []; vis.forEach(p => { const k = fmtMY(p.t.getMonth(), p.t.getFullYear()); let g = groups.find(g => g.k === k); if (!g) groups.push(g = { k, items: [] }); g.items.push(p); });
   const mem = EPI ? EPI_MEMORY[EPI.key] : MEMORIES[dayKey()];
-  const el = win({ cls: 'photos', body: `<div class="bigtitle">Pustaka</div><div class="cnt">${vis.length} Foto</div>${PHOTOS.filter(p => p.shared && photoGone(p) && visible(new Date(p.ts))).map(p => `<div class="shgone">${esc(p.shared)} menghapus 1 foto dari Koleksi Bersama</div>`).join('')}${mem ? `<div class="memcard"><div class="memimg">${im(mem[1][0])}</div><div class="memt"><small>KENANGAN · HARI INI</small><b>${esc(mem[0])}</b></div><span>▶</span></div>` : ''}${groups.map(g => `<div class="mon">${g.k}</div><div class="pgrid">${g.items.map(p => `<div class="ptile" data-i="${vis.indexOf(p)}">${imT(p.img)}${p.shared ? '<i class="shb">👥</i>' : ''}</div>`).join('')}</div>`).join('')}`,
+  const el = win({ cls: 'photos', body: `<div class="bigtitle">Pustaka</div><div class="cnt">${vis.length} Foto</div>${PHOTOS.filter(p => p.shared && photoGone(p) && visible(new Date(p.ts))).map(p => `<div class="shgone">${({ en: esc(p.shared) + ' deleted 1 photo from Shared Album', ko: esc(p.shared) + ' 님이 공유 앨범에서 사진 1장을 삭제했습니다' })[L] || esc(p.shared) + ' menghapus 1 foto dari Koleksi Bersama'}</div>`).join('')}${mem ? `<div class="memcard"><div class="memimg">${im(mem[1][0])}</div><div class="memt"><small>KENANGAN · HARI INI</small><b>${esc(mem[0])}</b></div><span>▶</span></div>` : ''}${groups.map(g => `<div class="mon">${g.k}</div><div class="pgrid">${g.items.map(p => `<div class="ptile" data-i="${vis.indexOf(p)}">${imT(p.img)}${p.shared ? '<i class="shb">👥</i>' : ''}</div>`).join('')}</div>`).join('')}`,
     act: '<span style="color:#007aff;font-size:17px">Pilih</span>', footer: '<div class="seg"><span>Tahun</span><span>Bulan</span><span class="on">Semua Foto</span></div>' });
   el.querySelector('.back').style.visibility = 'hidden';
   el.querySelectorAll(".ptile").forEach(t => t.onclick = () => viewPhoto(vis[+t.dataset.i]));
@@ -1208,7 +1214,7 @@ function memoryShow([title, pics]) {
 function viewPhoto(p) {
   if (p.img === 'img/ig/minchan-5.jpg') clue('hari-pertama');
   const t = p.t || p.ts;
-  const el = h(`<div class="win pview sub"><div class="nav"><button class="back" style="color:#fff">${BACK}</button><h2>${t ? `${t.getDate()} ${BULAN[t.getMonth()]} ${t.getFullYear()}<small>${p.place ? esc(p.place) + ' · ' : ''}${hm(t)}</small>` : ''}</h2></div><div class="pbig">${/\.mp4$/.test(p.img) ? `<video class="ph-img" src="${p.img}" playsinline autoplay loop controls></video>` : im(p.img)}</div></div>`);
+  const el = h(`<div class="win pview sub"><div class="nav"><button class="back" style="color:#fff">${BACK}</button><h2>${t ? `${fmtD(t, { y: true })}<small>${p.place ? esc(p.place) + ' · ' : ''}${hm(t)}</small>` : ''}</h2></div><div class="pbig">${/\.mp4$/.test(p.img) ? `<video class="ph-img" src="${p.img}" playsinline autoplay loop controls></video>` : im(p.img)}</div></div>`);
   el.querySelector('.back').onclick = pop;
   if (p.img && !/^data:|\.mp4$/.test(p.img) && S.unlocked) {
     el.insertAdjacentHTML('beforeend', `<div class="pbar"><button class="psend"><svg viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M5 13v7h14v-7"/></svg></button><span>Bagikan</span></div>`);
@@ -1308,7 +1314,7 @@ function appNotes(open) {
     const lastLog = n.log && n.log.filter(logVis).pop(); const dr = n.drafts && lastDraft(n);
     if (n.todo) { const it = todoVis(n), open = it.filter(x => !x.done); return `<button class="row" data-n="${n.id}"><div class="rt"><div class="r1">${dot(n)}<b>${esc(n.title)}</b></div><div class="r2"><span style="color:#3c3c43">${esc(relDay(todoLast(n)))}</span>&nbsp; ${esc(open.length ? open[0].t : 'semua beres')}</div></div></button>`; }
     const date = n.ts ? relDay(new Date(n.ts)) : dr ? relDay(new Date(dr[0])) : lastLog ? relDay(new Date(lastLog[0])) : n.date;
-    const sub = dr ? (dr[1] ? dr[1].split('\n')[0] : 'Tidak ada teks tambahan') : n.locked ? (S.letterRead ? 'kino,' : 'Terkunci') : lastLog ? lastLog[1].split('\n')[0] : n.body.split('\n')[0];
+    const sub = dr ? (dr[1] ? tr(dr[1]).split('\n')[0] : 'Tidak ada teks tambahan') : n.locked ? (S.letterRead ? 'kino,' : 'Terkunci') : lastLog ? tr(lastLog[1]).split('\n')[0] : tr(n.body).split('\n')[0];
     return `<button class="row" data-n="${n.id}"><div class="rt"><div class="r1">${dot(n)}<b>${n.locked ? '🔒 ' : ''}${esc(n.title)}</b></div><div class="r2"><span style="color:#3c3c43">${esc(date)}</span>&nbsp; ${esc(sub)}</div>${n.shared ? '<div class="r2" style="font-size:13px">👤 Dibagikan oleh Kris</div>' : ''}</div></button>`;
   }).join('');
   const el = win({ cls: 'notes', back: 'Folder', big: 'Catatan', body: `<div class="list">${rows}</div><div style="text-align:center;color:#8e8e93;font-size:12px">${vis.length} Catatan</div>` });
@@ -1846,7 +1852,7 @@ function appCalendar() {
     const sd = new Date(sel + 'T00:00'), list = ev(sel);
     el.querySelector('.back').innerHTML = `${BACK}${y}`;
     el.querySelector('.calwrap').innerHTML = `<div class="calbar"><div class="bigtitle" style="color:#ff3b30;padding:0">${BULAN[m]}</div><div><button class="cm" data-d="-1">‹</button><button class="cm" data-d="1">›</button></div></div>
-      <div class="calhead">${['M', 'S', 'S', 'R', 'K', 'J', 'S'].map(d => `<span>${d}</span>`).join('')}</div><div class="calgrid">${cells}</div>
+      <div class="calhead">${(({ en: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], ko: ['일', '월', '화', '수', '목', '금', '토'] })[L] || ['M', 'S', 'S', 'R', 'K', 'J', 'S']).map(d => `<span>${d}</span>`).join('')}</div><div class="calgrid">${cells}</div>
       <div class="caldate">${longDate(sd)}</div>
       ${list.length ? list.map(([, tm, ti, c, note]) => `<div class="evrow"><i style="background:${c}"></i><div style="flex:1"><div class="et">${esc(ti)}</div>${note ? `<div class="es">${esc(note)}</div>` : ''}</div><div class="es" style="text-align:right">${tm ? tm.replace(':', '.') : 'seharian'}</div></div>`).join('') : '<div style="padding:14px 16px;color:#8e8e93">Tidak Ada Acara</div>'}`;
     el.querySelectorAll('[data-k]').forEach(c => c.onclick = () => { sel = c.dataset.k; draw(); });
@@ -1868,7 +1874,7 @@ const IGI = {
   grid: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>',
 };
 S.igSeen = store.get('igSeen', {}); S.liked = store.get('liked', {});
-const ago = (t) => { const m = (now() - t) / 6e4; return m < 60 ? `${Math.max(1, m | 0)} menit` : m < 1440 ? `${(m / 60) | 0} jam` : m < 10080 ? `${(m / 1440) | 0} hari` : `${t.getDate()} ${BULAN[t.getMonth()]}`; };
+const ago = (t) => { const m = (now() - t) / 6e4; return m < 60 ? `${Math.max(1, m | 0)}${({ en: " min", ko: "분" })[L] || " menit"}` : m < 1440 ? `${(m / 60) | 0}${({ en: ' h', ko: '시간' })[L] || ' jam'}` : m < 10080 ? `${(m / 1440) | 0}${({ en: ' d', ko: '일' })[L] || ' hari'}` : fmtD(t); };
 const igPerson = (u) => (PROFILES[u] || {}).person;
 const igAv = (u, cls = 'sm rd') => av(igPerson(u), cls);
 function activeStories() {
@@ -1891,7 +1897,7 @@ const igVisible = () => INSTA.map(p => ({ ...p, t: new Date(p.ts) })).filter(p =
 const vidHTML = (src) => `<video class="ph-img" src="${src}" muted loop playsinline autoplay preload="metadata" poster="${vidPoster(src)}"></video><span class="reelic">${IGI.reels}</span>`;
 function postHTML(p, k) {
   const liked = S.liked[p.user + p.img];
-  return `<div class="post"><div class="phd" data-u="${p.user}">${igAv(p.user)}<span>${esc(p.user)}</span></div><div class="img${p.reel ? ' reelimg' : ''}" data-k="${k}">${p.reel ? vidHTML(p.img) : im(p.img)}<div class="bigheart">${IGI.heartF}</div></div><div class="acts"><span class="lk" data-k="${k}">${liked ? IGI.heartF : IGI.heart}</span><span class="cm" data-cm="${p.user}@${p.ts}">${IGI.com}</span>${IGI.send}${IGI.bm}</div><div class="cap"><b>${esc(p.likes)} suka</b><br><b data-u="${p.user}">${esc(p.user)}</b> ${esc(p.cap || '')}</div>${igComHTML(p)}<div class="tm">${now() - p.t < 6048e5 ? ago(p.t) + ' yang lalu' : ago(p.t)}</div></div>`;
+  return `<div class="post"><div class="phd" data-u="${p.user}">${igAv(p.user)}<span>${esc(p.user)}</span></div><div class="img${p.reel ? ' reelimg' : ''}" data-k="${k}">${p.reel ? vidHTML(p.img) : im(p.img)}<div class="bigheart">${IGI.heartF}</div></div><div class="acts"><span class="lk" data-k="${k}">${liked ? IGI.heartF : IGI.heart}</span><span class="cm" data-cm="${p.user}@${p.ts}">${IGI.com}</span>${IGI.send}${IGI.bm}</div><div class="cap"><b>${L === 'ko' ? '좋아요 ' + esc(p.likes) + '개' : esc(p.likes) + (L === 'en' ? ' likes' : ' suka')}</b><br><b data-u="${p.user}">${esc(p.user)}</b> ${esc(p.cap || '')}</div>${igComHTML(p)}<div class="tm">${now() - p.t < 6048e5 ? (L === 'ko' ? ago(p.t) + ' 전' : L === 'en' ? ago(p.t) + ' ago' : ago(p.t) + ' yang lalu') : ago(p.t)}</div></div>`;
 }
 // kolom ketik buat IG/X (markup sama kayak chat, biar typeOut kepake)
 const typeBar = (ph) => `<div class="qr" style="display:none"></div><div class="kinput socin"><div class="f" role="button" data-ph="${esc(ph)}"></div><button class="snd"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button></div>`;
@@ -1911,7 +1917,7 @@ const socUsed = (key) => (S.soc[key] || []).filter(([u]) => u === 'kinoo.lee' ||
 const igComs = (p) => (typeof IG_COMMENTS !== 'undefined' && IG_COMMENTS[p.user + '@' + p.ts]) || [];
 function igComHTML(p) {
   const cs = [...igComs(p), ...((S.soc[p.user + '@' + p.ts]) || [])]; if (!cs.length) return '';
-  return `<div class="igcom">${cs.length > 2 ? `<div class="igall" data-cm="${p.user}@${p.ts}">Lihat semua ${cs.length} komentar</div>` : ''}${cs.slice(0, 2).map(([u, t]) => `<div><b data-u="${u}">${esc(u)}</b> ${esc(t)}</div>`).join('')}</div>`;
+  return `<div class="igcom">${cs.length > 2 ? `<div class="igall" data-cm="${p.user}@${p.ts}">${({ en: `View all ${cs.length} comments`, ko: `댓글 ${cs.length}개 모두 보기` })[L] || `Lihat semua ${cs.length} komentar`}</div>` : ''}${cs.slice(0, 2).map(([u, t]) => `<div><b data-u="${u}">${esc(u)}</b> ${esc(t)}</div>`).join('')}</div>`;
 }
 // Kino komen/bales postingan Kris cuma pas lagi baik2 aja: sebelum minggu ini kerasa aneh (20 Okt 18.52), atau udah baikan (maafin, 25 Okt)
 const WEEK0 = '2026-10-20'; // mulai minggu cerita: bales/komen Kino harus sesuai postingannya
@@ -1935,7 +1941,7 @@ const pickLine = (key, pool) => { const used = socUsed(key), spec = KINO_POST_LI
 function openComments(key) {
   const [user, ts] = key.split('@'); const p = INSTA.find(x => x.user === user && x.ts === ts); if (!p) return;
   const t0 = new Date(p.ts); const cs = [...igComs(p), ...(S.soc[key] || [])];
-  const row = ([u, t, ts], i) => `<div class="igc-row" data-u="${u}">${igAv(u)}<div><b>${esc(u)}</b> ${esc(t)}<small>${ts ? 'baru saja' : ago(new Date(t0.getTime() + (i + 1) * 17 * 6e4))} · Balas</small></div><span class="igc-h">${IGI.heart}</span></div>`;
+  const row = ([u, t, ts], i) => `<div class="igc-row" data-u="${u}">${igAv(u)}<div><b>${esc(u)}</b> ${esc(t)}<small>${ts ? 'baru saja' : ago(new Date(t0.getTime() + (i + 1) * 17 * 6e4))} · ${({ en: 'Reply', ko: '답글 달기' })[L] || 'Balas'}</small></div><span class="igc-h">${IGI.heart}</span></div>`;
   const el = win({ cls: 'igapp igcoms', title: 'Komentar', back: '', sub: true, body: `<div class="igc-row cap0">${igAv(p.user)}<div><b>${esc(p.user)}</b> ${esc(p.cap || '')}<small>${ago(t0)}</small></div></div>${cs.map(row).join('')}`,
     footer: typeBar('Tambahkan komentar untuk ' + p.user + '...') });
   el.querySelectorAll('[data-u]').forEach(r => r.onclick = () => openProfile(r.dataset.u));
@@ -2120,7 +2126,7 @@ function appFind() {
   const km = pk ? kmBetween(pk, pm) : 0, dist = km < 0.1 ? 'Di dekat kamu' : `${km.toFixed(1).replace('.', ',')} km`;
   const at = (d) => (d.toDateString() === now().toDateString() ? '' : relDay(d) + ' ') + hm(d);
   const since = new Date(Math.max(new Date(ks), sh.at && sh.on ? sh.at : 0)), sinceTxt = at(since);
-  const krow = pk ? `<span>${esc(pk.n)}</span><small>${kk === 'jalan' ? 'Sekarang' : 'Di sini sejak ' + sinceTxt}</small></div><em>${dist}</em>` : `<span style="color:#8e8e93">Lokasi tidak tersedia</span><small>Berhenti berbagi lokasi dengan kamu · ${at(sh.at)}</small></div>`;
+  const krow = pk ? `<span>${esc(pk.n)}</span><small>${kk === 'jalan' ? 'Sekarang' : (({ en: 'Here since ', ko: '여기 있은 시각 ' })[L] || 'Di sini sejak ') + sinceTxt}</small></div><em>${dist}</em>` : `<span style="color:#8e8e93">Lokasi tidak tersedia</span><small>Berhenti berbagi lokasi dengan kamu · ${at(sh.at)}</small></div>`;
   const el = win({ cls: 'findapp', back: '', body: `${findMap(pk, pm)}
     <div class="fm-sheet"><div class="fm-grab"></div><div class="fm-h">Orang</div>
       <div class="fm-row" data-p="Kris">${av('Kris', 'rd')}<div class="rt"><b>${esc(dispName('Kris'))}</b>${krow}</div>
@@ -2140,7 +2146,7 @@ function findNotice() {
 const dKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const healthOf = (k) => { if (k.startsWith('2026-10-') && HEALTH[+k.slice(8)] && k <= '2026-10-25') return HEALTH[+k.slice(8)]; const e = endKey(); return e && HEALTH_AFTER[e] ? HEALTH_AFTER[e][k] : null; };
 const hDay = (dt) => { const t = now(), v = healthOf(dKey(dt)); if (!v) return null; const today = dKey(dt) === dKey(t); const frac = today ? Math.max(0, Math.min(1, (t.getHours() * 60 + t.getMinutes() - 420) / 900)) : 1; return { steps: Math.round(v[0] * frac), sleep: today && t.getHours() < 6 ? null : v[1], hr: v[2] }; };
-const hrs = (x) => `${Math.floor(x)}<small>j</small> ${Math.round((x % 1) * 60)}<small>m</small>`;
+const hrs = (x) => `${Math.floor(x)}<small>${({ en: 'h', ko: '시간' })[L] || 'j'}</small> ${Math.round((x % 1) * 60)}<small>${({ ko: '분' })[L] || 'm'}</small>`;
 const lastDays = (n) => Array.from({ length: n }, (_, i) => { const d = new Date(now()); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - (n - 1 - i)); return d; });
 function appHealth() {
   if (now() >= new Date('2026-10-24T17:38')) clue('health');
@@ -2151,7 +2157,7 @@ function appHealth() {
   const hel = win({ cls: 'healthapp', big: 'Ringkasan', body: `
     ${notes.length ? `<div class="sectionh">Sorotan</div>${notes.map(([ts, x]) => `<div class="hcard"><div class="hc-t" style="color:#ff2d55">♥ ${relDay(new Date(ts))}</div><p>${esc(x)}</p></div>`).join('')}` : ''}
     <div class="sectionh">Favorit</div>
-    <div class="hcard"><div class="hc-t" style="color:#ff9500">🔥 Langkah</div><div class="hc-v">${cur.steps.toLocaleString('id-ID')} <small>langkah</small></div>${bars('steps', 11000, '#ff9500')}</div>
+    <div class="hcard"><div class="hc-t" style="color:#ff9500">🔥 Langkah</div><div class="hc-v">${cur.steps.toLocaleString('id-ID')} <small>${({ en: 'steps', ko: '걸음' })[L] || 'langkah'}</small></div>${bars('steps', 11000, '#ff9500')}</div>
     <div class="hcard"><div class="hc-t" style="color:#5e5ce6">🛏 Tidur</div><div class="hc-v">${cur.sleep == null ? '<small>Belum ada data</small>' : hrs(cur.sleep)}</div>${bars('sleep', 9, '#5e5ce6')}</div>
     <div class="hcard"><div class="hc-t" style="color:#ff2d55">♥ Detak Jantung Istirahat</div><div class="hc-v">${cur.hr} <small>BPM</small></div></div>` });
   hel.querySelector('.back').style.visibility = 'hidden';
@@ -2175,7 +2181,7 @@ function screenTime() {
 }
 function appClock() {
   const al = [['00.00', 'ulang tahun', 1], ['07.00', 'makan kucing', 1], ['09.15', 'standup', 1], ['09.00', 'Alarm', 0]];
-  const el = win({ cls: 'dark-app', dark: false, back: '', act: '<span style="color:#ff9f0a;font-size:26px;font-weight:300">+</span>', body: `<div class="bigtitle">Alarm</div><div class="sectionh">Tidur | Bangun</div><div class="list" style="margin:0 16px 20px"><div class="row"><div class="rt" style="color:#8e8e93">Tidak Ada Alarm</div></div></div><div class="sectionh">Lainnya</div><div class="list">${al.map(([t, l, on]) => `<div class="row alarm"><div class="rt"><div class="at" style="${on ? '' : 'color:#8e8e93'}">${t}</div><div class="r2">${esc(l)}</div></div><i class="sw ${on ? '' : 'off'}"></i></div>`).join('')}</div>` });
+  const el = win({ cls: 'dark-app', dark: false, back: '', act: '<span style="color:#ff9f0a;font-size:26px;font-weight:300">+</span>', body: `<div class="bigtitle">Alarm</div><div class="sectionh">${({ en: 'Sleep | Wake Up', ko: '수면 | 기상' })[L] || 'Tidur | Bangun'}</div><div class="list" style="margin:0 16px 20px"><div class="row"><div class="rt" style="color:#8e8e93">Tidak Ada Alarm</div></div></div><div class="sectionh">Lainnya</div><div class="list">${al.map(([t, l, on]) => `<div class="row alarm"><div class="rt"><div class="at" style="${on ? '' : 'color:#8e8e93'}">${t}</div><div class="r2">${esc(l)}</div></div><i class="sw ${on ? '' : 'off'}"></i></div>`).join('')}</div>` });
   el.querySelector('.back').innerHTML = '<span style="color:#ff9f0a">Edit</span>';
 }
 function appWeather() {
@@ -2218,7 +2224,7 @@ function appSafari() {
   const list = SAFARI.filter(([t, , , e]) => visible(new Date(t)) && (!e || epiIs(e) || (!EPI && endKey() === e))).sort((a, b) => new Date(b[0]) - new Date(a[0]));
   const groups = []; list.forEach(r => { const d = new Date(r[0]); const k = dayStart(d).getTime(); let g = groups.find(x => x.k === k); if (!g) groups.push(g = { k, d, items: [] }); g.items.push(r); });
   const today = dayStart(now()).getTime();
-  const label = (g) => g.k === today ? 'Hari Ini' : g.k === today - 864e5 ? 'Kemarin' : `${HARI[g.d.getDay()]}, ${g.d.getDate()} ${BULAN[g.d.getMonth()]}`;
+  const label = (g) => g.k === today ? 'Hari Ini' : g.k === today - 864e5 ? 'Kemarin' : fmtD(g.d, { day: true });
   win({ cls: 'safari', big: 'Riwayat', back: '', body: groups.map(g => `<div class="sfh">${label(g)}</div><div class="list">${g.items.map(([t, q, site]) => `<div class="row"><div class="sfic">${site === 'google.com' ? 'G' : site[0].toUpperCase()}</div><div class="rt"><div class="r1" style="font-size:16px">${esc(q)}</div><div class="r2" style="font-size:13px">${esc(site)} · ${hm(new Date(t))}</div></div></div>`).join('')}</div>`).join(''),
     footer: '<div class="sbar"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>Cari atau masukkan situs web</div>' });
   topL().querySelector('.back').remove();

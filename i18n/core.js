@@ -4,7 +4,7 @@
 const LANGS = [['id', '🇮🇩', 'Indonesia'], ['en', '🇬🇧', 'English'], ['ko', '🇰🇷', '한국어']];
 const LANG = (() => { try { const l = JSON.parse(localStorage.getItem('hpkino:lang') || 'null'); return LANGS.some(x => x[0] === l) ? l : null; } catch (e) { return null; } })();
 const I18N_ON = true; // zh belum, makanya ga ada di LANGS
-const L = I18N_ON ? (LANG || 'id') : 'id';
+const L = I18N_ON ? (LANG || 'id') : 'id', UILANG = L;
 if (L !== 'id') document.write(`<script src="i18n/${L}.js"><\/script>`);
 document.documentElement.lang = L;
 function setLang(l) { try { localStorage.setItem('hpkino:lang', JSON.stringify(l)); } catch (e) {} location.reload(); }
@@ -23,6 +23,9 @@ function tr(s) {
   if ((m = t.match(/^(🎂\s*)?(\d+) hari lagi$/))) return (m[1] || '') + ({ en: `${m[2]} days left`, ko: `${m[2]}일 남음`, zh: `还有${m[2]}天` })[L];
   if ((m = t.match(/^(🎂\s+)(\S.*)$/)) && D[m[2]] !== undefined) return m[1] + D[m[2]];
   if ((m = t.match(/^(\d+) Foto$/))) return ({ en: `${m[1]} Photos`, ko: `사진 ${m[1]}장`, zh: `${m[1]}张照片` })[L];
+  if ((m = t.match(/^(\d+) Catatan$/))) return ({ en: `${m[1]} Notes`, ko: `메모 ${m[1]}개` })[L] || t;
+  // teks banyak baris yg ga ada utuh di kamus: terjemahin per baris
+  if (t.includes('\n')) { let hit = false; const out = s.split('\n').map(x => { const y = x.trim() ? tr(x) : x; if (y !== x) hit = true; return y; }).join('\n'); if (hit) return out; }
   return s;
 }
 // teks UI kecil yg nempel sama angka/nama (bukan dari naskah)
