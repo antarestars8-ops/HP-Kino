@@ -1693,10 +1693,12 @@ function ending(key, epiMode = false, jump = false) {
   const shareLine = lines[lines.length - 1];
   const tEnd = epiMode ? t0 + 1.4 + (epi.length - 1) * step + 0.8 + 3 : t0 + 1.8 + epi.length * step; // epilog: 3 detik abis paragraf terakhir
   if (epiMode) lines.length = 0;
+  const EL = !epiMode && !jump && ENDING_LOCK[key]; // penutup di layar kunci (bukan pas epilog / baca ulang)
+  const tLock = 0.4 + lines.length * step + 1.6, lockLen = EL ? (ENDLOCK_IN + EL.notifs.length * ENDLOCK_GAP + ENDLOCK_HOLD) / 1000 : 0;
   const el = h(`<div class="ending" data-nostatus="1" data-modal="1"><h2>${esc(epiMode ? tr('Epilog · ') + tr(E.title) : tr(E.title))}</h2>
     ${lines.map((l, i) => endP(l, 0.4 + i * step)).join('')}
     ${epi.length ? `<p class="epihead" style="animation-delay:${t0}s">${esc(E.epiHead || 'Seminggu kemudian.')}</p>${epi.map((l, i) => endP(l, t0 + 1.4 + i * step)).join('')}<p class="theend${epiMode ? ' big' : ''}" style="animation-delay:${tEnd}s">${esc(AU_TITLE)}<small>the end.</small></p>` : ''}
-    <div class="endcard${epiMode ? ' epi' : ''}" style="animation-delay:${(epi.length ? tEnd + (epiMode ? 6.5 : 0.8) : 0.8 + lines.length * step)}s">
+    <div class="endcard${epiMode ? ' epi' : ''}" style="animation-delay:${(epi.length ? tEnd + (epiMode ? 6.5 : 0.8) : EL ? tLock + lockLen + 0.6 : 0.8 + lines.length * step)}s">
       ${epiMode ? '' : `<div class="bd">selamat ulang tahun, kino.</div>
       <div style="color:#8e8e93;font-size:13px">${`25.10 · kamu main ${tone === 'sabar' ? 'sabar 🤍' : 'dingin 🧊'}`}</div>`}
       ${epiMode ? '' : `<div class="endcol">${(() => { const seen = store.get('endingsSeen', []), keys = ['maafin', 'jeda', 'turun', 'waktu']; return `<div class="ec-t">Ending terbuka: ${keys.filter(k => seen.includes(k)).length}/4</div><div class="ec-row">${keys.map(k => `<span class="${seen.includes(k) ? 'on' : ''}">${seen.includes(k) ? esc(ENDINGS[k].title) : '???'}</span>`).join('')}</div>`; })()}</div>
@@ -1707,7 +1709,8 @@ function ending(key, epiMode = false, jump = false) {
       ${EPI ? '' : '<button class="cta other" style="background:transparent;color:#fff;border:1px solid #48484a">Ending lain</button>'}
     </div></div>`);
   // tap di teks: munculin semua (skip animasi)
-  el.addEventListener('click', (e) => { if (e.target.closest('button')) return; el.querySelectorAll('p, .endcard').forEach(p => { p.style.animationDelay = '0s'; }); });
+  let stopLock = null; const lockT = EL ? setTimeout(() => { if (el.isConnected) stopLock = endLock(EL); }, tLock * 1000) : 0;
+  el.addEventListener('click', (e) => { if (e.target.closest('button')) return; clearTimeout(lockT); stopLock && stopLock(true); el.querySelectorAll('p, .endcard').forEach(p => { p.style.animationDelay = '0s'; }); });
   // auto-scroll ngikutin kalimat yg muncul; berhenti kalau pemain scroll sendiri
   let userScrolled = false; el.addEventListener('wheel', () => userScrolled = true); el.addEventListener('touchmove', () => userScrolled = true);
   // epilog: pas Days Until & tombol muncul, pastiin udah di paling bawah
@@ -1728,6 +1731,21 @@ function ending(key, epiMode = false, jump = false) {
   if (jump) { el.querySelectorAll('p, .endcard').forEach(p => { p.style.animationDelay = '0s'; p.style.animationDuration = '0s'; }); setTimeout(() => el.scrollTop = el.scrollHeight, 60); } // langsung ke kartu
 }
 // kartu hasil 9:16 buat dibagikan
+// layar kunci penutup ending: notif masuk satu2, ga bisa dibuka, terus pudar ke kartu ending
+const ENDLOCK_IN = 1400, ENDLOCK_GAP = 1500, ENDLOCK_HOLD = 3200;
+const ICON_PENGINGAT = '<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#fff"/><g fill="none" stroke="#c7c7cc" stroke-width="2.4"><path d="M24 18h22M24 30h22M24 42h22"/></g><circle cx="15" cy="18" r="4.5" fill="#ff9500"/><circle cx="15" cy="30" r="4.5" fill="#007aff"/><circle cx="15" cy="42" r="4.5" fill="#ff3b30"/></svg>';
+function endLock(E) {
+  const t = new Date(E.at), nc = (n) => ncard({ icon: n[0] === 'pengingat' ? ICON_PENGINGAT : (ICONS[n[0]] || ICONS.kakao), title: n[1], body: n[2], when: n[3] });
+  const el = h(`<div class="endlock" data-nostatus="1" data-modal="1">${im(STORY.wallLock)}<div class="shade"></div>
+    <div class="lk-top"><div class="lk-date">${longDate(t)}</div><div class="lk-time">${hm(t).replace('.', ':')}</div></div>
+    <div class="lk-notes">${(E.base || []).map(nc).join('')}</div></div>`);
+  push(el);
+  const notes = el.querySelector('.lk-notes'), timers = [];
+  E.notifs.forEach((n, i) => timers.push(setTimeout(() => { notes.insertAdjacentHTML('afterbegin', nc(n)); if (n[0] === 'kakao') katalk(); buzz(/^kris/i.test(n[1]) ? 'kris' : 'notif'); }, ENDLOCK_IN + i * ENDLOCK_GAP)));
+  const stop = (now) => { timers.forEach(clearTimeout); if (!el.isConnected) return; if (now) { el.remove(); syncChrome(); return; } el.classList.add('out'); setTimeout(() => { el.remove(); syncChrome(); }, 900); };
+  timers.push(setTimeout(stop, ENDLOCK_IN + E.notifs.length * ENDLOCK_GAP + ENDLOCK_HOLD));
+  return stop;
+}
 async function shareCard(key, tone, line) {
   const W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
   const load = (src) => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });

@@ -1518,6 +1518,17 @@ NOTES.unshift({ id: 'draft', title: 'kris', drafts: [
 const TONE = {
   kx1: [1, -1], kx2: [1, -1], kx3: [1, -1], k5: [-1, 1], j1: [-1, 1], j2: [-1, 1], g1: [-1, 1], s1: [1, -1], y1: [1, -1], i1: [-1, 1], b1: [-1, 1], m1: [1, -1], r1: [-1, 1],
 };
+// ===== penutup ending: abis prosa, layar fade ke layar kunci Kino. notif masuk satu2 (ga bisa dibuka), abis itu kartu ending =====
+// at = tanggal & jam di layar kunci. base = notif yg udah ada dari tadi (paling bawah). notifs = yg masuk satu2, yg terakhir masuk di paling atas (kayak iPhone)
+// notif: [ikon, judul, isi, jam]. ikon: kakao / phone / photos / pengingat
+const ENDING_LOCK = {
+  maafin: { at: '2026-10-25T20:41', notifs: [['kakao', 'Mama', 'kris nambah nasi tiga kali. lain kali ajak lagi ya 🍚', 'sekarang']] },
+  jeda: { at: '2026-10-25T23:52', notifs: [['pengingat', 'Pengingat', 'balikin jaket', 'nanti']] },
+  turun: { at: '2026-10-25T09:24', base: [['kakao', 'Kris', 'selamat ulang tahun, kino.', '00.01']], notifs: [
+    ['kakao', 'pemuda nyasar 😎 · Juna', '!!!!!!!!!!!!!!', '09.12'], ['phone', 'Telepon', 'Surya · Panggilan tak terjawab', '09.14'],
+    ['kakao', 'Mama', 'ANAK MAMA 😭😭 telpon mama sekarang', '09.15'], ['kakao', 'Kak Mina (Lead IT)', 'Aku tahu kamu bakal keterima. Sekarang istirahat.', '09.21']] },
+  waktu: { at: '2026-10-25T23:07', notifs: [['photos', 'Foto', 'Kenangan baru: dori 🐱', 'sekarang']] },
+};
 const ENDING_TAIL = {
   maafin: { sabar: 'Di dalam lift, Kino menyandarkan kepalanya ke bahu Kris. "Jangan bikin aku nyesel."', dingin: 'Di dalam lift, Kino tidak bicara sepatah kata pun. Tapi ia juga tidak melepaskan tangan Kris.' },
   jeda: { sabar: 'Malam itu Kino mengganti nama kontak Kris. "nanti."', dingin: 'Kino mengarsipkan chat Kris. Tidak dihapus. Hanya diarsipkan.' },
