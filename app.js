@@ -587,7 +587,7 @@ function unlock() {
   const t = now();
   if (t >= FAINT[0] && t < FAINT[1]) { // GERD Kino kumat (di klinik, ketiduran abis dikasih obat): HP ga bisa dibuka
     const el = h(`<div class="faint" data-nostatus="1" data-modal="1"><p>Dada Kino panas. Perutnya melilit.</p><p class="s">Ia nggak bisa berdiri. Lalu semuanya jauh.</p><p class="s2">(Kino lagi ditangani di klinik. HP-nya cuma bisa nerima notif. coba buka lagi nanti.)</p></div>`);
-    push(el); setTimeout(() => { el.remove(); syncChrome(); }, 4200); return;
+    const go = () => { if (el.isConnected) { el.remove(); syncChrome(); } }; push(el); setTimeout(() => { el.onclick = go; }, 2500); setTimeout(go, 10000); return; // 10 detik biar kebaca semua; boleh ditap abis 2,5 detik
   }
   if (t >= INTV[0] && t < INTV[1]) { // interview oxford: HP ditelungkupin
     const el = h(`<div class="faint" data-nostatus="1" data-modal="1"><p>Kino lagi interview.</p><p class="s">Teams. Kamera nyala. Jangan diganggu.</p><p class="s2">(HP-nya ditelungkupin di meja. coba buka lagi abis 17.40)</p></div>`);
