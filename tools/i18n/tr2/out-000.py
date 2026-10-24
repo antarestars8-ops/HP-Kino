@@ -1,0 +1,127 @@
+import json, os
+T = {
+0: ["your cookinggg?", "네가 한 거야~?"],
+1: ["i made too much", "너무 많이 만들었어"],
+2: ["dori's claimed it as a bed now", "도리가 거기 지 침대인 줄 알아"],
+3: ["i said don't call.", "전화하지 말랬지."],
+4: ["i'm working.", "나 일해."],
+5: ["i'm going back there now", "지금 다시 거기로 갈게"],
+6: ["guys don't forget dinner at 7 at my place!!", "guys 7시에 우리 집 저녁 잊지 마!!"],
+7: ["coming. not because i'm hungry", "갈게. 배고파서 가는 거 아님"],
+8: ["coming. who's paying", "감. 누가 쏴"],
+9: ["can't, sorry. something came up", "못 가, 미안. 일이 좀 있어서"],
+10: ["said he needed to think. said his life feels like it's going in circles", "생각 좀 하고 싶대. 사는 게 제자리만 맴도는 것 같대"],
+11: ["i thought it was about work", "일 얘긴 줄 알았지"],
+12: ["kino our office connects to your building. lift down, cross LG. 3 minutes", "키노, 우리 회사 너네 아파트랑 연결돼 있잖아. 엘베 타고 내려가서 LG층만 건너면 3분이야"],
+13: ["but you okay? you were super quiet in the meeting this morning", "근데 너 괜찮아? 아침 회의 때 엄청 조용하던데"],
+14: ["no shopper can log in or check out. you're leading today", "구매자 전원 로그인도 결제도 안 돼. 오늘 네가 리드해"],
+15: ["juna's still on call tomorrow. happy early birthday 🎂", "내일 온콜은 그대로 주나가 맡아. 생일 미리 축하해 🎂"],
+16: ["monday standup 9:30. late = buys coffee", "월요일 스탠드업 9시 반. 지각하면 커피 쏘기"],
+17: ["make me a cake, ma", "엄마 케이크 만들어 줘"],
+18: ["🐰 platform eng @ lumen 🛒 · soonie doongie dori", "🐰 lumen 플랫폼 엔지니어 🛒 · 순이 둥이 도리"],
+19: ["patch is tomorrow. i swear. 🫠", "패치는 내일. 진짜로. 🫠"],
+20: ["cook for him tomorrow. he asked.\nbuy the sour kimchi.", "내일 걔 밥 해주기. 걔가 해달래.\n신 김치 사기."],
+21: ["food's all gone. he went back for seconds twice.\nsoonie slept on his feet. traitor.", "음식 다 먹음. 두 번이나 더 먹음.\n순이는 걔 발 위에서 잠. 배신자."],
+22: ["made too much. he's tired, meetings till late.\nfine. soonie got the meat.", "너무 많이 만듦. 걔 피곤하대, 회의가 밤까지래.\n됐다. 고기는 순이가 먹음."],
+23: ["a year older.\nhe's at the lobby café.", "한 살 더 먹음.\n걔 로비 카페에 있음."],
+24: ["""kino,
+
+i'm not writing this to be forgiven. i'm writing it because you've spent a whole week guessing on your own, and that's on me.
+
+i lied this week. i said i was busy, launch, meetings, working late, sleeping at the office. the launch wrapped up last week, i've been home by five every day, and the past two days i was on leave. bagas probably told you already. i'm sorry you had to hear it from him.
+
+honestly, i felt unloved. on the 15th i said i love you, and you laughed and said "oh i know." i laughed too, but when i got home it felt empty. and it wasn't the first time.
+
+during the launch i barely slept for two weeks. i just wanted to hear you say "you did great," but what i got was you telling me to sleep and threatening to unplug my charger. now i know that's how you say i love you. back then i was too tired to see it. that's not your fault. that's something i should've said out loud, not buried and run away with.
+
+after a while i got bored. bored of waiting, bored of us feeling the same every day. then i used that as an excuse, when i should've just talked to you. i'm a coward. instead i went looking for people who seemed happy to have me around. dinner with gemilang, a movie with sadewa,
+
+and yuna.
+
+what looked like holding hands was yuna messing around, reading my palm. she said my love line is long. i laughed. to me she's a friend. only later did i realize she saw it differently, and i was too dumb to notice. there was nothing more than that. but that doesn't make me any less wrong. i let someone else hold my hand while telling you i was working late, alone. you're right, i made you look like a fool. but you're not the fool, kino. i am.
+
+on the night of the 22nd i didn't sleep at the office. i walked all the way to itaewon alone, just trying to clear my head. then i ran into yuna by accident. she asked me to dinner, and i went. she asked me to take her picture, and that's the photo that synced to our album. after that i slept at a jjimjilbang. i didn't have the guts to tell you any of it, so i lied again. on the 23rd i went to seongsu again, alone. sat in a café until night, watching stuff on your account. forgot you could see it. or maybe i didn't forget.
+
+when i noticed the photo was in our album, i deleted it. then i couldn't bring myself to open your chat. for two days. i knew you were waiting, and i still didn't open it. that's the cruelest part.
+
+maybe part of me wanted to get caught. so i wouldn't have to choose when to say it. at one in the morning i sat in the lobby, too scared to go up. that afternoon yuna asked me to lunch in seongsu, and i said yes, because it was easier than going up to 4419 and talking to you. i didn't even know what i wanted. not until you sent the photo and asked "is this you?"
+
+and the funniest part is, every time i was with them, all i could think about was you.
+
+that's when it hit me. you never said i love you, you did it. the second portion you always cook, telling me to go to sleep, letting dori sleep on my jacket. i was so busy waiting for words that i missed all of it. you never stopped loving me. i stopped looking.
+
+turns out what i was looking for all week was in unit 4419 the whole time.
+
+today you collapsed in the pantry. i won't say it was because of me, but i know i'm one of the things filling up your head.
+
+i'm sorry i made you wait, guess, and feel like a fool all alone this week. you didn't deserve that.
+
+i'm not asking to get back together. i just want you to hear everything from me, not from someone else's photo.
+
+i'm at the lobby café now. if you don't come down, i understand.
+
+happy birthday, kino.
+
+— kris
+
+p.s. the package in the lobby with no sender name is from me. i ordered it in august, back when i was still the person you knew. three name necklaces, for soonie, doongie, and dori. i didn't cancel it. maybe because that part of me still wants to come home.""",
+"""키노,
+
+용서받으려고 쓰는 거 아니야. 네가 일주일 내내 혼자 추측하게 만들었고, 그건 내 잘못이라서 쓰는 거야.
+
+이번 주에 나 거짓말했어. 바쁘다고, 런칭이다, 회의다, 야근이다, 회사에서 잔다고. 근데 런칭은 지난주에 끝났고, 나 매일 다섯 시에 퇴근했고, 그저께랑 어제는 휴가였어. 바가스가 벌써 말했겠지. 걔한테 듣게 해서 미안해.
+
+솔직히, 사랑받지 못하는 것 같았어. 15일에 내가 사랑한다고 했을 때, 넌 웃으면서 "아 알아"라고 했잖아. 나도 따라 웃었는데, 집에 오니까 허전하더라. 그게 처음도 아니었고.
+
+런칭 때 나 거의 2주를 못 잤잖아. 그냥 네가 "잘했어" 해주는 걸 듣고 싶었는데, 돌아온 건 빨리 자라는 잔소리랑 안 자면 충전기 뽑아버린다는 협박이었어. 이제는 알아, 그게 네가 사랑한다고 말하는 방식이라는 거. 그땐 너무 지쳐서 안 보였어. 그건 네 잘못 아니야. 내가 말했어야 하는 거였어. 혼자 삼키고 도망칠 게 아니라.
+
+그러다 지루해졌어. 기다리는 것도, 맨날 똑같은 우리도. 그리고 그걸 핑계로 삼았어. 너한테 말했어야 했는데. 나 겁쟁이야. 대신 나를 반가워해 주는 사람들을 찾아다녔어. 게밀랑이랑 밥 먹고, 사데와랑 영화 보고,
+
+그리고 유나.
+
+손잡은 걸로 보였던 건, 유나가 장난으로 내 손금 봐준 거야. 내 결혼선이 길대. 나는 웃었어. 나한텐 그냥 친구야. 걔는 다르게 생각했다는 걸 나중에야 알았어. 눈치 없는 내가 바보였지. 그 이상은 아무것도 없었어. 그래도 내가 잘못한 게 없어지는 건 아니야. 다른 사람이 내 손을 잡게 두면서, 너한텐 혼자 야근한다고 했으니까. 네 말이 맞아, 내가 너를 바보로 만들었어. 근데 넌 바보 아니야, 키노. 바보는 나야.
+
+22일 밤에 나 회사에서 안 잤어. 생각 좀 정리하고 싶어서 이태원까지 혼자 걸었어. 그러다 우연히 유나를 만났어. 밥 먹자길래 같이 먹었어. 사진 찍어달래서 찍어줬는데, 그게 우리 앨범에 동기화된 사진이야. 그다음엔 찜질방에서 잤어. 그걸 다 너한테 말할 용기가 없어서, 또 거짓말했어. 23일엔 또 성수에 갔어, 혼자. 밤까지 카페에 앉아서 네 계정으로 영화 봤어. 네가 볼 수 있다는 걸 잊고. 아니면 안 잊었던 걸지도 몰라.
+
+사진이 우리 앨범에 들어간 걸 알고 지웠어. 그리고 네 채팅방을 못 열었어. 이틀 동안. 네가 기다리는 거 알면서도 안 열었어. 그게 제일 나빴어.
+
+어쩌면 나 일부는 들키고 싶었나 봐. 언제 말할지 내가 고르지 않아도 되게. 새벽 한 시에 로비에 앉아 있었는데, 올라갈 용기가 안 났어. 점심엔 유나가 성수에서 밥 먹자고 했고, 나는 그러자고 했어. 4419호에 올라가서 너랑 얘기하는 것보다 그게 더 쉬워서. 나도 내가 뭘 원하는지 몰랐어. 네가 사진 보내면서 "이거 너야?"라고 묻기 전까지는.
+
+그리고 제일 웃긴 건, 그 사람들이랑 있을 때마다 내 머릿속엔 네 생각뿐이었다는 거야.
+
+그때 알았어. 넌 사랑한다고 말한 적은 없어도, 늘 행동으로 하고 있었어. 항상 2인분씩 하는 요리, 빨리 자라는 잔소리, 도리를 내 재킷 위에서 자게 두는 거. 나는 말만 기다리느라 그걸 하나도 못 봤어. 사랑을 멈춘 건 네가 아니야. 보는 걸 멈춘 건 나였어.
+
+결국 내가 일주일 내내 찾던 건, 처음부터 4419호에 있었어.
+
+오늘 너 탕비실에서 쓰러졌잖아. 나 때문이라고까지는 못 하겠지만, 네 머릿속을 꽉 채운 것 중 하나가 나라는 건 알아.
+
+일주일 동안 혼자 기다리고, 추측하고, 바보가 된 기분 들게 해서 미안해. 넌 그런 대우 받으면 안 되는 사람이야.
+
+다시 만나자고 하는 거 아니야. 그냥 다른 사람 사진이 아니라, 나한테서 다 듣게 하고 싶었어.
+
+나 지금 로비 카페에 있어. 안 내려와도, 이해해.
+
+생일 축하해, 키노.
+
+— 크리스
+
+추신. 로비에 있는 보낸 사람 이름 없는 택배, 그거 내가 보낸 거야. 8월에 주문했어, 아직 네가 알던 나였을 때. 이름 목걸이 세 개, 순이랑 둥이랑 도리 거. 취소 안 했어. 아마 그때의 나는 아직 집에 돌아가고 싶은가 봐."""],
+25: ["if someone eats your cooking 3 times does that mean it's good or he was just hungry", "누가 내 요리를 3번 먹으면 맛있다는 뜻이야 아니면 그냥 배고팠던 거야"],
+26: ["CGV Yongsan showtimes tonight", "CGV 용산 오늘 밤 상영시간표"],
+27: ["Kino held out the jacket. \"Here. Dori's over it.\"", "키노가 재킷을 내밀었다. \"자. 도리도 이제 질렸대.\""],
+28: ["That night Dori slept on the bed. Right where the jacket used to be.", "그날 밤 도리는 침대에서 잤다. 재킷이 있던 바로 그 자리에서."],
+29: ["kino, i'm at your door. brought food", "키노, 나 문 앞이야. 먹을 거 가져왔어"],
+30: ["sweetie, don't forget to return mom's green tupperware", "아들, 엄마 초록색 반찬통 꼭 돌려줘"],
+31: ["yes ma. next week, with kris", "응 엄마. 다음 주에 크리스랑 갈게"],
+32: ["🎂 today · off on-call", "🎂 오늘 · 온콜 없음"],
+33: ["us & dori", "우리 & 도리"],
+34: ["your cooking's good, what do i do", "너 요리 맛있어, 어떡해"],
+35: ["sweetie, does kris still like your cooking?", "아들, 크리스는 아직도 네 요리 좋아하니?"],
+36: ["platform @ lumen. three cats. don't reply to mentions.", "lumen 플랫폼. 고양이 셋. 멘션 답 안 함."],
+37: ["first time handling an incident on my own. kino hyung just watched. all good. (not all good)", "처음으로 혼자 장애 대응함. 키노 형은 지켜보기만. 괜찮음. (안 괜찮음)"],
+38: ["he went back for my cooking 3 times, i fake-nagged \"stop, no more\" while dancing on the inside", "내 요리를 세 번이나 더 먹었음. \"그만 먹어\" 하고 잔소리하는 척했는데 속으론 춤추는 중"],
+39: ["his jacket's still here and dori's sleeping on it. i kinda want to too but no, pride. later, when he's not around (he's literally not around)", "걔 재킷 아직 여기 있고 도리가 그 위에서 잠. 나도 그러고 싶은데 자존심 상해. 나중에 걔 없을 때 해야지 (걔 지금 없음)"],
+}
+out = {str(k): v for k, v in T.items()}
+json.dump(out, open(os.path.join(os.path.dirname(__file__), os.path.basename(__file__).replace('.py', '.json')), 'w'), ensure_ascii=False)
+print(len(out))
