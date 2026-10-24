@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>HP Kino posters</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; background: #0b0b12; }
+  body { font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif; color: #fff; position: relative; }
+  .bg { position: absolute; inset: 0; background:
+    radial-gradient(ellipse 70% 45% at 85% 8%, rgba(255, 214, 110, .22), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 10% 95%, rgba(120, 140, 255, .22), transparent 70%),
+    linear-gradient(180deg, #14131c 0%, #0b0b12 100%); }
+  .grain { position: absolute; inset: 0; opacity: .06; background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 4px 4px; }
+  .wrap { position: absolute; inset: 0; padding: 72px 76px; display: flex; flex-direction: column; }
+  .tag { display: inline-flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 600; color: #ffd66e; letter-spacing: .5px; }
+  .tag i { width: 10px; height: 10px; border-radius: 50%; background: #ffd66e; box-shadow: 0 0 14px #ffd66e; }
+  h1 { font-size: 104px; line-height: .98; font-weight: 800; letter-spacing: -3px; margin-top: 18px; }
+  h1 span { color: #ffd66e; }
+  .sub { font-size: 34px; line-height: 1.35; color: rgba(255,255,255,.78); margin-top: 22px; font-weight: 500; max-width: 900px; }
+  .phones { position: absolute; left: 0; right: 0; bottom: 150px; display: flex; justify-content: center; align-items: flex-end; gap: 26px; }
+  .ph { color-scheme: normal; width: 430px; height: 900px; border: 0; transform-origin: bottom center; pointer-events: none; background: transparent; }
+  .ph.s1 { transform: scale(.82); margin: 0 -38px; }
+  .ph.s2 { transform: scale(.70); margin: 0 -64px; }
+  .ph.tilt-l { transform: scale(.70) rotate(-5deg); }
+  .ph.tilt-r { transform: scale(.70) rotate(5deg); }
+  .ph.sm.s1 { transform: scale(.74); }
+  .ph.sm.tilt-l { transform: scale(.63) rotate(-5deg); }
+  .ph.sm.tilt-r { transform: scale(.63) rotate(5deg); }
+  .list { margin-top: 30px; display: grid; gap: 14px; }
+  .item { display: flex; gap: 16px; align-items: baseline; font-size: 31px; line-height: 1.3; color: rgba(255,255,255,.9); font-weight: 500; }
+  .item b { color: #fff; font-weight: 700; }
+  .item em { font-style: normal; font-size: 30px; width: 40px; flex: none; }
+  .foot { position: absolute; left: 76px; right: 76px; bottom: 56px; display: flex; justify-content: space-between; align-items: center; font-size: 28px; color: rgba(255,255,255,.7); }
+  .foot b { color: #fff; font-weight: 700; font-size: 32px; }
+  .pill { display: inline-block; background: rgba(255,214,110,.14); border: 1.5px solid rgba(255,214,110,.5); color: #ffd66e; border-radius: 40px; padding: 10px 22px; font-size: 26px; font-weight: 600; }
+  .num { position: absolute; top: 72px; right: 76px; font-size: 26px; color: rgba(255,255,255,.45); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="bg"></div><div class="grain"></div>
+<div class="wrap" id="wrap"></div>
+<script>
+const p = +(new URLSearchParams(location.search).get('p') || 1);
+const NOW = '2026-10-20T19:40';
+// tiap HP: iframe ke app asli, terus disetel ke layar tertentu
+const shots = {
+  lock: `S.unlocked = false; layersEl.innerHTML = ''; lock();`,
+  home: `S.unlocked = true; layersEl.innerHTML = ''; home();`,
+  chat: `S.unlocked = true; layersEl.innerHTML = ''; home(); appKakao(); openChat('surya');`,
+  kakao: `S.unlocked = true; layersEl.innerHTML = ''; home(); appKakao();`,
+  xsheet: `S.unlocked = true; S.xAcct = 'kino'; layersEl.innerHTML = ''; home(); openApp('x'); setTimeout(() => topL().querySelector('.xme').click(), 300);`,
+  insta: `S.unlocked = true; layersEl.innerHTML = ''; home(); openApp('insta');`,
+  mail: `S.unlocked = true; layersEl.innerHTML = ''; home(); openApp('mail');`,
+  safari: `S.unlocked = true; layersEl.innerHTML = ''; home(); openApp('safari');`,
+  call: `S.unlocked = true; layersEl.innerHTML = ''; home(); callScreen({ who: 'Juna', dir: 'in', lines: [['t', 'BANG']], autoMiss: 0 });`,
+};
+const phone = (shot, cls) => `<iframe allowtransparency="true" class="ph ${cls}" data-shot="${shot}" src="/?now=${NOW}&poster=1"></iframe>`;
+const foot = `<div class="foot"><b>hp-kino.vercel.app</b><span>cr. stayroom ai</span></div>`;
+const posters = {
+  1: `<div class="num">1/2</div>
+    <div class="tag"><i></i>REAL-TIME · 20–25 OKTOBER</div>
+    <h1>HP <span>Kino</span> 🐰</h1>
+    <p class="sub">Buka HP Kino, chat masuk sesuai jam beneran. Buka tiap hari ya.</p>
+    <div class="list">
+      <div class="item"><em>👆</em><span><b>Tap kolom chat</b>, Kino ngetik sendiri</span></div>
+      <div class="item"><em>🔒</em><span>Lupa passcode? <b>Liat notif lockscreen</b></span></div>
+    </div>
+    <div class="phones">${phone('lock', 'tilt-l')}${phone('chat', 's1')}${phone('home', 'tilt-r')}</div>${foot}`,
+  2: `<div class="num">2/2</div>
+    <div class="tag"><i></i>YANG BISA DIOPREK</div>
+    <h1 style="font-size:88px">Kepo <span>dikit</span> gapapa</h1>
+    <div class="list">
+      <div class="item"><em>💬</em><span><b>KakaoTalk</b>: PC, grup, chat iseng · 📞 <b>Telepon</b></span></div>
+      <div class="item"><em>🐦</em><span><b>X</b> priv / utama · 📸 <b>IG</b> · 🖼 <b>Foto</b></span></div>
+      <div class="item"><em>📧</em><span><b>Mail</b> · 🔍 <b>Safari</b> · 🗓 <b>Kalender</b> · 📝 <b>Catatan</b></span></div>
+      <div class="item"><em>🎵</em><span><b>Musik</b> · 🎙 <b>Memo</b> · 📷 <b>Kamera</b></span></div>
+    </div>
+    <div class="phones" style="bottom:130px">${phone('call', 'tilt-l sm')}${phone('xsheet', 's1 sm')}${phone('mail', 'tilt-r sm')}</div>
+    <div class="foot"><span class="pill">📲 Share → Add to Home Screen</span><span>cr. stayroom ai</span></div>`,
+};
+document.getElementById('wrap').innerHTML = posters[p];
+document.querySelectorAll('iframe[data-shot]').forEach(f => f.addEventListener('load', () => {
+  const run = () => { try { const d = f.contentDocument; const st = d.createElement('style'); st.textContent = 'html,body,#stage{background:transparent!important}'; d.head.appendChild(st); f.contentWindow.eval(shots[f.dataset.shot]); } catch (e) { setTimeout(run, 300); } };
+  setTimeout(run, 700);
+}));
+</script>
+</body>
+</html>

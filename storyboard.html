@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Storyboard HP Kino</title>
+<style>
+:root{--bg:#f6f4f1;--card:#fff;--ink:#1d1b19;--sub:#8a847c;--line:#e7e2db;--kris:#6d7fd8;--kino:#e8b400;--clue:#e5484d;--soft:#f1ede7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141312;--card:#1d1c1a;--ink:#f1eee9;--sub:#9a948c;--line:#2e2c29;--soft:#262421}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Pretendard",sans-serif;padding:28px 16px 80px}
+.wrap{max-width:980px;margin:0 auto}
+h1{font-size:28px;letter-spacing:-.5px}
+.lead{color:var(--sub);margin:6px 0 22px}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:28px}
+.key{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.key b{display:block;font-size:20px}
+.key span{color:var(--sub);font-size:13px}
+.day{display:grid;grid-template-columns:120px 1fr;gap:18px;padding:22px 0;border-top:1px solid var(--line)}
+@media (max-width:640px){.day{grid-template-columns:1fr;gap:8px}}
+.dh{position:sticky;top:12px;align-self:start}
+.dh .hx{font-size:13px;font-weight:700;color:var(--clue);letter-spacing:.5px}
+.dh .dd{font-size:22px;font-weight:700;letter-spacing:-.4px}
+.dh .dw{color:var(--sub);font-size:13px}
+.dh a{display:inline-block;margin-top:8px;font-size:12px;color:var(--ink);background:var(--soft);padding:5px 10px;border-radius:20px;text-decoration:none}
+.blocks{display:grid;gap:10px}
+.b{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.b h3{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);margin-bottom:6px;display:flex;gap:6px;align-items:center}
+.b.diary{background:var(--soft)}
+.b.diary p{white-space:pre-wrap;font-style:italic}
+.b.clue{border-color:var(--clue)}
+.b.clue h3{color:var(--clue)}
+.m{display:flex;gap:8px;font-size:14px;padding:2px 0}
+.m time{color:var(--sub);font-variant-numeric:tabular-nums;flex:none;width:42px}
+.m .w{flex:none;font-weight:600;min-width:64px}
+.m.me .w{color:var(--kino)}
+.m.kr .w{color:var(--kris)}
+.m.del{color:var(--sub);font-style:italic}
+details summary{cursor:pointer;font-weight:600;font-size:14px;padding:2px 0}
+details{padding:2px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{background:var(--soft);border-radius:20px;padding:3px 10px;font-size:13px}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap}
+.thumbs img,.thumbs video{width:64px;height:64px;object-fit:cover;border-radius:8px;background:var(--soft)}
+.small{color:var(--sub);font-size:13px}
+.ending p{margin:4px 0}
+.tg{flex:none;align-self:center;font-size:11px;font-weight:600;color:var(--sub);background:var(--soft);border-radius:20px;padding:1px 8px;margin-left:auto;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Storyboard · HP Kino</h1>
+  <p class="lead">Semua yang kejadian tiap hari, langsung dari data.js (jadi selalu sinkron). Halaman ini SPOILER — jangan dikasih ke pemain.</p>
+  <div class="keys" id="keys"></div>
+  <div id="days"></div>
+</div>
+<script src="data.js"></script>
+<script>
+const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BULAN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const dk = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const hm = d => `${pad(d.getHours())}.${pad(d.getMinutes())}`;
+const BD = new Date('2026-10-25T00:00');
+
+// semua pesan jadi list berwaktu
+const msgs = [];
+const END_N = { maafin: 'Terakhir', jeda: 'Jeda', turun: 'Lobi', waktu: 'Selesai', all: 'semua' };
+const tagOf = (o = {}) => o.end ? END_N[o.end] || o.end : o.epi ? 'epilog ' + (END_N[o.epi] || o.epi) : o.noEnd ? 'kecuali ' + (END_N[o.noEnd] || o.noEnd) : '';
+const tagHTML = (tags) => tags && tags.length ? `<span class="tg">${esc(tags.join(' · '))}</span>` : '';
+{ const seen = {};
+  CHATS.forEach(c => { let day; c.msgs.forEach(([who, text, time, o = {}]) => { if (who === 'date') { day = text; return; } const t = new Date(`${day}T${time.replace('.', ':')}`), tg = tagOf(o), key = c.id + '|' + who + '|' + text + '|' + t.getTime();
+    if (seen[key]) { if (tg && !seen[key].tags.includes(tg)) seen[key].tags.push(tg); return; }
+    seen[key] = { chat: c, who, text, o, t, tags: tg ? [tg] : [] }; msgs.push(seen[key]); }); }); }
+msgs.push({ chat: CHATS.find(c => c.id === 'kris'), who: 'them', text: 'selamat ulang tahun, kino.', o: {}, t: new Date('2026-10-25T00:00') });
+msgs.push({ chat: CHATS.find(c => c.id === 'kris'), who: 'them', text: 'aku di bawah.', o: {}, t: new Date('2026-10-25T00:00:30') });
+msgs.sort((a, b) => a.t - b.t);
+
+document.getElementById('keys').innerHTML = [
+  [STORY.passcode, 'kode HP · ultah Kris (3 Okt) — clue: notif Kenangan di lock screen'],
+  [STORY.noteCode, 'kode catatan "untuk kino" · hari jadi 25 Mar 2018 — clue: foto paling lama di Galeri'],
+  ['24 Okt 23.38', 'catatan terkunci dari Kris muncul'],
+  ['25 Okt 00.00', 'Kris nelpon kalau surat udah dibaca → pilih ending'],
+].map(([a, b]) => `<div class="key"><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join('');
+
+const line = (m) => {
+  const who = m.who === 'me' ? 'Kino' : m.who === 'them' ? (m.chat.person || m.chat.name) : m.who;
+  const cls = m.who === 'me' ? 'me' : who === 'Kris' ? 'kr' : '';
+  const txt = m.o.img ? '[foto]' : m.o.deleted ? 'pesan dihapus' : m.o.call ? `[${m.o.call}]` : m.text;
+  return `<div class="m ${cls} ${m.o.deleted ? 'del' : ''}"><time>${hm(m.t)}</time><span class="w">${esc(who)}</span><span>${esc(txt)}</span>${tagHTML(m.tags)}</div>`;
+};
+
+const start = new Date('2026-10-14T00:00'), out = [];
+const END = new Date('2026-11-01T00:00'); // sampe HP seminggu kemudian
+for (let d = new Date(start); d <= END; d.setDate(d.getDate() + 1)) {
+  const k = dk(d), left = Math.round((BD - d) / 864e5);
+  const same = t => dk(new Date(t)) === k;
+  const blocks = [];
+
+  const diary = (NOTES.find(n => n.log)?.log || []).filter(([t]) => same(t));
+  if (diary.length) blocks.push(`<div class="b diary"><h3>📝 catatan Kino</h3>${diary.map(([t, x]) => `<p><span class="small">${hm(new Date(t))}</span> — ${esc(x)}</p>`).join('')}</div>`);
+
+  const kris = msgs.filter(m => m.chat.id === 'kris' && dk(m.t) === k);
+  if (kris.length) blocks.push(`<div class="b"><h3>💬 Kris</h3>${kris.map(line).join('')}</div>`);
+
+  const others = {}; msgs.filter(m => m.chat.id !== 'kris' && dk(m.t) === k).forEach(m => (others[m.chat.name] = others[m.chat.name] || []).push(m));
+  if (Object.keys(others).length) blocks.push(`<div class="b"><h3>💬 chat lain</h3>${Object.entries(others).map(([n, ms]) => `<details><summary>${esc(n)} <span class="small">(${ms.length})</span></summary>${ms.map(line).join('')}</details>`).join('')}</div>`);
+
+  const reps = REPLIES.filter(r => same(r.at));
+  const types = (TYPE_KRIS[k] || []);
+  if (reps.length || types.length) blocks.push(`<div class="b"><h3>👆 interaksi pemain</h3>${reps.map(r => `<div class="small">${hm(new Date(r.at))} · balasan pilihan di <b>${esc(CHATS.find(c => c.id === r.chat).name)}</b></div><div class="chips">${r.opts.map(o => `<span class="chip">${esc(o.me[0])} → ${esc((o.them || []).map(x => Array.isArray(x) ? x[1] : x).join(' / ') || '(di-read)')}</span>`).join('')}</div>`).join('')}${types.length ? `<div class="small" style="margin-top:6px">ketikan ke Kris hari ini</div><div class="chips">${types.map(([a, b]) => `<span class="chip">${esc(a)} → ${esc(b ? b.join(' / ') : '(di-read)')}</span>`).join('')}</div>` : ''}</div>`);
+
+  const call = KRIS_CALL[k];
+  if (call) blocks.push(`<div class="b"><h3>📞 Kris nelpon (1 menit setelah main, isinya ikut jam)</h3>${call.map(v => `<div class="small" style="margin-top:8px">${v.from || '00:00'}–${v.to || '23:59'}</div>${v.lines.map(([w, t]) => `<div class="m ${w === 'k' ? 'me' : 'kr'}"><span class="w">${w === 'k' ? 'Kino' : 'Kris'}</span><span>${esc(t)}</span></div>`).join('')}`).join('')}</div>`);
+  const ml = (typeof MAILS !== 'undefined' ? MAILS : []).filter(m => same(m.ts));
+  if (ml.length) blocks.push(`<div class="b"><h3>📧 Mail</h3>${ml.map(m => `<div class="m"><time>${hm(new Date(m.ts))}</time><span class="w">${esc(m.from)}</span><span>${esc(m.subj)}</span>${tagHTML([tagOf({ epi: m.epi })].filter(Boolean))}</div>`).join('')}</div>`);
+  const xp = (typeof X_POSTS !== 'undefined' ? X_POSTS : []).filter(x => same(x[2]));
+  if (xp.length) blocks.push(`<div class="b"><h3>🐦 X</h3>${xp.map(x => `<div class="m"><time>${hm(new Date(x[2]))}</time><span class="w">${x[1] === 'alt' ? '🔒 kino' : esc(x[1])}</span><span>${esc(x[3])}</span>${tagHTML([tagOf(x[7] || {})].filter(Boolean))}</div>`).join('')}</div>`);
+  const sf = (typeof SAFARI !== 'undefined' ? SAFARI : []).filter(r => same(r[0]));
+  if (sf.length) blocks.push(`<div class="b"><h3>🔍 Safari</h3>${sf.map(r => `<div class="m"><time>${hm(new Date(r[0]))}</time><span>${esc(r[1])}</span></div>`).join('')}</div>`);
+
+  const st = STORIES.filter(s => same(s.ts)), po = INSTA.filter(p => same(p.ts));
+  if (st.length || po.length) blocks.push(`<div class="b"><h3>📸 Instagram</h3>${st.map(s => `<div class="m"><time>${hm(new Date(s.ts))}</time><span class="w">story</span><span>@${esc(s.user)}${s.txt ? ` — "${esc(s.txt)}"` : ''}</span>${tagHTML([tagOf(s)].filter(Boolean))}</div>`).join('')}${po.map(p => `<div class="m"><time>${hm(new Date(p.ts))}</time><span class="w">post</span><span>@${esc(p.user)} — ${esc(p.cap || '')}</span>${tagHTML([tagOf(p)].filter(Boolean))}</div>`).join('')}<div class="thumbs" style="margin-top:6px">${[...st, ...po].map(x => `<img src="${x.img}" alt="">`).join('')}</div></div>`);
+
+  const ph = PHOTOS.filter(p => same(p.ts));
+  if (ph.length) blocks.push(`<div class="b"><h3>🖼️ galeri</h3><div class="thumbs">${ph.map(p => /\.mp4$/.test(p.img) ? `<video src="${p.img}#t=.5" muted></video>` : `<img src="${p.img}" alt="">`).join('')}</div></div>`);
+
+  const ag = AGENDA.filter(a => a[0] === k), cam = CAMERA_BY_DAY[k];
+  if (ag.length || cam) blocks.push(`<div class="b"><h3>📅 kalender & 📷 kamera</h3>${ag.map(a => `<div class="m"><time>${a[1] ? a[1].replace(':', '.') : '—'}</time><span>${esc(a[2])}${a[4] ? ` <span class="small">(${esc(a[4])})</span>` : ''}</span>${tagHTML([tagOf({ epi: a[5] })].filter(Boolean))}</div>`).join('')}${cam ? `<div class="small" style="margin-top:4px">kamera: ${esc(cam.src.split('/').pop())}${cam.start ? ` (mulai detik ${cam.start})` : ''}</div>` : ''}</div>`);
+
+  if (k === '2026-10-24') blocks.push(`<div class="b clue"><h3>💥 TURNING POINT — Hana lapor (13.50), Kris nelpon, berantem (14.07) · Kino pingsan 17.40–20.35</h3>${FIGHT_CALL.map(([w, t]) => `<div class="m ${w === 'k' ? 'me' : 'kr'}"><span class="w">${w === 'k' ? 'Kino' : 'Kris'}</span><span>${esc(t)}</span></div>`).join('')}<div class="small" style="margin-top:6px">telepon ini muncul pertama kali pemain buka HP setelah 24 Okt 14.07. Jam 17.40–20.35 HP gak bisa dibuka (Kino pingsan), notif numpuk. Chat Kris setelahnya baru kebuka abis telepon ini.</div></div>`);
+  if (k === '2026-10-24') blocks.push(`<div class="b clue"><h3>🔒 klimaks</h3><div>23.36–23.38 Kris nyuruh baca Catatan "untuk kino" (kode ${STORY.noteCode}).</div><div class="small" style="margin-top:4px">${esc(LETTER.split('\n\n').slice(1, 3).join(' '))} …</div></div>`);
+  if (k === '2026-10-25') blocks.push(`<div class="b clue ending"><h3>🎂 00.00 — telepon Kris + ending</h3>${MIDNIGHT_CALL.map(([w, t]) => `<div class="m ${w === 'k' ? 'me' : 'kr'}"><span class="w">${w === 'k' ? 'Kino' : 'Kris'}</span><span>${esc(t)}</span></div>`).join('')}${Object.values(ENDINGS).map(e => `<details><summary>Ending: ${esc(e.title)}</summary>${e.lines.map(l => `<p>${esc(l)}</p>`).join('')}</details>`).join('')}</div>`);
+
+  out.push(`<section class="day"><div class="dh"><div class="hx">${left > 0 ? 'H-' + left : left === 0 ? 'HARI H' : 'EPILOG · H+' + -left}</div><div class="dd">${d.getDate()} ${BULAN[d.getMonth()]}</div><div class="dw">${HARI[d.getDay()]}</div><a href="index.html?now=${k}T${left === 0 ? '00:01' : '23:59'}" target="_blank">buka HP hari ini ↗</a></div><div class="blocks">${blocks.join('') || '<div class="small">—</div>'}</div></section>`);
+}
+document.getElementById('days').innerHTML = out.join('');
+</script>
+</body>
+</html>

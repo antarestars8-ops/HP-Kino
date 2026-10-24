@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- buat foto adegan HP Kino (promo/tutorial): shot.html?scene=chat&now=2026-10-21T22:35 -->
+<html><head><meta charset="utf-8"><style>html,body{margin:0;height:100%;background:#0b0b0d}iframe{border:0;width:100%;height:100%}</style></head>
+<body><iframe id="f"></iframe>
+<script>
+const q = new URLSearchParams(location.search), scene = q.get('scene') || 'intro', at = q.get('now') || '2026-10-21T22:35';
+localStorage.clear();
+if (scene === 'ending') localStorage.setItem('hpkino:letterRead', 'true');
+// &end=maafin → ending udah kepilih; &epi=1 → HP epilog (1 Nov)
+if (q.get('end')) { localStorage.setItem('hpkino:ending', JSON.stringify(q.get('end'))); localStorage.setItem('hpkino:fightDone', 'true'); }
+// &clues=draft,alt,... → rahasia yg udah ketemu (buat ngetes Secret Secret)
+if (q.get('clues')) localStorage.setItem('hpkino:clues', JSON.stringify(q.get('clues').split(',')));
+if (q.get('epi')) localStorage.setItem('hpkino:epi', JSON.stringify({ key: q.get('end'), at: Date.now() - (+q.get('epimin') || 0) * 60000 }));
+const f = document.getElementById('f');
+f.src = q.get('epi') ? '/' : '/?now=' + at;
+f.onload = () => setTimeout(() => {
+  const w = f.contentWindow; if (scene === 'intro') return;
+  w.eval(`S.unlocked = true; home();`);
+  const run = {
+    lock: `lock()`,
+    home: ``,
+    chat: `openApp('kakao', 'kris')`,
+    group: `openApp('kakao', 'grup')`,
+    call: `callScreen({ who: 'Kris', dir: 'in', lines: [['t','sayang? kebangun ya']] })`,
+    insta: `openApp('insta')`,
+    reels: `openApp('insta'); setTimeout(openReels, 300)`,
+    x: `openApp('x')`,
+    photos: `openApp('photos')`,
+    music: `openApp('music')`,
+    epinarr: `ending(EPI.key, true); setTimeout(() => { const e = document.querySelector('.ending'); e.querySelectorAll('p, .endcard').forEach(p => p.style.animationDelay = '0s'); e.scrollTop = 0; }, 300)`,
+    epinarrend: `ending(EPI.key, true); setTimeout(() => { const e = document.querySelector('.ending'); e.querySelectorAll('p, .endcard').forEach(p => p.style.animationDelay = '0s'); setTimeout(() => e.scrollTop = e.scrollHeight, 400); }, 300)`,
+    secret: `openApp('music'); setTimeout(secretPlaylist, 300)`,
+    secretnote: `openApp('notes', 'secret')`,
+    photosvid: `openApp('photos'); setTimeout(() => { const v = topL().querySelector('.ptile video'); v && v.scrollIntoView({ block: 'center' }); }, 500)`,
+    phone: `openApp('phone')`,
+    notes: `openApp('notes')`,
+    todo: `openApp('notes', '${q.get('id') || 'todo'}')`,
+    find: `openApp('find')`,
+    findk: `openApp('find'); setTimeout(() => topL().querySelector('[data-p="Kris"]').click(), 400)`,
+    health: `openApp('health')`,
+    screen: `openApp('settings'); setTimeout(screenTime, 400)`,
+    ai: `openApp('ai'); setTimeout(() => { const r = [...topL().querySelectorAll('.ai-row')].find(r => r.textContent.includes(decodeURIComponent('${encodeURIComponent(q.get('t') || '')}'))); r && r.click(); setTimeout(() => { const b = topL().querySelector('.body'); b.scrollTop = +'${q.get('y') || 0}'; }, 600); }, 600)`,
+    ending: `ending('maafin'); setTimeout(() => document.querySelector('.ending').click(), 200)`,
+  }[scene];
+  try { w.eval(run); } catch (e) { document.title = 'ERR ' + e.message; }
+}, 1200);
+</script></body></html>

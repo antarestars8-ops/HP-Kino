@@ -1,0 +1,11 @@
+storyboard.html
+img/FOTO.md
+aud/SUARA.md
+.claude
+*.md
+icons/README*
+node_modules
+tools
+supabase
+promo
+.wrangler

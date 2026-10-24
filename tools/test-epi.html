@@ -1,0 +1,5 @@
+<!doctype html><meta charset="utf-8"><body><pre id="out">running</pre><script>
+localStorage.clear(); localStorage.setItem('hpkino:ending', JSON.stringify('maafin')); localStorage.setItem('hpkino:fightDone', 'true');
+const f = document.createElement('iframe'); f.style.cssText = 'width:420px;height:880px'; f.src = '/?now=2026-10-26T10:00'; document.body.appendChild(f);
+f.onload = () => setTimeout(() => { const w = f.contentWindow; try { const r = w.eval(`S.unlocked=true; layersEl.innerHTML=''; home(); const btn=document.querySelector('.epibtn'); const has=!!btn; btn.click(); const e=document.querySelector('.ending'); JSON.stringify({has, h2:e.querySelector('h2').innerText, head:e.querySelector('.epihead').innerText, end:e.querySelector('.theend').innerText, n:e.querySelectorAll('p').length, buttons:[...e.querySelectorAll('button')].map(b=>b.innerText)})`); document.getElementById('out').textContent = r; } catch (err) { document.getElementById('out').textContent = 'ERR ' + err; } }, 1500);
+</script>

@@ -1,0 +1,37 @@
+<!doctype html>
+<!-- bikin meme orisinal buat grup/X: tools/meme.html?m=<id> → screenshot 1080x1080 (headless chrome) -->
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+#m{height:100%}
+html,body{width:1080px;height:1080px;font-family:-apple-system,"Helvetica Neue",Arial,sans-serif;overflow:hidden}
+.two{display:grid;grid-template-rows:1fr 1fr;height:100%}
+.p{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:60px;gap:24px}
+.p small{font-size:34px;font-weight:700;letter-spacing:4px;opacity:.6;text-transform:uppercase}
+.p b{font-size:76px;line-height:1.1;font-weight:900}
+.p i{font-style:normal;font-size:150px;line-height:1}
+.one{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:80px;gap:36px}
+.one b{font-size:84px;line-height:1.1;font-weight:900}
+.one span{font-size:44px;opacity:.75;font-weight:600}
+.one i{font-style:normal;font-size:180px;line-height:1}
+.term{height:100%;background:#0d1117;color:#c9d1d9;font:600 46px/1.6 Menlo,monospace;padding:90px 80px}
+.term .g{color:#7ee787}.term .y{color:#e3b341}.term .r{color:#ff7b72}.term .c{color:#8b949e}
+.wm{position:absolute;right:28px;bottom:22px;font-size:26px;opacity:.45;font-weight:700}
+</style></head><body><div id="m"></div><script>
+const M = {
+  dinner: `<div class="two"><div class="p" style="background:#fff3d6;color:#4a3200"><small>ekspektasi</small><i>🍽️</i><b>dinner santai<br>sama tetangga</b></div><div class="p" style="background:#ffd6e0;color:#5a0020"><small>realita</small><i>🥢</i><b>surya nyendokin japchae<br>ke semua piring</b></div></div>`,
+  jumat: `<div class="one" style="background:#1f2937;color:#fff"><i>🔋</i><b>energi hari jumat</b><span>3%  ·  kopi 0  ·  meeting 4</span></div>`,
+  deploy: `<div class="term"><span class="c"># jumat, 22.47</span><br><span class="g">$</span> git merge 0042-session-index<br><span class="g">$</span> deploy --prod<br><span class="y">? staging check</span> <span class="r">skipped</span><br><span class="g">✔ deployed</span> 😎<br><br><span class="c"># "aman kok bang"</span></div>`,
+  works: `<div class="two"><div class="p" style="background:#e8f5e9;color:#0b3d12"><small>di laptop gue</small><i>✅</i><b>jalan</b></div><div class="p" style="background:#ffebee;color:#5c0a0a"><small>di prod</small><i>🔥</i><b>ga jalan</b></div></div>`,
+  postmortem: `<div class="one" style="background:#fafafa;color:#111"><i>📝</i><b>POSTMORTEM</b><span>penyebab: gue<br>pelajaran: jangan deploy jumat<br>hukuman: nulis test 3 sprint</span></div>`,
+  kopi: `<div class="two"><div class="p" style="background:#f3e8d8;color:#3d2410"><small>kopi gratis dari senior galak</small><i>☕</i><b>✅ diterima</b></div><div class="p" style="background:#e9e9ef;color:#222"><small>gaji intern</small><i>🫠</i><b>"bukan anak kecil"<br>tapi uang jajan</b></div></div>`,
+  palet: `<div class="one" style="background:#f7f5f2;color:#333;gap:28px"><b style="font-size:62px">palet perasaan minggu ini 🎨</b><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;width:100%">${[['#ffd54f','senin'],['#b0bec5','selasa'],['#90a4ae','rabu'],['#78909c','kamis']].map(([c,d])=>`<div><div style="height:300px;border-radius:24px;background:${c}"></div><div style="font-size:38px;font-weight:700;margin-top:14px">${d}</div></div>`).join('')}</div><span>abu2 lagi. jangan tanya 😩</span></div>`,
+  cookies: `<div class="one" style="background:#2b1a3d;color:#ffe9c7"><i>👻🍪👻</i><b>HALLOWEEN COOKIES</b><span>batch 1 · no raisins · made with love 🫶</span></div>`,
+  ultah_maafin: `<div class="two"><div class="p" style="background:#fff0f5;color:#5a1030"><small>ekspektasi ultah</small><i>🎂🥳</i><b>tiup lilin,<br>disayang</b></div><div class="p" style="background:#fff7d6;color:#4a3400"><small>realita ultah gue</small><i>🥹</i><b>berantem H-1,<br>baikan jam 12 malem</b></div></div>`,
+  ultah_jeda: `<div class="two"><div class="p" style="background:#fff0f5;color:#5a1030"><small>ekspektasi ultah</small><i>🎂🥳</i><b>tiup lilin,<br>disayang</b></div><div class="p" style="background:#e6eef7;color:#1d2f45"><small>realita ultah gue</small><i>⏸️</i><b>"kita break dulu"</b></div></div>`,
+  ultah_turun: `<div class="two"><div class="p" style="background:#fff0f5;color:#5a1030"><small>ekspektasi ultah</small><i>🎂🥳</i><b>tiup lilin,<br>disayang</b></div><div class="p" style="background:#ece6dd;color:#3a2c1a"><small>realita ultah gue</small><i>🧥</i><b>balikin jaket<br>di lobi</b></div></div>`,
+  ultah_waktu: `<div class="two"><div class="p" style="background:#fff0f5;color:#5a1030"><small>ekspektasi ultah</small><i>🎂🥳</i><b>tiup lilin,<br>disayang</b></div><div class="p" style="background:#e9e9ec;color:#202024"><small>realita ultah gue</small><i>📵</i><b>putus.<br>lewat telfon</b></div></div>`,
+  senin: `<div class="two"><div class="p" style="background:#dbeafe;color:#0c2a5a"><small>senin pagi</small><i>☕</i><b>"minggu ini<br>gue produktif"</b></div><div class="p" style="background:#e5e7eb;color:#222"><small>senin 10.03</small><i>🫠</i><b>buka 47 tab,<br>ga ada yg kelar</b></div></div>`,
+};
+const k = new URLSearchParams(location.search).get('m');
+document.getElementById('m').innerHTML = M[k] + '<div class="wm">' + (new URLSearchParams(location.search).get('wm') || '') + '</div>';
+</script></body></html>
