@@ -4326,7 +4326,7 @@ const DRAFTS = [
   ['2026-10-23T12:00', '2026-10-23T23:59', 'kamu lagi di mana sih sebenernya'],
   // 24 dini hari: Kino ga tidur, ngetik panjang, dihapus sampe sisa "kamu", terus itu juga dihapus (priv 07.10). [5] = berhenti dulu pas sisa segini
   ['2026-10-24T02:10', '2026-10-24T07:10', 'kamu tadi di lobi kan. juna liat. aku juga pengen turun. aku ga marah. aku cuma pengen kamu cerita, apa aja. besok aku ultah. kamu dateng ya', false, null, 'kamu'],
-  ['2026-10-24T00:00', '2026-10-24T13:50', 'besok kamu dateng kan'],
+  ['2026-10-24T00:00', '2026-10-24T08:00', 'besok kamu dateng kan'], // abis 08.02 prod down: Kino sibuk war room, ga sempet ngetik ke Kris
   ['2026-10-24T20:45', '2026-10-24T23:40', 'kamu udah makan?', true],
 ];
 
