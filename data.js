@@ -396,7 +396,7 @@ const CHATS = [
       ['them', 'okay. kalo ada apa2 bilang ya', '16.41'],
       ['date', '2026-10-24'],
       ['them', 'KINO prod down', '08.06'],
-      ['them', 'semua user ga bisa login. lo lead ya hari ini', '08.06'],
+      ['them', 'semua pembeli ga bisa login, ga bisa checkout. lo lead ya hari ini', '08.06'],
       ['me', 'on it kak', '08.07'],
       ['them', 'CTO nanya ETA', '09.00'],
       ['me', 'belum ada. jangan janjiin apa2 kak', '09.05'],
@@ -646,7 +646,7 @@ const INSTA = [
 ];
 const g = (k, n) => Array.from({ length: n }, (_, i) => `img/ig/${k}-${i}.jpg`);
 const PROFILES = {
-  'kinoo.lee':    { person: 'Kino', name: 'Kino', bio: '🐰 IT · soonie doongie dori', followers: '1.204', following: '312', posts: [...g('kino', 8), 'img/ig/cats-1.jpg', 'img/ig/cats-2.jpg', 'img/ig/cats-3.jpg'] },
+  'kinoo.lee':    { person: 'Kino', name: 'Kino', bio: '🐰 platform eng @ lumen 🛒 · soonie doongie dori', followers: '1.204', following: '312', posts: [...g('kino', 8), 'img/ig/cats-1.jpg', 'img/ig/cats-2.jpg', 'img/ig/cats-3.jpg'] },
   'kris.chandra': { person: 'Kris', name: 'Kris', bio: '🐺 product dev · always busy (katanya)', followers: '986', following: '341', posts: ['img/ig-kris.jpg', ...g('minchan', 8), ...g('kris', 9)] },
   'gemilangrp':   { person: 'Gemilang', name: 'Gemilang', bio: 'gambar · makan · tidur 🎨', followers: '2.877', following: '510', posts: ['img/ig-gemilang.jpg', ...g('gemilang', 8)] },
   'sadewaa.k':    { person: 'Sadewa', name: 'Sadewa', bio: 'ok', followers: '743', following: '198', posts: ['img/ig-sadewa.jpg', ...g('sadewa', 8)] },
@@ -1746,7 +1746,7 @@ more('mama', [
 
 // ===== X (Twitter) =====
 const X_USERS = {
-  kino:     { name: 'kino', handle: 'kinoleee', person: 'Kino', bio: 'it. kucing tiga. ga bales mention.', following: 41, followers: 380 },
+  kino:     { name: 'kino', handle: 'kinoleee', person: 'Kino', bio: 'platform @ lumen. kucing tiga. ga bales mention.', following: 41, followers: 380 },
   kris:     { name: 'kris', handle: 'krischandra', person: 'Kris', bio: 'product. 🐺', following: 88, followers: 512 },
   juna:     { name: 'JUNA 🐿️', handle: 'junahann', person: 'Juna', bio: 'developer (katanya). drama queen (fakta)', following: 302, followers: 455 },
   surya:    { name: 'surya ☀️', handle: 'suryalix', person: 'Surya', bio: 'baking & loving my friends 🫶', following: 210, followers: 1290 },
