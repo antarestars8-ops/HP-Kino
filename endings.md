@@ -166,6 +166,8 @@ _Cara edit: jangan hapus tanda [..] di depan paragraf. Ganti teks di belakangnya
 
 [maafin 76] "Nggak perlu pindah tim." Kino memandang ke luar lagi. "Kamu cuma perlu pulang."
 
+"Aku nggak tahu caranya nggak sayang sama kamu," tambahnya, nyaris berbisik. "Marah aja aku capek. Benci apalagi. Delapan tahun, Kris. Aku udah kebiasaan."
+
 [maafin 77] Kris menatapnya. Lalu, pelan-pelan, seperti takut ditolak, ia menggeser tangannya di atas sofa sampai ujung jarinya menyentuh ujung jari Kino.
 
 [maafin 78] Kino tidak menarik tangannya.
@@ -324,7 +326,7 @@ _Cara edit: jangan hapus tanda [..] di depan paragraf. Ganti teks di belakangnya
 
 [jeda 4] "...Oke."
 
-[jeda 5] "Bukan karena aku benci kamu."
+[jeda 5] "Bukan karena aku benci kamu. Aku nggak bisa benci kamu. Delapan tahun, aku nggak tahu caranya nggak sayang sama kamu."
 
 [jeda 6] "Aku tahu."
 
@@ -620,7 +622,7 @@ _Cara edit: jangan hapus tanda [..] di depan paragraf. Ganti teks di belakangnya
 
 [turun 32] _Eight years. One sentence. That was all it took._
 
-[turun 33] Yang tidak ia katakan: ia masih hafal Kris minum kopi tanpa gula tapi diam-diam suka kalau ada yang menaruh satu sendok. Ia masih refleks mengeluarkan dua sendok setiap kali makan. Ia masih sayang, sebesar ini, sampai dadanya sakit waktu berdiri di depan orang itu.
+[turun 33] Yang tidak ia katakan: ia masih hafal Kris minum kopi tanpa gula tapi diam-diam suka kalau ada yang menaruh satu sendok. Ia masih refleks mengeluarkan dua sendok setiap kali makan. Ia masih sayang, sebesar ini, sampai dadanya sakit waktu berdiri di depan orang itu. Delapan tahun membuatnya lupa caranya tidak sayang. Membenci pun ia tidak tahu caranya.
 
 [turun 34] Justru karena itu ia harus pergi sekarang. Sebelum sayang itu membuatnya lupa caranya berdiri sendiri lagi.
 
@@ -854,7 +856,7 @@ Ia tidak pernah marah karena Kris pergi dengan orang lain. Ia marah karena tahu 
 
 [waktu 28] Kino tidak tahu kenapa ia tetap berdiri di jendela. Mungkin untuk memastikan. Mungkin untuk menghukum dirinya sendiri. Mungkin karena ini terakhir kalinya ia bisa melihat Kris menunggunya, dan sebagian kecil dari dirinya yang bodoh, yang masih memasak bulgogi porsi dua, ingin melihatnya sampai habis.
 
-[waktu 29] Ia sayang Kris. Ia tahu itu sejelas ia tahu namanya sendiri. Bahkan sekarang, ada bagian dari dirinya yang ingin turun, memakaikan syal ke leher orang bodoh yang duduk kedinginan di bangku taman itu, lalu memarahinya karena tidak pakai sarung tangan.
+[waktu 29] Ia sayang Kris. Ia tahu itu sejelas ia tahu namanya sendiri. Bahkan sekarang, ada bagian dari dirinya yang ingin turun, memakaikan syal ke leher orang bodoh yang duduk kedinginan di bangku taman itu, lalu memarahinya karena tidak pakai sarung tangan. Delapan tahun, dan ia tidak pernah belajar caranya tidak menyayangi orang itu. Membenci pun ia tidak bisa. Ia sudah terlalu terbiasa.
 
 [waktu 30] Tapi sayang saja ternyata tidak cukup untuk dua orang yang tidak pernah saling bicara.
 
