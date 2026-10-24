@@ -862,8 +862,8 @@ function xNotif() {
   const me = S.xAcct, items = [];
   if (me === 'kino') X_POSTS.filter(p => p[1] === 'kino' && xOk(p)).forEach(p => {
     const t0 = new Date(p[2]).getTime();
-    (p[5] || []).forEach(([u, t], i) => { if (u !== 'kino') items.push({ t: t0 + (i + 1) * 7 * 6e4, u, html: `<b>${esc(X_USERS[u] ? X_USERS[u].name : u)}</b> membalas: ${esc(t)}` }); });
-    if (p[6]) items.push({ t: t0 + 40 * 6e4, u: (p[5] && p[5][0] && p[5][0][0]) || 'juna', html: `❤️ <b>${p[6]} orang</b> menyukai postingan kamu: <span style="color:#536471">${esc(p[3].slice(0, 60))}</span>` });
+    (p[5] || []).forEach(([u, t], i) => { if (u !== 'kino') items.push({ t: t0 + (i + 1) * 7 * 6e4, u, html: `<b>${esc(X_USERS[u] ? X_USERS[u].name : u)}</b> ${({ en: 'replied:', ko: '님이 답글을 남겼어요:' })[L] || 'membalas:'} ${esc(tr(t))}` }); });
+    if (p[6]) items.push({ t: t0 + 40 * 6e4, u: (p[5] && p[5][0] && p[5][0][0]) || 'juna', html: `❤️ ${({ en: `<b>${p[6]} people</b> liked your post:`, ko: `<b>${p[6]}명</b>이 회원님의 게시물을 마음에 들어 해요:` })[L] || `<b>${p[6]} orang</b> menyukai postingan kamu:`} <span style="color:#536471">${esc(tr(p[3]).slice(0, 60))}</span>` });
   });
   const vis = items.filter(x => x.t <= now().getTime()).sort((a, b) => b.t - a.t);
   const el = win({ cls: 'xapp', title: 'Notifikasi', back: '', sub: true, body: vis.length ? vis.map(x => `<div class="xsrow">${xAv(x.u, 'sm')}<div style="flex:1;min-width:0"><span style="color:#0f1419;font-size:14px">${x.html}</span><small style="display:block;color:#536471;font-size:12px">${xAgo(new Date(x.t))}</small></div></div>`).join('') : `<div class="xempty">${me === 'alt' ? 'Belum ada notifikasi.<br><small>akun ini dikunci, ga ada yg ngikutin</small>' : 'Belum ada notifikasi'}</div>`, footer: xBar(2) });
@@ -899,9 +899,9 @@ function igActivity() {
   const items = [];
   INSTA.filter(p => p.user === 'kinoo.lee').forEach(p => {
     const t0 = new Date(p.ts).getTime();
-    igComs(p).forEach(([u, t], i) => { if (u !== 'kinoo.lee') items.push({ t: t0 + (i + 1) * 9 * 6e4, u, html: `<b>${esc(u)}</b> mengomentari: ${esc(t)}` }); });
+    igComs(p).forEach(([u, t], i) => { if (u !== 'kinoo.lee') items.push({ t: t0 + (i + 1) * 9 * 6e4, u, html: `<b>${esc(u)}</b> ${({ en: 'commented:', ko: '님이 댓글을 남겼어요:' })[L] || 'mengomentari:'} ${esc(tr(t))}` }); });
     const likers = [t0 < new Date('2026-10-23T00:00').getTime() ? 'kris.chandra' : null, 'suryalix'].filter(Boolean);
-    items.push({ t: t0 + 25 * 6e4, u: likers[0], html: `<b>${likers.join(', ')}</b> dan ${Math.max(1, (parseInt(p.likes) || 100) - likers.length)} lainnya menyukai postingan kamu` });
+    items.push({ t: t0 + 25 * 6e4, u: likers[0], html: (() => { const n = Math.max(1, (parseInt(p.likes) || 100) - likers.length); return ({ en: `<b>${likers.join(', ')}</b> and ${n} others liked your post`, ko: `<b>${likers.join(', ')}</b>님 외 ${n}명이 회원님의 게시물을 좋아해요` })[L] || `<b>${likers.join(', ')}</b> dan ${n} lainnya menyukai postingan kamu`; })() });
   });
   const vis = items.filter(x => x.t <= now().getTime()).sort((a, b) => b.t - a.t);
   win({ cls: 'insta', title: '<b>Notifikasi</b>', back: '', sub: true, body: vis.length ? vis.map(x => `<div class="igc-row">${igAv(x.u)}<div>${x.html}<small style="display:block;color:#8e8e8e">${ago(new Date(x.t))}</small></div></div>`).join('') : '<div class="xempty">Belum ada aktivitas</div>' });
@@ -1337,7 +1337,7 @@ function appNotes(open) {
 }
 const lastDraft = (n) => n.drafts.filter(([t]) => visible(new Date(t))).pop();
 const logVis = ([t, , f]) => visible(new Date(t)) && (f !== 'fight' || S.fightDone);
-const logBody = (n) => n.log.filter(logVis).reverse().map(([t, x]) => { const d = new Date(t); return `${HARI[d.getDay()].toLowerCase()}, ${d.getDate()}/${d.getMonth() + 1}\n${x}`; }).join('\n\n—\n\n');
+const logBody = (n) => n.log.filter(logVis).reverse().map(([t, x]) => { const d = new Date(t); return `${HARI[d.getDay()].toLowerCase()}, ${d.getDate()}/${d.getMonth() + 1}\n${tr(x)}`; }).join('\n\n—\n\n');
 function openNote(id) {
   if (id === 'todo' && now() >= new Date('2026-10-20T10:05')) clue('todo-0042'); if (id === 'draft') { clue('notes-kris'); if (lateOk()) clue('draft'); } if (id === 'secret') store.set('secretRead', true);
   { const ns = store.get('notesSeen', {}); ns[id] = Math.max(ns[id] || 0, now().getTime()); store.set('notesSeen', ns); }
@@ -2065,6 +2065,7 @@ function appAI() {
 }
 // markdown kecil ala Claude: paragraf, list, **tebal**, `kode`, ```blok```
 function aiMd(t) {
+  t = tr(t); // diterjemahin utuh dulu: abis dipecah jadi <b>/<li> potongannya ga bakal cocok sama kamus
   const inl = (x) => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>');
   return t.split(/```\n?/).map((part, i) => i % 2 ? `<pre>${esc(part.replace(/\n$/, ''))}</pre>` : part.split(/\n{2,}/).map(x => x.trim()).filter(Boolean).map(blk => {
     const ls = blk.split('\n');
