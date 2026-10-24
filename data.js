@@ -727,7 +727,7 @@ lama-lama aku bosen. bosen nunggu, bosen sama kita yang rasanya gitu-gitu aja. t
 
 dan yuna.
 
-ga ada apa-apa yang lebih dari yang ada di foto-foto itu. tapi itu ga bikin aku jadi ga salah. aku pegang tangan orang lain sambil bilang ke kamu aku lembur sendirian. kamu bener, aku bikin kamu keliatan kayak orang bego. padahal kamu ga bego, kino. yang bego aku.
+yang keliatan pegangan tangan itu yuna lagi iseng baca garis tangan aku. katanya garis jodoh aku panjang. aku ketawa. ga ada apa-apa yang lebih dari itu. tapi itu ga bikin aku jadi ga salah. aku ngebiarin tangan aku dipegang orang lain, sambil bilang ke kamu aku lembur sendirian. kamu bener, aku bikin kamu keliatan kayak orang bego. padahal kamu ga bego, kino. yang bego aku.
 
 pas aku sadar fotonya masuk ke album kita, aku hapus. terus aku ga berani buka chat kamu. dua hari. aku tau kamu nunggu, dan aku tetep ga buka. itu yang paling jahat.
 
