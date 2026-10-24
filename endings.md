@@ -150,7 +150,7 @@ _Cara edit: jangan hapus tanda [..] di depan paragraf. Ganti teks di belakangnya
 
 [maafin 69] "Capek, bilang capek. Bosen, bilang bosen. Ngerasa nggak disayang..." Napasnya tertahan sebentar. "Bilang. Ke aku. Bukan ke orang lain."
 
-"Kamu mau jalan sama yang lain pun nggak apa-apa. Makan, nonton, terserah. Asal bilang dulu." Kino menggeleng pelan. "Kamu pikir aku marah karena itu? Nggak. Aku marah karena tiba-tiba ditanya, 'ikut nonton nggak?' 'ikut ramen nggak?' Tapi aku nggak tahu apa-apa."
+"Kamu mau jalan sama yang lain pun nggak apa-apa. Makan, nonton, terserah. Asal bilang dulu." Kino menggeleng pelan. "Kamu pikir aku marah karena kamu nggak ngajak aku? Enggak. Aku marah karena tiba-tiba ditanya, 'ikut nonton nggak?' 'ikut ramen nggak?' Tapi aku nggak tahu apa-apa."
 
 [maafin 70] "Iya."
 
