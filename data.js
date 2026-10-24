@@ -721,7 +721,7 @@ seminggu ini aku bohong. aku bilang aku sibuk, launch, meeting, lembur, nginep k
 
 jujurnya, aku ngerasa ga disayang. tanggal 15 aku bilang sayang, terus kamu jawab "oh itu tau" sambil ketawa. aku ikut ketawa, tapi pas pulang rasanya kosong. dan itu bukan pertama kalinya.
 
-waktu launch, aku hampir dua minggu ga tidur. aku cuma pengen denger kamu bilang "kamu hebat", tapi yang aku dapet kamu nyuruh tidur sambil ngancem nyabut charger. sekarang aku tau itu cara kamu bilang sayang. waktu itu aku terlalu capek buat ngeliatnya.
+waktu launch, aku hampir dua minggu ga tidur. aku cuma pengen denger kamu bilang "kamu hebat", tapi yang aku dapet kamu nyuruh tidur sambil ngancem nyabut charger. sekarang aku tau itu cara kamu bilang sayang. waktu itu aku terlalu capek buat ngeliatnya. itu bukan salah kamu. itu hal yang harusnya aku omongin, bukan aku pendem terus aku bawa kabur.
 
 lama-lama aku bosen. bosen nunggu, bosen sama kita yang rasanya gitu-gitu aja. terus bosen itu aku jadiin alasan, padahal harusnya aku ngomong ke kamu. aku pengecut. aku malah nyari orang yang keliatan seneng aku ada. makan sama gemilang, nonton sama sadewa,
 
@@ -740,6 +740,10 @@ dan yang paling lucu, tiap kali aku sama mereka, yang aku pikirin malah kamu.
 di situ aku baru sadar. kamu ga pernah bilang sayang, kamu ngelakuinnya. porsi kedua yang selalu kamu masak, nyuruh aku tidur, dori yang kamu biarin tidur di jaket aku. aku terlalu sibuk nunggu kata-kata sampe ga liat semua itu. bukan kamu yang ga sayang. aku yang berhenti ngeliat.
 
 ternyata yang aku cari seminggu ini dari awal ada di unit 4419.
+
+hari ini kamu jatoh di pantry. aku ga berani bilang itu gara2 aku, tapi aku tau aku salah satu yang bikin kepala kamu penuh.
+
+maaf aku bikin kamu nunggu, nebak-nebak, dan ngerasa bego sendirian seminggu ini. kamu ga pantes digituin.
 
 aku ga minta kita balik. aku cuma mau kamu tau semuanya dari aku, bukan dari foto orang lain.
 
