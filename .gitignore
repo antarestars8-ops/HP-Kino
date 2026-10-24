@@ -12,3 +12,4 @@ node_modules/
 .wrangler/
 .dev.vars
 .dev.vars
+tools/i18n/missing.json

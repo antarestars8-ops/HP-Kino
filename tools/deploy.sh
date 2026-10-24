@@ -13,6 +13,13 @@ echo "== $V"
 # 0. jadwal push (api/_events.js) dibikin ulang dari data.js, biar notif HP ga ketinggalan
 node tools/build-events.mjs || { echo "build-events gagal — ga dideploy"; exit 1; }
 
+# 0b. bahasa: kamus -> i18n/en.js, ko.js (+ notif push), terus cek teks Indo yg belum ada en/ko
+node tools/i18n/build.mjs > /dev/null || { echo "build bahasa gagal — ga dideploy"; exit 1; }
+node tools/i18n/missing.mjs || true
+if [[ -s tools/i18n/missing.json && "$(cat tools/i18n/missing.json)" != "[]" ]]; then
+  echo "   (tetep dideploy; teks di atas tampil bahasa Indo dulu. suruh Claude: \"terjemahin missing.json\")"
+fi
+
 # 1. Cloudflare: media di root, file inti di /<versi>/
 mkdir -p $OUT/$V/i18n
 rsync -a --exclude '*.md' --exclude '.DS_Store' img vid aud icons $OUT/
