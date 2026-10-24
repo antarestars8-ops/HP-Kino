@@ -1295,6 +1295,11 @@ const endTone = () => { tone([480], 0, .18, .06); tone([480], .25, .18, .06); to
 // dir: 'out' (Kino nelpon) / 'in' (masuk). lines: [['t'|'k', teks]]
 // log panggilan buat Telepon > Terkini
 S.callLog = store.get('callLog', []);
+// riwayat telpon: maks 40. missed call spam berantem cuma disisain 8 terbaru, biar riwayat hari2 sebelumnya (bisa diputer ulang) ga kedorong ilang
+function trimCallLog() {
+  S.callLog.sort((a, b) => b.t - a.t); let spam = 0;
+  S.callLog = S.callLog.filter(c => !(c.fight && c.missed) || ++spam <= 8).slice(0, 40); store.set('callLog', S.callLog);
+}
 function callScreen(opts) {
   if (music) { music.pause(); }
   if (opts.replay) return callScreen_(opts); // puter ulang dari riwayat: ga dicatet lagi
@@ -1302,7 +1307,7 @@ function callScreen(opts) {
   if (opts.lines && opts.lines.length > 1) entry.lines = opts.lines.map(l => [l[0], l[1]]);
   if (opts.lines === FIGHT_CALL) entry.fight = true;
   if (opts.vm) entry.vmLines = opts.vm;
-  S.callLog.unshift(entry); S.callLog = S.callLog.slice(0, 40); store.set('callLog', S.callLog);
+  S.callLog.unshift(entry); trimCallLog();
   const onEnd = opts.onEnd; opts = { ...opts, onEnd: () => { entry.missed = false; store.set('callLog', S.callLog); onEnd && onEnd(); } };
   return callScreen_(opts);
 }
@@ -1438,7 +1443,7 @@ function fightCatchUp(until) {
     const miss = t + FIGHT_RING_MS; addMsg('kris', fightPleas(), miss - now().getTime()); t = miss + fightRedialMs(); n++;
   }
   store.set('fightNext', t);
-  if (n) { S.callLog.sort((a, b) => b.t - a.t); S.callLog = S.callLog.slice(0, 40); store.set('callLog', S.callLog); }
+  if (n) trimCallLog();
 }
 // abis telpon berantem: Kino bales di chat. pendek, nyelekit, terus balik kerja
 const FIGHT_REACT = ['brengsek.', 'delapan tahun. kamu bisa ngomong ke semua orang, kecuali aku.', 'nangisin kamu ga bikin prod naik.'];
@@ -1530,7 +1535,7 @@ function logMissedKrisCalls() {
       S.callLog.push({ who: 'Kris', t, out: false, missed: true, lines: o.lines.map(l => [l[0], l[1]]), vmLines: o.vm }); done.push(day + ':' + vi); added = true;
     });
   });
-  if (added) { S.callLog.sort((x, y) => y.t - x.t); S.callLog = S.callLog.slice(0, 40); store.set('callLog', S.callLog); store.set('krisCalls', done); }
+  if (added) { trimCallLog(); store.set('krisCalls', done); }
 }
 function maybeKrisCall() {
   const k = dayKey(); const opts = KRIS_CALL[k]; const vi = Array.isArray(opts) ? opts.findIndex(o => o && o.lines && inWin(o)) : -1; const v = vi >= 0 ? opts[vi] : null; const lines = v ? v.lines : null;
