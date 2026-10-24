@@ -566,6 +566,7 @@ function intro() {
     <h1>HP Kino</h1>
     ${I18N_ON ? '' : '<!--'}<div class="langs">${LANGS.map(([k, f, n]) => `<button data-l="${k}" class="${k === L ? 'on' : ''}">${f} ${n}</button>`).join('')}</div>${I18N_ON ? '' : '-->'}
     <p>${T.when(d)}<br>${T.p}</p>
+    <div class="cw">cw: dugaan selingkuh (salah paham, ga ada cheating), bohong ke pasangan</div>
     <button class="cta">${T.go}</button>
     <div class="pwa"><button class="inst" style="display:none">⤓ Install ke HP</button><button class="notif">🔔 Nyalain notifikasi</button><button class="fullbtn" style="display:none"></button></div>
     <div class="disc">Fan fiction. Semua nama, chat & kejadian rekaan.<br>cr. stayroom ai & antarestars</div>
@@ -1572,7 +1573,7 @@ function fightCatchUp(until) {
   if (n) trimCallLog();
 }
 // abis telpon berantem: Kino bales di chat. pendek, nyelekit, terus balik kerja
-const FIGHT_REACT = ['brengsek.', 'delapan tahun. kamu bisa ngomong ke semua orang, kecuali aku.', 'nangisin kamu ga bikin prod naik.'];
+const FIGHT_REACT = ['brengsek.', 'aku yg kayak orang bego seminggu.', 'nangisin kamu ga bikin prod naik.'];
 function kinoReacts() {
   if (store.get('fightReact', false) || !S.fightEnd) return; store.set('fightReact', true);
   addMsg('kris', FIGHT_REACT.map(x => ['me', x]), S.fightEnd + 20000 - now().getTime());
