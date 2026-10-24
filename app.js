@@ -1356,8 +1356,8 @@ function lockedNote() {
 }
 function showLetter() {
   S.letterSeenAt = Date.now();
-  const paras = LETTER.split('\n\n');
-  const el = win({ cls: 'notes notepage', back: 'Catatan', sub: true, body: `<div class="notebody" style="padding-bottom:0"><div class="nd">${longDate(new Date(letterNote().ts))} pukul 23.38 · Kris</div></div><div class="letter">${paras.map((p, i) => `<p style="animation-delay:${i * 0.45}s">${esc(p)}</p>`).join('')}</div>` });
+  const paras = tr(LETTER).split('\n\n'); // diterjemahin utuh dulu (kamus nyimpen suratnya utuh), baru dipecah per paragraf
+  const el = win({ cls: 'notes notepage', back: 'Catatan', sub: true, body: `<div class="notebody" style="padding-bottom:0"><div class="nd">${longDate(new Date(letterNote().ts))} ${({ en: 'at', ko: '' })[L] ?? 'pukul'} 23.38 · Kris</div></div><div class="letter">${paras.map((p, i) => `<p style="animation-delay:${i * 0.45}s">${esc(p)}</p>`).join('')}</div>` });
   const body = el.querySelector('.body');
   body.addEventListener('scroll', () => { S.letterSeenAt = Date.now(); if (body.scrollTop + body.clientHeight >= body.scrollHeight - 10) afterLetter(); });
   setTimeout(() => { if (body.scrollHeight <= body.clientHeight + 10) afterLetter(); }, paras.length * 450 + 1500);
