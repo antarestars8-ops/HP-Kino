@@ -9,6 +9,7 @@ Simpan foto (jpg) di folder ini dengan nama persis seperti di bawah. Yang belum 
 - av-kino.jpg (Lee Know) · av-kris.jpg (Bang Chan)
 - av-sadewa.jpg (Seungmin) · av-gemilang.jpg (Hyunjin)
 - av-juna.jpg (Han) · av-surya.jpg (Felix) · av-bagas.jpg (Changbin) · av-ilham.jpg (I.N)
+- av-dimas.jpg (Dino) · av-teguh.jpg (Jungwoo) — tim IT, belum ada fotonya (sampe diupload: avatar default)
 
 ## Galeri Kino
 - soonie-jaket.jpg — kucing tidur di jaket (20 Okt)

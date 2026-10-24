@@ -1529,6 +1529,14 @@ const ENDING_LOCK = {
     ['kakao', 'Mama', 'ANAK MAMA 😭😭 telpon mama sekarang', '09.15'], ['kakao', 'Kak Mina (Lead IT)', 'Aku tahu kamu bakal keterima. Sekarang istirahat.', '09.21']] },
   waktu: { at: '2026-10-25T23:07', notifs: [['photos', 'Foto', 'Kenangan baru: dori 🐱', 'sekarang']] },
 };
+// suara suasana di narasi ending (disintesis, ga pake file). [jenis, awal paragraf pas mulai, awal paragraf pas berhenti, volume]
+// hum = dengung kulkas kafe lobi, ding = lift sampe. teks paragrafnya diganti → cue-nya ikut diganti juga
+const ENDING_SFX = {
+  maafin: [['ding', 'Semuanya hilang begitu pintu terbuka.'], ['hum', 'Kafe kecil di lobi', 'Mereka berjalan ke lift bersama.'], ['ding', 'Pintu lift terbuka di lantai empat puluh empat.']],
+  jeda: [['hum', 'Di telepon, Kris menunggu.', 'Kris menutup teleponnya.', .018]], // kedengeran lewat telepon: lebih pelan
+  turun: [['ding', 'Kris berdiri di depan kafe lobi'], ['hum', 'Kris berdiri di depan kafe lobi', 'Kino tidak menoleh. Ia masuk lift.']],
+  waktu: [['ding', 'Sebelum berangkat, Kino berdiri lama di depan lift.']],
+};
 const ENDING_TAIL = {
   maafin: { sabar: 'Di dalam lift, Kino menyandarkan kepalanya ke bahu Kris. "Jangan bikin aku nyesel."', dingin: 'Di dalam lift, Kino tidak bicara sepatah kata pun. Tapi ia juga tidak melepaskan tangan Kris.' },
   jeda: { sabar: 'Malam itu Kino mengganti nama kontak Kris. "nanti."', dingin: 'Kino mengarsipkan chat Kris. Tidak dihapus. Hanya diarsipkan.' },
@@ -5189,7 +5197,7 @@ HEALTH_NOTE.push(['2026-10-22T17:06', 'Detak jantung tinggi: 118 BPM saat tidak 
 SAFARI.push(['2026-10-22T17:41', 'cara tau interview lancar dari muka profesor', 'google.com'], ['2026-10-22T17:42', 'profesor senyum di akhir interview artinya apa', 'google.com']);
 
 // ===== tim IT: 2 anggota yg jarang ngomong (dimas DBA, teguh QA) =====
-Object.assign(PEOPLE, { Dimas: { av: '' }, Teguh: { av: '' } });
+Object.assign(PEOPLE, { Dimas: { av: 'img/av-dimas.jpg' }, Teguh: { av: 'img/av-teguh.jpg' } }); // visual: Dimas = Dino, Teguh = Jungwoo
 more('kru', [
   ['date', '2026-10-21'], ['Teguh', 'staging masih mati ya? gue ga bisa tes apa2', '10.15'],
   ['date', '2026-10-23'], ['Dimas', '☕ makasih kin', '09.47'], ['Teguh', 'makasih bang 🙏', '09.48'],

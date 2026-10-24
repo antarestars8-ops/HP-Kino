@@ -453,8 +453,10 @@ function popTo(n) {
 }
 const topL = () => layersEl.lastElementChild;
 // abis balik: update badge home & daftar chat (biar yg udah dibaca ilang)
+function dailyToast(d) { toast({ icon: typeof ICONS[d[0]] === 'function' ? ICONS[d[0]](now()) : (ICONS[d[0]] || ICONS.calendar(now())), title: d[1], body: d[2], ms: 5000 }); }
 function refreshUnder() {
   const t = layersEl.lastElementChild; if (!t) return;
+  if (S.dailyLater && t.classList.contains('home')) { const d = S.dailyLater; S.dailyLater = null; setTimeout(() => dailyToast(d), 500); } // banner harian yg ditunda (masuk lewat notif)
   if (t.classList.contains('home')) t.querySelectorAll('.app').forEach(a => { const n = a.dataset.app === 'kakao' ? unreadTotal() : 0; const b = a.querySelector('.bdg'); if (a.dataset.app !== 'kakao') return; if (n) { if (b) b.textContent = n; else a.querySelector('.icon').insertAdjacentHTML('afterend', `<span class="bdg">${n}</span>`); } else if (b) b.remove(); });
   if (t.classList.contains('kakao') && !t.dataset.chat) { const b = t.querySelector('.body'), html = kakaoRows(); if (b._rows !== html) { morph(b, html); b._rows = html; } wireKakao(t); }
 }
@@ -615,12 +617,13 @@ function lock() {
 function lockDrag(lk, d) {
   let p = layersEl.querySelector('.pass');
   if (!p) { S.goTo = null; passcode(); p = layersEl.querySelector('.pass'); if (!p) return; p.style.animation = 'none'; }
-  lk.style.transition = 'none'; lk.style.transform = `translateY(${-d * .6}px)`;
-  p.style.transition = 'none'; p.style.opacity = Math.min(1, d / 260);
+  const k = Math.min(1, d / 260);
+  lk.style.transition = 'none'; lk.style.transform = `translateY(${-d}px)`; lk.style.opacity = Math.max(0, 1 - k * 1.8); // layar kunci pudar duluan,
+  p.style.transition = 'none'; p.style.opacity = Math.max(0, (k - .3) / .7); // baru keypad nongol (ga numpuk di tengah)
 }
 function lockRelease(lk, d, v) {
   const p = layersEl.querySelector('.pass'), ok = d > 140 || (d > 40 && v > .5); S.lockDragAt = Date.now();
-  lk.style.transition = 'transform .3s cubic-bezier(.2,.8,.2,1)'; lk.style.transform = '';
+  lk.style.transition = 'transform .3s cubic-bezier(.2,.8,.2,1), opacity .3s'; lk.style.transform = ''; lk.style.opacity = '';
   if (p) { p.style.transition = 'opacity .22s'; p.style.opacity = ok ? '1' : '0'; }
   setTimeout(() => { lk.style.transition = ''; if (!p) return; p.style.transition = ''; if (!ok && p.isConnected) { p.remove(); syncChrome(); } }, 320);
 }
@@ -656,7 +659,7 @@ function unlock() {
   if (t >= FAINT[0] && t < FAINT[1]) { // GERD Kino kumat (di klinik, ketiduran abis dikasih obat): HP ga bisa dibuka
     buzz('faint');
     const el = h(`<div class="faint" data-nostatus="1" data-modal="1"><p>Dada Kino panas. Perutnya melilit.</p><p class="s">Ia nggak bisa berdiri. Lalu semuanya jauh.</p><p class="s2">(Kino lagi ditangani di klinik. HP-nya cuma bisa nerima notif. coba buka lagi nanti.)</p></div>`);
-    const go = () => { if (el.isConnected) { el.remove(); syncChrome(); } }; push(el); setTimeout(() => { el.onclick = go; }, 2500); setTimeout(go, 10000); return; // 10 detik biar kebaca semua; boleh ditap abis 2,5 detik
+    const go = () => { if (el.isConnected) { el.remove(); syncChrome(); } }; push(el); ambWhile(el, 'beep'); setTimeout(() => { el.onclick = go; }, 2500); setTimeout(go, 10000); return; // 10 detik biar kebaca semua; boleh ditap abis 2,5 detik
   }
   if (t >= INTV[0] && t < INTV[1]) { // interview oxford: HP ditelungkupin
     const el = h(`<div class="faint" data-nostatus="1" data-modal="1"><p>Kino lagi interview.</p><p class="s">Teams. Kamera nyala. Jangan diganggu.</p><p class="s2">(HP-nya ditelungkupin di meja. coba buka lagi abis 17.40)</p></div>`);
@@ -665,7 +668,7 @@ function unlock() {
   S.unlocked = true; home();
   if (go) setTimeout(() => { if (!S.unlocked || layersEl.children.length > 1) return; const [k, v] = go.split(':'); if (k === 'c') openApp('kakao', v); else openApp(v); }, 350);
   const k = dayKey(), d = DAILY[k], shown = store.get('daily', {});
-  if (d && !shown[k] && !EPI) { shown[k] = 1; store.set('daily', shown); setTimeout(() => toast({ icon: typeof ICONS[d[0]] === 'function' ? ICONS[d[0]](now()) : (ICONS[d[0]] || ICONS.calendar(now())), title: d[1], body: d[2], ms: 5000 }), 900); }
+  if (d && !shown[k] && !EPI) { shown[k] = 1; store.set('daily', shown); if (go) { S.dailyLater = d; return; } setTimeout(() => toast({ icon: typeof ICONS[d[0]] === 'function' ? ICONS[d[0]](now()) : (ICONS[d[0]] || ICONS.calendar(now())), title: d[1], body: d[2], ms: 5000 }), 900); }
 }
 
 // ---------- home ----------
@@ -1358,6 +1361,38 @@ function tone(freqs, start, dur, vol = .06, type = 'sine') {
   freqs.forEach(f => { const o = a.createOscillator(); o.type = type; o.frequency.value = f; o.connect(g); o.start(a.currentTime + start); o.stop(a.currentTime + start + dur + .05); });
   } catch (e) {}
 }
+// ---------- suara suasana: disintesis langsung (ga pake file → ga ada urusan hak cipta / kuota) ----------
+let ambNoise = null;
+function noiseSrc(a) { if (!ambNoise) { ambNoise = a.createBuffer(1, a.sampleRate * 2, a.sampleRate); const d = ambNoise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; } const s = a.createBufferSource(); s.buffer = ambNoise; s.loop = true; return s; }
+// rain = hujan, hum = dengung kulkas kafe lobi, beep = monitor klinik. balikin fungsi stop(detik fade)
+function amb(kind, vol) {
+  const a = ac(); if (!a) return () => {};
+  const out = a.createGain(), nodes = []; out.gain.value = 0; out.connect(a.destination);
+  const fade = (v, sec) => { const t = a.currentTime; out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(out.gain.value, t); out.gain.linearRampToValueAtTime(v, t + sec); };
+  const filt = (type, f) => { const b = a.createBiquadFilter(); b.type = type; b.frequency.value = f; return b; };
+  try {
+    if (kind === 'rain') { const n = noiseSrc(a), hp = filt('highpass', 500), lp = filt('lowpass', 2800); n.connect(hp); hp.connect(lp); lp.connect(out); n.start(); nodes.push(n); fade(vol || .05, 1.5); }
+    if (kind === 'hum') {
+      [[100, .5], [200, .2], [300, .06]].forEach(([f, v]) => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = f; g.gain.value = v; o.connect(g); g.connect(out); o.start(); nodes.push(o); });
+      const n = noiseSrc(a), lp = filt('lowpass', 450), g = a.createGain(); g.gain.value = .3; n.connect(lp); lp.connect(g); g.connect(out); n.start(); nodes.push(n);
+      fade(vol || .035, 2.5);
+    }
+    if (kind === 'beep') {
+      const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 1050; g.gain.value = 0; o.connect(g); g.connect(out); o.start(); nodes.push(o);
+      for (let i = 0; i < 60; i++) { const t = a.currentTime + .3 + i * 1.05; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(1, t + .01); g.gain.setValueAtTime(1, t + .11); g.gain.linearRampToValueAtTime(0, t + .13); }
+      fade(vol || .03, .05);
+    }
+  } catch (e) {}
+  let done = false;
+  return (sec = 1.2) => { if (done) return; done = true; fade(0, sec); setTimeout(() => nodes.forEach(n => { try { n.stop(); } catch (e) {} }), sec * 1000 + 100); };
+}
+// "ting-tung" lift
+function ding() {
+  const a = ac(); if (!a) return;
+  try { [[1319, 0], [1047, .45]].forEach(([f, d]) => [[1, .07], [2.76, .012]].forEach(([m, v]) => { const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + d; o.frequency.value = f * m; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .005); g.gain.exponentialRampToValueAtTime(.0001, t + 1.8); o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + 1.9); })); } catch (e) {}
+}
+// suara ikut idup selama layer-nya masih ada di layar
+function ambWhile(el, kind, vol) { const stop = amb(kind, vol); const chk = setInterval(() => { if (!el.isConnected) { clearInterval(chk); stop(.6); } }, 400); return stop; }
 function ringback() { let on = true; const loop = () => { if (!on) return; tone([440, 480], 0, 1.0, .07); setTimeout(loop, 3000); }; loop(); return () => on = false; }
 // ringtone: aud/ringtone.mp3 kalau ada, kalau gak ada pake marimba sintetis
 function marimba(f, at, vol = .12) {
@@ -1710,7 +1745,16 @@ function ending(key, epiMode = false, jump = false) {
     </div></div>`);
   // tap di teks: munculin semua (skip animasi)
   let stopLock = null; const lockT = EL ? setTimeout(() => { if (el.isConnected) stopLock = endLock(EL); }, tLock * 1000) : 0;
-  el.addEventListener('click', (e) => { if (e.target.closest('button')) return; clearTimeout(lockT); stopLock && stopLock(true); el.querySelectorAll('p, .endcard').forEach(p => { p.style.animationDelay = '0s'; }); });
+  // suara suasana di narasi (ENDING_SFX): mulai pas paragrafnya muncul
+  const cueT = [], hums = [];
+  if (!epiMode && !jump) (ENDING_SFX[key] || []).forEach(([k, from, to, vol]) => {
+    const at = (s) => { const i = lines.findIndex(l => String(l).startsWith(s)); return i < 0 ? -1 : (0.4 + i * step) * 1000; };
+    const t1 = at(from); if (t1 < 0) return;
+    if (k === 'ding') return cueT.push(setTimeout(() => { if (el.isConnected) ding(); }, t1 + 300));
+    const t2 = to ? at(to) : -1;
+    cueT.push(setTimeout(() => { if (!el.isConnected) return; const st = ambWhile(el, k, vol); hums.push(st); cueT.push(setTimeout(() => st(2.5), t2 > t1 ? t2 - t1 : 30000)); }, t1));
+  });
+  el.addEventListener('click', (e) => { if (e.target.closest('button')) return; clearTimeout(lockT); stopLock && stopLock(true); cueT.forEach(clearTimeout); hums.forEach(st => st(.6)); el.querySelectorAll('p, .endcard').forEach(p => { p.style.animationDelay = '0s'; }); });
   // auto-scroll ngikutin kalimat yg muncul; berhenti kalau pemain scroll sendiri
   let userScrolled = false; el.addEventListener('wheel', () => userScrolled = true); el.addEventListener('touchmove', () => userScrolled = true);
   // epilog: pas Days Until & tombol muncul, pastiin udah di paling bawah
@@ -2125,6 +2169,7 @@ function appWeather() {
   const w = weatherNow(); const hr = now().getHours();
   const icons = { cloud: '<svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.4 2A3 3 0 0 0 7 18z" fill="#fff"/></svg>', rain: '<svg viewBox="0 0 24 24"><path d="M7 15h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.4 2A3 3 0 0 0 7 15z" fill="#fff"/><path d="M9 18l-1 3M13 18l-1 3M17 18l-1 3" stroke="#5ac8fa" stroke-width="1.6" stroke-linecap="round"/></svg>', moon: '<svg viewBox="0 0 24 24"><path d="M15 3a8 8 0 1 0 6 13A9 9 0 0 1 15 3z" fill="#fff"/></svg>' };
   const hours = Array.from({ length: 6 }, (_, i) => { const hh = (hr + i) % 24; return [i === 0 ? 'Skrg' : pad(hh), w.s.includes('Hujan') ? icons.rain : hh >= 19 || hh < 6 ? icons.moon : icons.cloud, w.t - (i > 2 ? 1 : 0)]; });
+  if (w.s.includes('Hujan')) setTimeout(() => { const el = layersEl.querySelector('.win.weather'); if (el) ambWhile(el, 'rain'); }, 0);
   win({ cls: 'weather', dark: false, body: `<div class="wbig"><div class="c">Seoul</div><div class="t">${w.t}°</div><div class="s">${w.s}</div><div class="s">T:${w.hi}° R:${w.lo}°</div></div>
     <div class="wcard"><div class="wt">Prakiraan per jam</div><div class="wrow">${hours.map(([t, i, d]) => `<div><span>${t}</span>${i}<span>${d}°</span></div>`).join('')}</div></div>
     <div class="wcard"><div class="wt">Prakiraan 5 hari</div>${[['Hari ini', w.lo, w.hi], ['Rab', 6, 14], ['Kam', 6, 12], ['Jum', 5, 13], ['Sab', 4, 11]].map(([d, a, b]) => `<div style="display:flex;justify-content:space-between;padding:7px 0;font-weight:500"><span>${d}</span><span style="opacity:.7">${a}°  —  ${b}°</span></div>`).join('')}</div>` });
