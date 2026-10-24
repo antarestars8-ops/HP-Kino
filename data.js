@@ -5623,3 +5623,13 @@ const RETRACT_ALT = {
   'aku di bawah': '"aku di bawah" terus diapus. di bawah ngapain. naik engga, pergi engga',
   'semangat hari ini': '"semangat hari ini" terus ditarik. afk tapi ngechat. ngechat tapi ditarik. lo maunya apa',
 };
+
+// kartu ending: "kamu main sabar/dingin" + satu frasa yg nyambung ke kalimat penutup tiap ending (ENDING_TAIL)
+const TONE_LABEL = {
+  maafin: { sabar: 'kino milih pulang', dingin: 'tapi tangannya ga dilepas' },
+  jeda: { sabar: 'kontaknya jadi "nanti."', dingin: 'diarsipin, bukan dihapus' },
+  turun: { sabar: 'kuenya dimakan sendirian', dingin: 'kuenya buat surya' },
+  waktu: { sabar: 'makasih udah jujur', dingin: 'akhirnya tidur nyenyak' },
+};
+// 2 pilihan "dingin" ke Kris sempet keikut dihangatin (aturan "ke Kris tetep paling hangat"), jadi kebaca sabar. balikin biar skornya adil
+REPLIES.forEach(r => { if (r.id === 'kx1') r.opts[1].me = ['oke.']; if (r.id === 'kx3') r.opts[1].me = ['oh. oke.']; });

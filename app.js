@@ -1709,6 +1709,7 @@ function finale() {
   push(el);
 }
 // skor gaya main: tiap balasan pilihan = sabar (+1) / dingin (-1), liat TONE
+const toneLabel = (key, tone) => `kamu main ${tone === 'sabar' ? 'sabar 🤍' : 'dingin 🧊'}` + (typeof TONE_LABEL !== 'undefined' && TONE_LABEL[key] ? ' · ' + TONE_LABEL[key][tone] : '');
 function score() { return Object.entries(S.answers || {}).reduce((a, [id, v]) => a + ((TONE[id] || [])[v.choice] || 0), 0); }
 // baris narasi: '***' jeda adegan, '_..._' italic, 'Flashback.'/'Flashback end.' penanda
 function endP(l, d) {
@@ -1736,7 +1737,7 @@ function ending(key, epiMode = false, jump = false) {
     ${epi.length ? `<p class="epihead" style="animation-delay:${t0}s">${esc(E.epiHead || 'Seminggu kemudian.')}</p>${epi.map((l, i) => endP(l, t0 + 1.4 + i * step)).join('')}<p class="theend${epiMode ? ' big' : ''}" style="animation-delay:${tEnd}s">${esc(AU_TITLE)}<small>the end.</small></p>` : ''}
     <div class="endcard${epiMode ? ' epi' : ''}" style="animation-delay:${(epi.length ? tEnd + (epiMode ? 6.5 : 0.8) : EL ? tLock + lockLen + 0.6 : 0.8 + lines.length * step)}s">
       ${epiMode ? '' : `<div class="bd">selamat ulang tahun, kino.</div>
-      <div style="color:#8e8e93;font-size:13px">${`25.10 · kamu main ${tone === 'sabar' ? 'sabar 🤍' : 'dingin 🧊'}`}</div>`}
+      <div style="color:#8e8e93;font-size:13px">${`25.10 · ${esc(toneLabel(key, tone))}`}</div>`}
       ${epiMode ? '' : `<div class="endcol">${(() => { const seen = store.get('endingsSeen', []), keys = ['maafin', 'jeda', 'turun', 'waktu']; return `<div class="ec-t">Ending terbuka: ${keys.filter(k => seen.includes(k)).length}/4</div><div class="ec-row">${keys.map(k => `<span class="${seen.includes(k) ? 'on' : ''}">${seen.includes(k) ? esc(ENDINGS[k].title) : '???'}</span>`).join('')}</div>`; })()}</div>
       ${playlistHTML()}`}
       <div class="cr">fan fiction · semua nama & kejadian rekaan<br>cr. stayroom ai & antarestars</div>
@@ -1802,7 +1803,7 @@ async function shareCard(key, tone, line) {
   x.fillStyle = '#fff'; x.font = '800 96px -apple-system, sans-serif'; x.fillText(ENDINGS[key].title, W / 2, 1390);
   x.fillStyle = '#c7c7cc'; x.font = '40px -apple-system, sans-serif';
   const words = line.split(' '); let row = '', y = 1480; for (const w of words) { if (x.measureText(row + w).width > 860) { x.fillText(row.trim(), W / 2, y); row = ''; y += 56; } row += w + ' '; } x.fillText(row.trim(), W / 2, y);
-  x.fillStyle = tone === 'sabar' ? '#ffd9e2' : '#9fd3ff'; x.font = '600 40px -apple-system, sans-serif'; x.fillText(tone === 'sabar' ? 'kamu main sabar 🤍' : 'kamu main dingin 🧊', W / 2, y + 110);
+  x.fillStyle = tone === 'sabar' ? '#ffd9e2' : '#9fd3ff'; x.font = '600 40px -apple-system, sans-serif'; x.fillText(toneLabel(key, tone), W / 2, y + 110);
   x.fillStyle = '#fee500'; x.font = '600 36px -apple-system, sans-serif'; x.fillText(`🤫 secret secret: ${secretCount()}/${CLUES.length}`, W / 2, y + 180);
   x.fillStyle = '#636366'; x.font = '32px -apple-system, sans-serif'; x.fillText('hp-kino.vercel.app · cr. stayroom ai & antarestars', W / 2, H - 90);
   c.toBlob(async (blob) => {
