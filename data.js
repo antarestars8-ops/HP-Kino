@@ -2715,7 +2715,7 @@ ALT.push(['2026-10-20T22:27', 'nanya soal rep gemilang di twitter dia, katanya g
 X_POSTS.push(['a' + (ALT.length - 1), 'alt', '2026-10-20T22:27', ALT[ALT.length - 1][1], '', [], 0, {}]);
 
 // ===== EPILOG (versi final, sesuai arahan): tiap ending punya waktu & judul sendiri, ditutup "Days Until · the end"
-ENDINGS.maafin.epiHead = 'Di jalan ke rumah Mama.';
+ENDINGS.maafin.epiHead = '25 Oktober, siang. Di jalan ke rumah Mama.'; // biar ga dikira 1 nov (epilog maafin masih hari ultah)
 ENDINGS.maafin.epi = [
   'Kotak brownies Surya ada di pangkuan Kino, dibungkus kain bunga-bunga pinjaman Surya. Oleh-oleh buat Mama. Kris menyetir pelan sekali, terlalu pelan, seperti takut perjalanan ini selesai sebelum ia sempat mengatakan semua yang mau ia katakan.',
   '"Aku mau benerin semuanya," katanya akhirnya, mata lurus ke jalan. "Aku udah bikin daftar. Aku mau belajar masak. Aku mau pulang jam lima beneran, bukan bohongan. Aku mau nanya tiap kali aku ngerasa aneh, bukan lari. Aku mau—"',

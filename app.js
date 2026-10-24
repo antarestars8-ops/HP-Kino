@@ -1741,7 +1741,7 @@ function ending(key, epiMode = false, jump = false) {
       ${epiMode ? '' : `<div class="endcol">${(() => { const seen = store.get('endingsSeen', []), keys = ['maafin', 'jeda', 'turun', 'waktu']; return `<div class="ec-t">Ending terbuka: ${keys.filter(k => seen.includes(k)).length}/4</div><div class="ec-row">${keys.map(k => `<span class="${seen.includes(k) ? 'on' : ''}">${seen.includes(k) ? esc(ENDINGS[k].title) : '???'}</span>`).join('')}</div>`; })()}</div>
       ${playlistHTML()}`}
       <div class="cr">fan fiction · semua nama & kejadian rekaan<br>cr. stayroom ai & antarestars</div>
-      ${epiMode ? (EPI ? '<button class="cta epi">tutup</button><br><br><button class="cta now" style="background:transparent;color:#fff;border:1px solid #48484a">← balik ke hari ultah Kino</button>' : '<button class="cta epi">📱 buka HP Kino · seminggu kemudian</button>') : '<button class="cta bday">lanjut ke hari ulang tahun Kino →</button>'}<br><br>
+      ${epiMode ? (EPI ? '<button class="cta epi">tutup</button><br><br><button class="cta now" style="background:transparent;color:#fff;border:1px solid #48484a">← balik ke hari ultah Kino</button>' : '<button class="cta epi">📱 buka HP Kino · seminggu kemudian</button>') : '<button class="cta bday">lanjut ke hari ulang tahun Kino →</button>' + (now() < EPI_OPEN ? '<br><br><button class="cta late" style="background:transparent;color:#fff;border:1px solid #48484a">⏩ ulang tahun Kino, tapi udah jam 10 malem</button><div style="color:#8e8e93;font-size:12px;margin-top:6px">chat seharian masuk sekaligus · HP seminggu kemudian langsung kebuka</div>' : '')}<br><br>
       <button class="cta share" style="background:#fee500">Bagikan hasil</button><br><br>
       ${EPI ? '' : '<button class="cta other" style="background:transparent;color:#fff;border:1px solid #48484a">Ending lain</button>'}
     </div></div>`);
@@ -1770,6 +1770,8 @@ function ending(key, epiMode = false, jump = false) {
     el.remove(); pickAgain();
   };
   const bd = el.querySelector('.bday'); if (bd) bd.onclick = () => { if (S.reloadAfterEnding) { try { localStorage.setItem('hpkino:resume', 'true'); } catch (e) {} location.href = location.pathname + location.search; return; } layersEl.querySelectorAll('.call, .ending').forEach(x => x.remove()); S.unlocked = true; home(); }; // ke HP, bukan balik ke pilihan
+  // lompat ke 25 Okt 22.00: jam di HP dimajuin (offset kesimpen, jalan terus), terus balik ke HP
+  const lt = el.querySelector('.late'); if (lt) lt.onclick = () => { try { localStorage.setItem('hpkino:replayOffset', String(EPI_OPEN.getTime() - tnow())); localStorage.setItem('hpkino:resume', 'true'); } catch (e) {} location.href = location.pathname; };
   el.querySelector('.share').onclick = () => shareCard(key, tone, shareLine);
   const nw = el.querySelector('.now'); if (nw) nw.onclick = () => { try { localStorage.removeItem('hpkino:epi'); localStorage.setItem('hpkino:backToCard', JSON.stringify(key)); } catch (e) {} location.href = location.pathname + (tnow() < EPI_OPEN.getTime() ? '?now=2026-10-25T22:00' : ''); };
   const ep = el.querySelector('.epi'); if (ep) ep.onclick = () => { if (EPI) { el.remove(); syncChrome(); return; } goEpilogPhone(key); };
