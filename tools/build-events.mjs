@@ -24,7 +24,8 @@ for (const c of CHATS) { if (c.muted) continue; // grup di-mute: ga ada push
   }
 }
 ev.push({ t: FIGHT_AT, tag: 'call', title: 'kris 🐺', body: 'KakaoTalk Audio · memanggil…' });
-ev.push({ t: '2026-10-25T00:00', tag: 'call', title: 'kris 🐺', body: 'KakaoTalk Audio · memanggil…' });
+// telpon 00.00 cuma beneran ada kalau surat Kris udah dibaca: HP yg belum baca dapet ucapan aja (tag 'kris', jadi ga dobel)
+ev.push({ t: '2026-10-25T00:00', tag: 'call', title: 'kris 🐺', body: 'selamat ulang tahun, kino.', full: 'KakaoTalk Audio · memanggil…', gate: 'letter', altTag: 'kris' });
 ev.push({ t: '2026-10-25T00:00', tag: 'kris', title: 'kris 🐺', body: 'selamat ulang tahun, kino.' });
 ev.push({ t: '2026-10-25T22:00', tag: 'epi', title: 'Days Until', body: '📱 seminggu kemudian udah kebuka. udah milih ending? cek di home' });
 ev.forEach(e => e.t = e.t.slice(0, 16)); // tick.js baca 'YYYY-MM-DDTHH:MM' (jam yg pake detik bikin notifnya ga pernah kekirim)

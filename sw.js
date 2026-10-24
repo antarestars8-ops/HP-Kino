@@ -1,5 +1,5 @@
 // HP Kino service worker — naikin VERSION tiap file inti berubah
-const VERSION = 'hpkino-v342';
+const VERSION = 'hpkino-v343';
 const SHELL = ['index.html', 'style.css', 'i18n/core.js', 'app.js', 'data.js', 'manifest.webmanifest', 'icons/icon-192.png'];
 const MEDIA = 'hpkino-media'; // foto/video/suara: ga ikut kehapus tiap deploy (nama file baru = file baru)
 const CDN = 'https://hp-kino-media.hp-kino.workers.dev'; // media diambil dari Cloudflare (ga ngabisin kuota Vercel). kosongin = balik ke Vercel
@@ -31,9 +31,11 @@ self.addEventListener('notificationclick', e => {
 self.addEventListener('push', e => {
   let d = {}; try { d = e.data.json(); } catch (_) { d = { title: 'HP Kino', body: e.data && e.data.text() }; }
   // pesan Kris sesudah berantem: tampilin isinya cuma kalau di HP ini telponnya udah diangkat sebelum pesan itu (state ditulis app.js)
-  const body = d.gate !== 'fight' ? Promise.resolve(d.body) : caches.open('hpkino-state').then(c => c.match('/__state')).then(r => r ? r.json() : {}).then(st => st.fightAt && d.at >= st.fightAt ? d.full : d.body).catch(() => d.body);
-  e.waitUntil(Promise.all([self.clients.matchAll({ type: 'window', includeUncontrolled: true }), body]).then(([cs, b]) => {
+  // telpon 00.00 (gate 'letter'): cuma kalau surat Kris udah dibaca; kalau belum, jadi ucapan biasa di tag lain
+  const pick = (st) => d.gate === 'fight' ? (st.fightAt && d.at >= st.fightAt) : d.gate === 'letter' ? !!st.letterRead : true;
+  const body = !d.gate ? Promise.resolve({ b: d.body, tag: d.tag }) : caches.open('hpkino-state').then(c => c.match('/__state')).then(r => r ? r.json() : {}).then(st => pick(st) ? { b: d.full, tag: d.tag } : { b: d.body, tag: d.altTag || d.tag }).catch(() => ({ b: d.body, tag: d.altTag || d.tag }));
+  e.waitUntil(Promise.all([self.clients.matchAll({ type: 'window', includeUncontrolled: true }), body]).then(([cs, { b, tag }]) => {
     if (cs.some(c => c.visibilityState === 'visible')) return;
-    return self.registration.showNotification(d.title || 'HP Kino', { body: b || '', tag: d.tag, renotify: true, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png' });
+    return self.registration.showNotification(d.title || 'HP Kino', { body: b || '', tag, renotify: true, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png' });
   }));
 });

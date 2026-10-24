@@ -1362,7 +1362,7 @@ function lockedNote() {
     if (k === '⌫') code = code.slice(0, -1); else if (code.length < 4) code += k;
     draw();
     if (code.length === 4) setTimeout(() => {
-      if (code === STORY.noteCode) { S.letterRead = true; store.set('letterRead', true); pop(); showLetter(); return; }
+      if (code === STORY.noteCode) { S.letterRead = true; store.set('letterRead', true); swState(); pop(); showLetter(); return; }
       boxes.classList.add('shake'); setTimeout(() => boxes.classList.remove('shake'), 450); code = ''; draw();
     }, 180);
   });
@@ -1611,7 +1611,7 @@ function kinoReacts() {
 const FIGHT_GIVEUP = new Date('2026-10-24T14:27');
 const fightOver = () => now() >= FIGHT_GIVEUP;
 // buat sw.js: notif push pesan Kris sesudah berantem baru keliatan isinya kalau telponnya udah diangkat (kalau ga diangkat, 14.27 otomatis keangkat)
-function swState() { try { caches.open('hpkino-state').then(c => c.put('/__state', new Response(JSON.stringify({ fightAt: S.fightAns || FIGHT_GIVEUP.getTime() })))); } catch (e) {} }
+function swState() { try { caches.open('hpkino-state').then(c => c.put('/__state', new Response(JSON.stringify({ fightAt: S.fightAns || FIGHT_GIVEUP.getTime(), letterRead: !!S.letterRead })))); } catch (e) {} }
 if ('caches' in window) { setTimeout(swState, 3000); document.addEventListener('visibilitychange', () => { if (document.hidden) swState(); }); }
 const FIGHT_AUTO_SEC = 3 * 60 + 41; // durasi telpon kalo diangkatnya "di luar layar" jam 14.27: kelar 14.30, Kino balik ke ruangan 14.31
 // jeda sebelum nelpon lagi: awalnya beruntun, lama2 makin jarang (biar ga ratusan telpon kalo HP dibiarin), tapi ga pernah berhenti

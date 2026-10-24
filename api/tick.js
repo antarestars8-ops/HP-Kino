@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     if (!due.length) return;
     // satu notif per room: pesan terakhir + jumlah sisanya
     const byTag = {}; due.forEach(e => (byTag[e.tag] = byTag[e.tag] || []).push(e));
-    const notes = Object.values(byTag).map(list => { const e0 = list[list.length - 1], e = e0[s.lang] || e0; const more = list.length > 1 ? `  (+${list.length - 1})` : ''; return { title: e.title, body: e.body + more, tag: e0.tag, ...(e0.gate ? { gate: e0.gate, full: (e.full || e0.full) + more, at: toEpoch(e0.t, s.tz_min) } : {}) }; }).slice(-4);
+    const notes = Object.values(byTag).map(list => { const e0 = list[list.length - 1], e = e0[s.lang] || e0; const more = list.length > 1 ? `  (+${list.length - 1})` : ''; return { title: e.title, body: e.body + more, tag: e0.tag, ...(e0.gate ? { gate: e0.gate, full: (e.full || e0.full) + more, at: toEpoch(e0.t, s.tz_min), altTag: e0.altTag } : {}) }; }).slice(-4);
     const target = { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } };
     for (const n of notes) {
       try { await webpush.sendNotification(target, JSON.stringify(n), { TTL: 3600 }); sent++; }
