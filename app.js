@@ -1409,10 +1409,16 @@ const FIGHT_DECLINE = [['kino', 'please'], ['aku tau kamu liat hp'], ['kasih aku
 // abis itu muter terus, sampe diangkat. makin kacau
 const FIGHT_DECLINE_LOOP = [['delapan tahun kino', 'jangan selesai kayak gini'], ['yuna itu', 'nggak.', 'aku salah. udah itu aja'], ['aku ga bisa mikir apa2', 'dari tadi cuma liatin hp'], ['bilang aku brengsek juga gpp', 'asal kamu ngomong'], ['kino'], ['aku jelasin semuanya. ga ada yg aku tutupin lagi'], ['kamu udah makan?', 'maaf. aku ga tau mau ngomong apa lagi'], ['satu kali aja'], ['kamu mau blok aku juga aku ngerti', 'tapi jangan dulu'], ['kino sayang', 'maaf', 'maaf maaf maaf'], ['ini aku. kris', 'masih aku'], ['aku ga tidur semalem', 'iya aku tau itu bukan alesan'], ['tolong'], ['kamu pernah bilang', '"kalo berantem jangan tidur sebelum baikan"', 'aku masih pegang itu'], ['aku nangis kayak orang bego'], ['...'], ['aku mau ke tempat kamu', 'nggak. nanti kamu makin marah', 'angkat aja please'], ['kino please please'], ['aku ga minta dimaafin sekarang', 'aku cuma mau denger suara kamu'], ['jangan pergi']];
 let fightDeclines = 0;
+// diangkat: chat mohon2 yg masih antri (dijadwalin beberapa detik ke depan) dibatalin, biar Kris ga spam pas lagi ngobrol
+function dropQueuedPleas() {
+  const t0 = now().getTime(), c = CHATS.find(x => x.id === 'kris'), late = (who, t) => who !== 'me' && t > t0;
+  S.extra = S.extra.filter(x => !(x.chat === 'kris' && late(x.who, x.t))); store.set('extra', S.extra);
+  for (let i = c.items.length - 1; i >= 0; i--) if (c.items[i].x && late(c.items[i].who, c.items[i].ts.getTime())) c.items.splice(i, 1);
+}
 function fightCall(autoMiss = 0) {
   if (fightRinging || S.fightDone) return;
   fightRinging = true;
-  callScreen({ who: 'Kris', dir: 'in', lines: FIGHT_CALL, onAnswer: () => { if (!S.fightAns) { S.fightAns = now().getTime(); store.set('fightAns', S.fightAns); } },
+  callScreen({ who: 'Kris', dir: 'in', lines: FIGHT_CALL, onAnswer: () => { if (!S.fightAns) { S.fightAns = now().getTime(); store.set('fightAns', S.fightAns); } dropQueuedPleas(); },
     onEnd: () => { fightRinging = false; S.fightDone = true; store.set('fightDone', true); refreshUnder(); },
     onDecline: () => { // ditolak: Kris ga nyerah, missed call numpuk + chat, nelpon lagi bentar kemudian sampe diangkat (atau prod up 17.25)
       const queued = S.extra.filter(x => x.chat === 'kris').reduce((m, x) => Math.max(m, x.t), 0) - now().getTime(); // chat batch sebelumnya belum abis masuk: antri di belakangnya, jangan nyampur
