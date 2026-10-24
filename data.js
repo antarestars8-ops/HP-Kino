@@ -140,6 +140,8 @@ const CHATS = [
       ['them', '', '14.33', { call: 'Panggilan tak terjawab', afterFight: true }],
       ['them', 'kino please', '14.34', { afterFight: true }],
       ['them', 'aku bisa jelasin semuanya', '14.36', { afterFight: true }],
+      ['me', 'aku bilang jangan telfon.', '14.37', { afterFight: true }],
+      ['me', 'aku kerja.', '14.37', { afterFight: true }],
       ['them', 'yuna itu cuma...', '14.40', { afterFight: true }],
       ['them', 'nggak. aku ga mau bikin alasan', '14.41', { afterFight: true }],
       ['them', 'aku salah. aku tau', '14.41', { afterFight: true }],

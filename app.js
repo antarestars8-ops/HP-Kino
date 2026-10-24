@@ -1014,7 +1014,9 @@ const RETRACT_NOW = new Set(); // pesan ditarik yg lagi nongol sebentar di chat 
 const retractGone = (m) => { const t = m.ts.getTime(); if (RETRACT_NOW.has(t)) return false; if (S.glimpsed && S.glimpsed[t]) return true;
   const c = CHATS.find(x => x.items.includes(m)); return !!c && c.items.some(it => it.who === 'me' && it.ts > m.ts && visible(it.ts)); };
 S.ghostUntil = 0;
-const ghostOn = () => !S.fightDone && Date.now() < S.ghostUntil && now() >= new Date(GHOST_TYPING[0]) && now() < new Date(GHOST_TYPING[1]);
+// Kino udah nanya "ini kamu?" (bisa dikirim duluan) tapi balesan Kris baru jadwal 14.06:20: Kris ngetik, berhenti, ngetik lagi
+const krisAsked = () => now() < new Date('2026-10-24T14:06:20') && msgsOnly(CHATS.find(c => c.id === 'kris')).slice(-1).some(m => m.who === 'me' && m.text === 'ini kamu?');
+const ghostOn = () => !S.fightDone && Date.now() < S.ghostUntil && ((now() >= new Date(GHOST_TYPING[0]) && now() < new Date(GHOST_TYPING[1])) || krisAsked());
 // obrolan masih nyambung tapi nanti (bukan sekarang): jangan bilang "ga mau ngetik", kasih tau ini belum kelar
 const laterHint = (c) => { if (c.id === 'kris') return null; // chat Kris jangan ngasih kode bakal dibales apa ngga
   const nx = c.items.find(it => !visible(it.ts) && !hiddenByGate(c, it)), last = lastMsg(c); if (!nx || !last || nx.ts - now() > 3 * 3600e3) return null;
@@ -2126,7 +2128,10 @@ setInterval(() => {
   });
   const t = topL(); if (t && t.dataset.chat) { const c = CHATS.find(x => x.id === t.dataset.chat); if (t.dataset.sig !== chatSig(c)) renderChat(t, c); }
   if (changed) { refreshHome(); if (!S.unlocked && topL() && topL().classList.contains('lock')) morph(topL().querySelector('.lk-notes'), lockNotifs()); }
-  { const t = topL(); if (t && t.dataset.chat === 'kris' && Date.now() > S.ghostUntil + 9000 && Math.random() < .12) S.ghostUntil = Date.now() + 3500 + Math.random() * 2500; }
+  { const t = topL(); if (t && t.dataset.chat === 'kris') {
+    const asked = krisAsked(); // panik nyari kata2: kedipnya lebih sering
+    if (asked ? Date.now() > S.ghostUntil + 1500 + Math.random() * 2000 : Date.now() > S.ghostUntil + 9000 && Math.random() < .12) S.ghostUntil = Date.now() + (asked ? 2000 + Math.random() * 3000 : 3500 + Math.random() * 2500);
+  } }
   { const mv = mailVis(); if (mv.length > lastMailN) { const m = mv[0]; lastMailN = mv.length; refreshHome(); layersEl.querySelectorAll('.win.mail').forEach(w => w._mailRefresh && w._mailRefresh()); if (S.unlocked) toast({ icon: ICONS.mail, title: mailFrom(m), body: m.subj, onClick: () => { openApp('mail'); } }); } }
   maybeFight();
   if (S.unlocked && (!S._mkc || Date.now() - S._mkc > 60000)) { S._mkc = Date.now(); logMissedKrisCalls(); }
