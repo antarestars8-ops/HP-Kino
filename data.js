@@ -729,7 +729,7 @@ dan yuna.
 
 yang keliatan pegangan tangan itu yuna lagi iseng baca garis tangan aku. katanya garis jodoh aku panjang. aku ketawa. buat aku dia temen. belakangan aku baru sadar dia nganggepnya beda, dan aku yang bego ga nyadar. ga ada apa-apa yang lebih dari itu. tapi itu ga bikin aku jadi ga salah. aku ngebiarin tangan aku dipegang orang lain, sambil bilang ke kamu aku lembur sendirian. kamu bener, aku bikin kamu keliatan kayak orang bego. padahal kamu ga bego, kino. yang bego aku.
 
-malem tanggal 22 aku ga nginep kantor. abis makan aku jalan sendirian sampe itaewon, terus tidur di jjimjilbang. aku cuma pengen nata pikiran, tapi aku ga berani bilang itu ke kamu, jadi aku bohong lagi.
+malem tanggal 22 aku ga nginep kantor. abis makan aku jalan sendirian sampe itaewon, terus tidur di jjimjilbang. aku cuma pengen nata pikiran, tapi aku ga berani bilang itu ke kamu, jadi aku bohong lagi. tanggal 23 aku ke seongsu lagi, sendirian. duduk di kafe sampe malem, nonton pake akun kamu. lupa kalo kamu bisa liat. atau mungkin aku ga lupa.
 
 pas aku sadar fotonya masuk ke album kita, aku hapus. terus aku ga berani buka chat kamu. dua hari. aku tau kamu nunggu, dan aku tetep ga buka. itu yang paling jahat.
 
