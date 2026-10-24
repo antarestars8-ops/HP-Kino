@@ -729,7 +729,7 @@ dan yuna.
 
 yang keliatan pegangan tangan itu yuna lagi iseng baca garis tangan aku. katanya garis jodoh aku panjang. aku ketawa. buat aku dia temen. belakangan aku baru sadar dia nganggepnya beda, dan aku yang bego ga nyadar. ga ada apa-apa yang lebih dari itu. tapi itu ga bikin aku jadi ga salah. aku ngebiarin tangan aku dipegang orang lain, sambil bilang ke kamu aku lembur sendirian. kamu bener, aku bikin kamu keliatan kayak orang bego. padahal kamu ga bego, kino. yang bego aku.
 
-malem tanggal 22 aku ga nginep kantor. abis makan aku jalan sendirian sampe itaewon, terus tidur di jjimjilbang. aku cuma pengen nata pikiran, tapi aku ga berani bilang itu ke kamu, jadi aku bohong lagi. tanggal 23 aku ke seongsu lagi, sendirian. duduk di kafe sampe malem, nonton pake akun kamu. lupa kalo kamu bisa liat. atau mungkin aku ga lupa.
+malem tanggal 22 aku ga nginep kantor. aku jalan sendirian sampe itaewon, cuma pengen nata pikiran. terus ga sengaja ketemu yuna. dia ngajak makan, aku ikut. dia minta difotoin, foto itu yang ke-sync ke album kita. abis itu aku tidur di jjimjilbang. aku ga berani bilang semua itu ke kamu, jadi aku bohong lagi. tanggal 23 aku ke seongsu lagi, sendirian. duduk di kafe sampe malem, nonton pake akun kamu. lupa kalo kamu bisa liat. atau mungkin aku ga lupa.
 
 pas aku sadar fotonya masuk ke album kita, aku hapus. terus aku ga berani buka chat kamu. dua hari. aku tau kamu nunggu, dan aku tetep ga buka. itu yang paling jahat.
 
@@ -1798,7 +1798,7 @@ const X_POSTS = [
   ['s1', 'sadewa', '2026-10-21T22:40', 'film tadi biasa aja. gue ga nangis. mata gue alergi popcorn.', '', [['ilham', 'pfft'], ['sadewa', 'diem']], 31],
   ['r3', 'kris', '2026-10-21T22:55', 'film bagus.', '', [], 12],
   ['u1', 'surya', '2026-10-22T16:00', 'brownies batch 2 success!! no raisins, for someone special 🍫🫶', 'img/ig-surya.jpg', [['kino', 'bagus'], ['surya', 'BANG KINO BALES 🥹🥹']], 410],
-  ['y2', 'yuna', '2026-10-22T23:00', 'malem ini seru ✨ seongsu at night hits different', '', [], 74],
+  ['y2', 'yuna', '2026-10-22T23:00', 'ga direncanain tapi malem ini seru bgt ✨ itaewon at night hits different', '', [], 74],
   ['i1', 'ilham', '2026-10-23T10:00', 'pertama kali pegang incident sendiri. bang kino cuma ngeliatin. aman. (ga aman)', '', [['kino', 'aman.'], ['ilham', 'iya iya bang']], 15],
   ['b1', 'bagas', '2026-10-23T22:50', 'jalan malem. kepala jadi enteng. coba deh.', '', [], 9],
   ['y3', 'yuna', '2026-10-24T13:30', 'seongsu lagi 🤍 favorit', '', [], 66],
