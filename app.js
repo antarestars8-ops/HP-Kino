@@ -1405,9 +1405,9 @@ function maybeFight() {
   fightCall(); // HP kekunci juga tetep bunyi, kayak telfon beneran
 }
 // telpon berantem (dipake juga sama telpon spam Kris abis foto dikirim: kalau diangkat, ya ini)
-const FIGHT_DECLINE = [['kino angkat please'], ['aku tau kamu liat hp', 'kino'], ['5 menit aja. please'], ['kino. jangan diem aja', 'angkat'], ['kino', 'kino please'], ['please', 'aku ga akan berhenti nelfon']];
-// abis itu muter terus, sampe diangkat
-const FIGHT_DECLINE_LOOP = [['kino'], ['angkat please'], ['aku ga akan berhenti'], ['kino please', 'sekali aja'], ['aku tau aku salah', 'tapi angkat dulu'], ['please'], ['kino angkat'], ['aku ga mau kita selesai lewat chat'], ['kino', 'kino', 'please'], ['aku tunggu'], ['jangan gini kino'], ['angkat. aku mohon']];
+const FIGHT_DECLINE = [['kino', 'please'], ['aku tau kamu liat hp'], ['kasih aku 5 menit. abis itu terserah kamu'], ['aku ga akan bohong lagi', 'sumpah'], ['kamu boleh marah. boleh teriak', 'tapi ngomong sama aku'], ['jangan diem kino', 'diem kamu yg paling aku takutin'], ['aku ga akan berhenti nelfon']];
+// abis itu muter terus, sampe diangkat. makin kacau
+const FIGHT_DECLINE_LOOP = [['delapan tahun kino', 'jangan selesai kayak gini'], ['yuna itu', 'nggak.', 'aku salah. udah itu aja'], ['aku ga bisa mikir apa2', 'dari tadi cuma liatin hp'], ['bilang aku brengsek juga gpp', 'asal kamu ngomong'], ['kino'], ['aku jelasin semuanya. ga ada yg aku tutupin lagi'], ['kamu udah makan?', 'maaf. aku ga tau mau ngomong apa lagi'], ['satu kali aja'], ['kamu mau blok aku juga aku ngerti', 'tapi jangan dulu'], ['kino sayang', 'maaf', 'maaf maaf maaf'], ['ini aku. kris', 'masih aku'], ['aku ga tidur semalem', 'iya aku tau itu bukan alesan'], ['tolong'], ['kamu pernah bilang', '"kalo berantem jangan tidur sebelum baikan"', 'aku masih pegang itu'], ['aku nangis kayak orang bego'], ['...'], ['aku mau ke tempat kamu', 'nggak. nanti kamu makin marah', 'angkat aja please'], ['kino please please'], ['aku ga minta dimaafin sekarang', 'aku cuma mau denger suara kamu'], ['jangan pergi']];
 let fightDeclines = 0;
 function fightCall(autoMiss = 0) {
   if (fightRinging || S.fightDone) return;
@@ -1415,7 +1415,8 @@ function fightCall(autoMiss = 0) {
   callScreen({ who: 'Kris', dir: 'in', lines: FIGHT_CALL, onAnswer: () => { if (!S.fightAns) { S.fightAns = now().getTime(); store.set('fightAns', S.fightAns); } },
     onEnd: () => { fightRinging = false; S.fightDone = true; store.set('fightDone', true); refreshUnder(); },
     onDecline: () => { // ditolak: Kris ga nyerah, missed call numpuk + chat, nelpon lagi bentar kemudian sampe diangkat (atau prod up 17.25)
-      addMsg('kris', [['them', '', { call: 'Panggilan tak terjawab', quiet: true }], ...(FIGHT_DECLINE[fightDeclines] || FIGHT_DECLINE_LOOP[(fightDeclines - FIGHT_DECLINE.length) % FIGHT_DECLINE_LOOP.length]).map(x => ['them', x])], 300); fightDeclines++;
+      const queued = S.extra.filter(x => x.chat === 'kris').reduce((m, x) => Math.max(m, x.t), 0) - now().getTime(); // chat batch sebelumnya belum abis masuk: antri di belakangnya, jangan nyampur
+      addMsg('kris', [['them', '', { call: 'Panggilan tak terjawab', quiet: true }], ...(FIGHT_DECLINE[fightDeclines] || FIGHT_DECLINE_LOOP[(fightDeclines - FIGHT_DECLINE.length) % FIGHT_DECLINE_LOOP.length]).map(x => ['them', x])], Math.max(300, queued + 1500)); fightDeclines++;
       fightGap = Date.now() + 3500; setTimeout(() => { fightRinging = false; if (!S.fightDone && now() < new Date('2026-10-24T17:25') && !store.get('ending', null) && !document.querySelector('.call')) fightCall(); }, 3000);
     } });
   autoDecline(); // dibiarin bunyi 25 detik = tak terjawab: Kris chat lagi terus nelpon lagi
