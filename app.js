@@ -323,7 +323,7 @@ S.fightEnd = store.get('fightEnd', 0);
 const FIGHT_ALT = X_POSTS.find(x => x[1] === 'alt' && x[2] === '2026-10-24T14:07'), FIGHT_ALT_TXT = FIGHT_ALT && FIGHT_ALT[3];
 function fixFightAlt() {
   if (!FIGHT_ALT) return;
-  if (S.fightAns) { const t = new Date(S.fightAns - 20000); FIGHT_ALT[2] = `${dayKey(t)}T${hm(t).replace('.', ':')}`; FIGHT_ALT[7] = {};
+  if (S.fightAns) { const t = new Date(S.fightAns - 20000); FIGHT_ALT[2] = `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}T${pad(t.getHours())}:${pad(t.getMinutes())}`; // jangan pake dayKey/hm: dipanggil pas startup, dayKey belum ada FIGHT_ALT[7] = {};
     FIGHT_ALT[3] = S.fightAns - new Date(FIGHT_AT).getTime() > 3 * 60000 ? FIGHT_ALT_TXT.replace(/^baru juga dikirim,? langsung/, 'dari tadi') : FIGHT_ALT_TXT; }
   else if (!S.fightDone) FIGHT_ALT[7] = { fight: true };
 }
