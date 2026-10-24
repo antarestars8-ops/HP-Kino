@@ -1175,10 +1175,11 @@ function playDraft(el, c) {
   const t = now(), d = DRAFTS.find(x => t >= new Date(x[0]) && t < new Date(x[1]) && (!x[3] || S.fightDone) && (!x[4] || endKey() === x[4]));
   const seen = store.get('draftsSeen', []); if (!d || seen.includes(d[0])) return;
   seen.push(d[0]); store.set('draftsSeen', seen); clue('draft');
+  const txt = tr(d[2]); // kolom ketik ga ikut diterjemahin otomatis: terjemahin di sini
   const inp = el.querySelector('.kinput .f'); el.dataset.typing = '1';
   inp.classList.add('typing-now'); inp.value = '';
   // diketik pelan2, didiemin, baru dihapus (biar kebaca)
-  let i = 0; const typ = () => { if (!el.isConnected) return; if (i < d[2].length) { inp.value = d[2].slice(0, ++i); keyClick(false); return setTimeout(typ, 70 + Math.random() * 60); } setTimeout(del, 3200); };
+  let i = 0; const typ = () => { if (!el.isConnected) return; if (i < txt.length) { inp.value = txt.slice(0, ++i); keyClick(false); return setTimeout(typ, 70 + Math.random() * 60); } setTimeout(del, 3200); };
   let held = false; const del = () => {
     if (!el.isConnected) return;
     if (d[5] && !held && inp.value === d[5]) { held = true; return setTimeout(del, 2600); } // sisa "kamu" doang, didiemin, baru ikut dihapus
