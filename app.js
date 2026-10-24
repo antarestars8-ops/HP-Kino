@@ -168,15 +168,15 @@ function brokenFollowups() {
   if (added.length) store.set('extra', S.extra); return added.filter(x => !x.img);
 }
 brokenFollowups();
-function pushExtra(chat, who, text, t, typed) { const c = CHATS.find(x => x.id === chat); c.items.push({ who, text, o: {}, ts: new Date(t), typed }); }
-S.extra.forEach(e => e.call ? CHATS.find(x => x.id === e.chat).items.push({ who: e.who, text: '', o: { call: e.call, quiet: e.quiet }, ts: new Date(e.t) }) : e.img ? CHATS.find(x => x.id === e.chat).items.push({ who: e.who, text: '', o: { img: e.img }, ts: new Date(e.t) }) : pushExtra(e.chat, e.who, e.text, e.t, e.who !== 'me'));
+function pushExtra(chat, who, text, t, typed) { const c = CHATS.find(x => x.id === chat); c.items.push({ who, text, o: {}, ts: new Date(t), typed, x: 1 }); } // x = pesan tambahan (bukan naskah): ga ikut ketahan FIGHT_LOCK
+S.extra.forEach(e => e.call ? CHATS.find(x => x.id === e.chat).items.push({ who: e.who, text: '', o: { call: e.call, quiet: e.quiet }, ts: new Date(e.t), x: 1 }) : e.img ? CHATS.find(x => x.id === e.chat).items.push({ who: e.who, text: '', o: { img: e.img }, ts: new Date(e.t), x: 1 }) : pushExtra(e.chat, e.who, e.text, e.t, e.who !== 'me'));
 CHATS.forEach(sortItems); // pesan tambahan (random chat, ketikan) diurutin sesuai jam, bukan ditempel di bawah
 // tambah pesan (who: 'me' / 'them' / nama) mulai delay ms dari sekarang
 function addMsg(chat, list, delay = 0) {
   let t = now().getTime() + delay;
   list.forEach(([who, text, o]) => { // o.img = kirim foto
-    if (o && o.img) { CHATS.find(x => x.id === chat).items.push({ who, text: '', o: { img: o.img }, ts: new Date(t) }); S.extra.push({ chat, who, text: '', t, img: o.img }); t += 2500; return; }
-    if (o && o.call) { CHATS.find(x => x.id === chat).items.push({ who, text: '', o: { call: o.call, quiet: o.quiet }, ts: new Date(t) }); S.extra.push({ chat, who, text: '', t, call: o.call, quiet: o.quiet }); t += 1500; return; } // o.call = log telfon (mis. Kino nelpon dulu, ga diangkat)
+    if (o && o.img) { CHATS.find(x => x.id === chat).items.push({ who, text: '', o: { img: o.img }, ts: new Date(t), x: 1 }); S.extra.push({ chat, who, text: '', t, img: o.img }); t += 2500; return; }
+    if (o && o.call) { CHATS.find(x => x.id === chat).items.push({ who, text: '', o: { call: o.call, quiet: o.quiet }, ts: new Date(t), x: 1 }); S.extra.push({ chat, who, text: '', t, call: o.call, quiet: o.quiet }); t += 1500; return; } // o.call = log telfon (mis. Kino nelpon dulu, ga diangkat)
     pushExtra(chat, who, text, t, who !== 'me'); S.extra.push({ chat, who, text, t }); t += who === 'me' ? 800 : 1600 + text.length * 50; });
   store.set('extra', S.extra); sortItems(CHATS.find(x => x.id === chat));
 }
@@ -243,7 +243,7 @@ function typeOut(el, text, done) {
 const epiIs = (e) => !!EPI && (e === 'all' || EPI.key === e);
 const endKey = () => (EPI && EPI.key) || store.get('ending', null);
 { const e = store.get('ending', null), seen = store.get('endingsSeen', []); if (e && !seen.includes(e)) { seen.push(e); store.set('endingsSeen', seen); } } // pemain lama: ending yg udah didapet ikut kecatat
-function hiddenByGate(c, it) { if (afterFightAns(c, it)) return true; return (it.o && it.o.noEnd && endKey() === it.o.noEnd) || (it.o && it.o.end && endKey() !== it.o.end) || (it.o && it.o.epi && (!EPI || !epiIs(it.o.epi))) || (!S.fightDone && ((it.o && it.o.afterFight) || (c.id === 'kris' && it.ts > FIGHT_LOCK))); }
+function hiddenByGate(c, it) { if (afterFightAns(c, it)) return true; return (it.o && it.o.noEnd && endKey() === it.o.noEnd) || (it.o && it.o.end && endKey() !== it.o.end) || (it.o && it.o.epi && (!EPI || !epiIs(it.o.epi))) || (!S.fightDone && ((it.o && it.o.afterFight) || (c.id === 'kris' && it.ts > FIGHT_LOCK && !it.x))); }
 function nextScriptedMe(c) {
   const last = lastMsg(c); if (!last || last.who === 'me') return null;
   const nx = c.items.find(it => !visible(it.ts) && !it.typed && !hiddenByGate(c, it));
@@ -291,7 +291,7 @@ const FIGHT_LOCK = new Date('2026-10-24T14:08');
 // telpon berantem udah diangkat duluan: spam chat Kris sesudahnya (sampe jam telpon aslinya) ga dimunculin
 S.fightAns = store.get('fightAns', 0);
 const afterFightAns = (c, it) => S.fightAns && c.id === 'kris' && it.ts.getTime() > S.fightAns && it.ts.getTime() <= new Date(FIGHT_AT).getTime();
-const visItems = (c) => { const out = []; let lastDay = null; for (const it of c.items) { if (!visible(it.ts) || afterFightAns(c, it) || (it.o && it.o.noEnd && endKey() === it.o.noEnd) || (it.o && it.o.end && endKey() !== it.o.end) || (it.o && it.o.epi && (!EPI || !epiIs(it.o.epi))) || (!S.fightDone && ((it.o && it.o.afterFight) || (c.id === 'kris' && it.ts > FIGHT_LOCK)))) continue; const d = dayStart(it.ts).getTime(); if (d !== lastDay) { out.push({ date: new Date(d) }); lastDay = d; } out.push(it); } return out; };
+const visItems = (c) => { const out = []; let lastDay = null; for (const it of c.items) { if (!visible(it.ts) || afterFightAns(c, it) || (it.o && it.o.noEnd && endKey() === it.o.noEnd) || (it.o && it.o.end && endKey() !== it.o.end) || (it.o && it.o.epi && (!EPI || !epiIs(it.o.epi))) || (!S.fightDone && ((it.o && it.o.afterFight) || (c.id === 'kris' && it.ts > FIGHT_LOCK && !it.x)))) continue; const d = dayStart(it.ts).getTime(); if (d !== lastDay) { out.push({ date: new Date(d) }); lastDay = d; } out.push(it); } return out; };
 const msgsOnly = (c) => visItems(c).filter(i => !i.date);
 function unread(c) {
   const ms = msgsOnly(c); let lastMe = -1; ms.forEach((m, i) => { if (m.who === 'me') lastMe = i; });
@@ -1406,6 +1406,8 @@ function maybeFight() {
 }
 // telpon berantem (dipake juga sama telpon spam Kris abis foto dikirim: kalau diangkat, ya ini)
 const FIGHT_DECLINE = [['kino angkat please'], ['aku tau kamu liat hp', 'kino'], ['5 menit aja. please'], ['kino. jangan diem aja', 'angkat'], ['kino', 'kino please'], ['please', 'aku ga akan berhenti nelfon']];
+// abis itu muter terus, sampe diangkat
+const FIGHT_DECLINE_LOOP = [['kino'], ['angkat please'], ['aku ga akan berhenti'], ['kino please', 'sekali aja'], ['aku tau aku salah', 'tapi angkat dulu'], ['please'], ['kino angkat'], ['aku ga mau kita selesai lewat chat'], ['kino', 'kino', 'please'], ['aku tunggu'], ['jangan gini kino'], ['angkat. aku mohon']];
 let fightDeclines = 0;
 function fightCall(autoMiss = 0) {
   if (fightRinging || S.fightDone) return;
@@ -1413,7 +1415,7 @@ function fightCall(autoMiss = 0) {
   callScreen({ who: 'Kris', dir: 'in', lines: FIGHT_CALL, onAnswer: () => { if (!S.fightAns) { S.fightAns = now().getTime(); store.set('fightAns', S.fightAns); } },
     onEnd: () => { fightRinging = false; S.fightDone = true; store.set('fightDone', true); refreshUnder(); },
     onDecline: () => { // ditolak: Kris ga nyerah, missed call numpuk + chat, nelpon lagi bentar kemudian sampe diangkat (atau prod up 17.25)
-      addMsg('kris', [['them', '', { call: 'Panggilan tak terjawab', quiet: true }], ...FIGHT_DECLINE[fightDeclines < FIGHT_DECLINE.length ? fightDeclines : 4 + (fightDeclines % 2)].map(x => ['them', x])], 300); fightDeclines++;
+      addMsg('kris', [['them', '', { call: 'Panggilan tak terjawab', quiet: true }], ...(FIGHT_DECLINE[fightDeclines] || FIGHT_DECLINE_LOOP[(fightDeclines - FIGHT_DECLINE.length) % FIGHT_DECLINE_LOOP.length]).map(x => ['them', x])], 300); fightDeclines++;
       fightGap = Date.now() + 3500; setTimeout(() => { fightRinging = false; if (!S.fightDone && now() < new Date('2026-10-24T17:25') && !store.get('ending', null) && !document.querySelector('.call')) fightCall(); }, 3000);
     } });
   autoDecline(); // dibiarin bunyi 25 detik = tak terjawab: Kris chat lagi terus nelpon lagi
