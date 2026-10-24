@@ -1,0 +1,11 @@
+import json, os
+T = {
+2335: ["still warmest with Kris", "그래도 크리스한테 제일 다정함"],
+2336: ["His body was still weak, his chest still a little sore. The plaster from this afternoon's injection was still stuck to his arm. Dori lifted her head from the jacket at the foot of the bed, looked at him for a moment, then went back to sleep. Didn't care.", "몸은 아직 축 처졌고, 가슴은 아직 조금 쓰렸다. 오후에 맞은 주사 자국의 반창고가 팔에 그대로 붙어 있었다. 침대 끝 재킷 위에서 도리가 고개를 들어 잠깐 그를 보더니, 다시 잠들었다. 관심 없다는 듯."],
+2338: ["Kris always says he fell first. Eight years ago, at a little café near campus, he was the one who asked, his voice shaking a little. \"Would you— uh, can you— can i be your boyfriend?\" Three rewrites in one breath. Kino answered \"whatever\". Kris counted it as a win.", "크리스는 늘 자기가 먼저 반했다고 말한다. 8년 전, 학교 앞 작은 카페에서, 먼저 물어본 것도 그였다. 살짝 떨리는 목소리로. \"너 나랑— 어, 혹시 너— 내가 네 남자친구 해도 돼?\" 한 호흡에 세 번이나 말을 바꿨다. 키노는 \"맘대로 해\"라고 대답했다. 크리스는 그걸 승리로 쳤다."],
+2341: ["\"Sit down for a bit. Keep standing like that and you'll end up sick too.\"", "\"좀 앉으세요. 계속 서 있다간 그쪽도 쓰러지겠어요.\""],
+2343: ["Kris always says he fell first. Ten years ago, at a little café near campus, he was the one who asked, his voice shaking a little. \"Would you— uh, can you— can i be your boyfriend?\" Three rewrites in one breath. Kino answered \"whatever\". Kris counted it as a win.", "크리스는 늘 자기가 먼저 반했다고 말한다. 10년 전, 학교 앞 작은 카페에서, 먼저 물어본 것도 그였다. 살짝 떨리는 목소리로. \"너 나랑— 어, 혹시 너— 내가 네 남자친구 해도 돼?\" 한 호흡에 세 번이나 말을 바꿨다. 키노는 \"맘대로 해\"라고 대답했다. 크리스는 그걸 승리로 쳤다."],
+}
+out = {str(k): v for k, v in T.items()}
+json.dump(out, open(os.path.join(os.path.dirname(__file__), os.path.basename(__file__).replace('.py', '.json')), 'w'), ensure_ascii=False)
+print(len(out))
