@@ -58,6 +58,15 @@ const now = () => !EPI && !NOW_Q && tnow() + OFFSET > ULTAH_END ? new Date(ULTAH
   } catch (e) {}
 })();
 const BDAY = new Date('2026-10-25T00:00');
+// kode hadiah (?kado=...): ga usah nunggu ke epilog. jam HP dimajuin ke 25 Okt 22.00 (HP seminggu kemudian kebuka).
+// cuma berlaku mulai 25 Okt jam beneran, biar cerita real-time 20–24 ga bisa dilewatin. ganti/tambah kodenya di sini
+const KADO_CODES = ['kadokino'];
+try { const kq = new URLSearchParams(location.search).get('kado'); if (kq) {
+  const ok = KADO_CODES.includes(kq.toLowerCase()) && tnow() >= BDAY.getTime(), to = new Date('2026-10-25T22:00').getTime();
+  if (ok && now().getTime() < to) { localStorage.setItem('hpkino:replayOffset', String(to - tnow())); localStorage.setItem('hpkino:resume', 'true'); localStorage.setItem('hpkino:kadoToast', 'true'); }
+  else localStorage.setItem('hpkino:kadoToast', ok ? '"udah"' : (KADO_CODES.includes(kq.toLowerCase()) ? '"belum"' : '"salah"'));
+  window.__kadoGo = true; location.replace(location.pathname);
+} } catch (e) {}
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 if (UI[L]) { HARI.splice(0, 7, ...UI[L].hari); BULAN.splice(0, 12, ...UI[L].bulan); }
@@ -2352,6 +2361,10 @@ if (window.visualViewport) visualViewport.addEventListener('resize', fit);
 addEventListener('resize', fit); fit();
 // buat ngecek ending: ?lihat=maafin (ending) / ?lihat=maafin&epilog (narasi epilog → tombol HP seminggu kemudian). pake tab private biar progres asli ga ketimpa
 { const lk = DEV && new URLSearchParams(location.search).get('lihat'); if (lk && ENDINGS[lk] && !EPI) { S.unlocked = true; S.fightDone = true; store.set('fightDone', true); home(); setTimeout(() => ending(lk, new URLSearchParams(location.search).has('epilog')), 300); } else if (EPI) epiEnter(); else if (store.get('resume', false)) { try { localStorage.removeItem('hpkino:resume'); } catch (e) {} S.unlocked = true; home(); } else if (store.get('backToCard', null) && ENDINGS[store.get('backToCard', null)]) { const k = store.get('backToCard', null); try { localStorage.removeItem('hpkino:backToCard'); } catch (e) {} S.unlocked = true; home(); setTimeout(() => ending(k, false, true), 200); } else if (store.get('pickAgain', false)) { try { localStorage.removeItem('hpkino:pickAgain'); } catch (e) {} S.unlocked = true; home(); setTimeout(pickAgain, 300); } else intro(); }
+
+// abis pake kode hadiah: kasih tau
+{ const k = !window.__kadoGo && store.get('kadoToast', null); if (k) { try { localStorage.removeItem('hpkino:kadoToast'); } catch (e) {} setTimeout(() => toast({ icon: ICONS.notes, title: '🎁 hadiah dari antarestars', ms: 6000,
+  body: k === true ? 'jam di HP Kino dimajuin ke 25 Okt 22.00. HP seminggu kemudian udah kebuka' : k === 'udah' ? 'udah lewat jam 10 malem kok, langsung aja ke epilog' : k === 'belum' ? 'kodenya baru bisa dipake mulai 25 Oktober' : 'kodenya ga ada 🥲' }), 1500); } }
 
 // ---------- afk ≥ 1 jam → muat ulang (biar dapet cerita terbaru + versi terbaru) ----------
 {
