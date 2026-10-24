@@ -5450,6 +5450,9 @@ X_KRIS_LIKES.push(['y0', '2026-10-16T18:52']);
     ["waktu","lines",39,"Untuk pertama kalinya, ia memahami sesuatu yang seharusnya ia pahami jauh lebih awal: kalau ia mengirim pesan sekarang, itu untuk dirinya sendiri. Supaya ia merasa lebih baik. Bukan untuk Kino.","Untuk pertama kalinya, ia memahami sesuatu yang seharusnya ia pahami jauh lebih awal, kalau ia mengirim pesan sekarang, itu untuk dirinya sendiri. Supaya ia merasa lebih baik. Bukan untuk Kino."]];
   ED.forEach(([k, f, i, from, to]) => { const L = ENDINGS[k][f]; if (L[i] !== from) throw new Error("endings.md " + k + " " + f + " " + i); L[i] = to; });
 }
+// maafin: Kino bukan marah karena Kris jalan sama orang lain, tapi karena dia ga tau apa-apa (disisipin abis ED biar nomor paragraf di atas ga geser)
+{ const L = ENDINGS.maafin.lines, i = L.findIndex(t => t.startsWith('"Capek, bilang capek.'));
+  if (i >= 0) L.splice(i + 1, 0, '"Kamu mau jalan sama yang lain pun nggak apa-apa. Makan, nonton, terserah. Asal bilang dulu." Kino menggeleng pelan. "Kamu pikir aku marah karena itu? Nggak. Aku marah karena tiba-tiba ditanya, \'ikut nonton nggak?\' \'ikut ramen nggak?\' Tapi aku nggak tahu apa-apa."'); }
 // komen/bales Kino ke postingan Kris: sesuai isi postingannya (bukan "norak wkwk" buat semua)
 const KINO_POST_LINES = {
   'ig:kris.chandra@2026-10-13T21:00': [['selamat.', 'makasih 🥹'], ['tidur sana', 'iya iya, abis ini 😅']],

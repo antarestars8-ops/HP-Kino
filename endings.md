@@ -150,6 +150,8 @@ _Cara edit: jangan hapus tanda [..] di depan paragraf. Ganti teks di belakangnya
 
 [maafin 69] "Capek, bilang capek. Bosen, bilang bosen. Ngerasa nggak disayang..." Napasnya tertahan sebentar. "Bilang. Ke aku. Bukan ke orang lain."
 
+"Kamu mau jalan sama yang lain pun nggak apa-apa. Makan, nonton, terserah. Asal bilang dulu." Kino menggeleng pelan. "Kamu pikir aku marah karena itu? Nggak. Aku marah karena tiba-tiba ditanya, 'ikut nonton nggak?' 'ikut ramen nggak?' Tapi aku nggak tahu apa-apa."
+
 [maafin 70] "Iya."
 
 [maafin 71] "Bosen itu bisa diurus. Kita cari bareng-bareng. Masak yang belum pernah kita masak. Naik kereta ke kota yang belum pernah kita datengin. Jalan ke Sungai Han pagi-pagi, terserah." Ia mengusap matanya dengan punggung tangan, cepat, seperti tidak mau ketahuan. "Bosen ada obatnya, Kris."
