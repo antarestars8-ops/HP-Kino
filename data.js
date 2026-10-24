@@ -1798,7 +1798,7 @@ const X_POSTS = [
   ['s1', 'sadewa', '2026-10-21T22:40', 'film tadi biasa aja. gue ga nangis. mata gue alergi popcorn.', '', [['ilham', 'pfft'], ['sadewa', 'diem']], 31],
   ['r3', 'kris', '2026-10-21T22:55', 'film bagus.', '', [], 12],
   ['u1', 'surya', '2026-10-22T16:00', 'brownies batch 2 success!! no raisins, for someone special 🍫🫶', 'img/ig-surya.jpg', [['kino', 'bagus'], ['surya', 'BANG KINO BALES 🥹🥹']], 410],
-  ['y2', 'yuna', '2026-10-22T23:00', 'ga direncanain tapi malem ini seru bgt ✨ itaewon at night hits different', '', [], 74],
+  ['y2', 'yuna', '2026-10-22T23:00', 'malem ini seru ✨ seongsu at night hits different', '', [], 74],
   ['i1', 'ilham', '2026-10-23T10:00', 'pertama kali pegang incident sendiri. bang kino cuma ngeliatin. aman. (ga aman)', '', [['kino', 'aman.'], ['ilham', 'iya iya bang']], 15],
   ['b1', 'bagas', '2026-10-23T22:50', 'jalan malem. kepala jadi enteng. coba deh.', '', [], 9],
   ['y3', 'yuna', '2026-10-24T13:30', 'seongsu lagi 🤍 favorit', '', [], 66],
@@ -5184,7 +5184,7 @@ LOC_KRIS.forEach(e => { if (e[0] === '2026-10-22T20:20') e[1] = 'itaewon'; });
 {
   const t = 'find my bilang itaewon. "ada urusan" katanya. oh, urusannya di itaewon. kantornya kan di yeouido. gue tutup appnya. gue buka lagi. masih itaewon';
   ALT.forEach(a => { if (a[0] === '2026-10-22T21:00') a[1] = t; });
-  X_POSTS.forEach(p => { if (p[1] === 'alt' && p[2] === '2026-10-22T21:00') p[3] = t; if (p[0] === 'y2') p[3] = 'malem ini seru ✨ itaewon at night hits different'; });
+  X_POSTS.forEach(p => { if (p[1] === 'alt' && p[2] === '2026-10-22T21:00') p[3] = t; if (p[0] === 'y2') p[3] = 'ga direncanain tapi malem ini seru bgt ✨ itaewon at night hits different'; });
 }
 
 // janjian dinner tower B (kamis 22, jam 7, unit surya) — diajak dari tgl 20, kris ngegantung
